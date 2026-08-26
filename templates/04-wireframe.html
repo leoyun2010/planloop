@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-### 화면명 — 와이어프레임</title>
+<style>
+  /* ===== 와이어프레임 공통 스타일 (로파이 그레이스케일 — 수정하지 말고 그대로 사용) ===== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: #e8e8e8; color: #333; padding: 24px; }
+  .wf-meta { max-width: 1000px; margin: 0 auto 16px; font-size: 13px; color: #666;
+             background: #fffbe6; border: 1px solid #e6d996; padding: 10px 14px; border-radius: 4px; }
+  .wf-meta strong { color: #333; }
+  .screen { max-width: 1000px; margin: 0 auto; background: #fff; border: 2px solid #555; min-height: 600px; }
+
+  /* 박스형 요소 */
+  .wf-box { border: 1px dashed #999; background: #fafafa; padding: 16px; margin: 12px; position: relative; }
+  .wf-box.solid { border-style: solid; }
+
+  /* 주석 번호 배지 — 화면정의서의 구성요소 번호 [n]와 일치시킬 것 */
+  .n { display: inline-flex; align-items: center; justify-content: center;
+       width: 20px; height: 20px; border-radius: 50%; background: #d33; color: #fff;
+       font-size: 12px; font-weight: bold; position: absolute; top: -10px; left: -10px; }
+
+  /* 자리표시자 요소 */
+  .wf-img { background: repeating-linear-gradient(45deg, #eee, #eee 8px, #f7f7f7 8px, #f7f7f7 16px);
+            border: 1px solid #bbb; display: flex; align-items: center; justify-content: center;
+            color: #999; font-size: 12px; min-height: 120px; }
+  .wf-btn { display: inline-block; border: 1px solid #666; background: #ddd; padding: 8px 20px;
+            font-size: 14px; cursor: default; border-radius: 3px; }
+  .wf-btn.primary { background: #888; color: #fff; }
+  .wf-input { border: 1px solid #999; background: #fff; padding: 8px 10px; font-size: 14px;
+              width: 100%; color: #aaa; border-radius: 3px; }
+  .wf-text { color: #555; font-size: 14px; line-height: 1.6; }
+  .wf-text.title { font-size: 20px; font-weight: bold; color: #222; }
+  .wf-text.placeholder { background: #eee; color: transparent; border-radius: 2px; user-select: none; }
+  .wf-nav { display: flex; align-items: center; gap: 16px; padding: 12px 16px;
+            border-bottom: 2px solid #555; background: #f0f0f0; }
+  .wf-nav .logo { font-weight: bold; border: 1px solid #999; padding: 4px 10px; background: #fff; }
+  .wf-nav .spacer { flex: 1; }
+  .row { display: flex; gap: 12px; margin: 12px; }
+  .row > * { margin: 0; }
+  .col-main { flex: 2; } .col-side { flex: 1; }
+  .wf-footer { border-top: 2px solid #555; background: #f0f0f0; padding: 16px; text-align: center;
+               color: #999; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<!-- 문서 정보: 화면정의서(.md)와 항상 동기화할 것 -->
+<div class="wf-meta">
+  <strong>SCR-### 화면명</strong> · v0.1 · 상태: 초안 ·
+  관련: REQ-###, POL-### · 정의서: SCR-###-화면명.md
+</div>
+
+<div class="screen">
+
+  <!-- [1] GNB -->
+  <div class="wf-nav">
+    <span class="n" style="position:static">1</span>
+    <span class="logo">LOGO</span>
+    <span>메뉴A</span><span>메뉴B</span>
+    <span class="spacer"></span>
+    <span class="wf-btn">로그인</span>
+  </div>
+
+  <!-- [2] 페이지 제목 -->
+  <div class="wf-box">
+    <span class="n">2</span>
+    <div class="wf-text title">페이지 제목</div>
+  </div>
+
+  <div class="row">
+    <!-- [3] 콘텐츠 영역 -->
+    <div class="wf-box col-main">
+      <span class="n">3</span>
+      <div class="wf-img">이미지/콘텐츠</div>
+      <p class="wf-text" style="margin-top:8px">콘텐츠 설명 텍스트 영역</p>
+    </div>
+    <!-- [4] 사이드 영역 -->
+    <div class="wf-box col-side">
+      <span class="n">4</span>
+      <p class="wf-text">사이드 영역</p>
+    </div>
+  </div>
+
+  <!-- [5] 주요 버튼 -->
+  <div class="wf-box" style="text-align:center; border:none; background:none">
+    <span class="n">5</span>
+    <span class="wf-btn primary">주요 버튼</span>
+  </div>
+
+  <!-- [6] 푸터 -->
+  <div class="wf-footer"><span class="n" style="position:static">6</span> 푸터</div>
+
+</div>
+
+</body>
+</html>
