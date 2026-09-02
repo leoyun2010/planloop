@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-003 동행자 추가 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-003 동행자 추가</strong> · v0.1 · 상태: 초안 · 경로 <code>/apply/2</code> · 사용자(모바일)
+  <div class="tags">관련: REQ-006, REQ-007 · POL-006, POL-042, POL-043(미확정) · 정의서: SCR-003-동행자추가.md · 원본 U3</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>[＋ 사람 추가]로 실제로 추가·수정·삭제됩니다. 총 인원과 금액이 즉시 재계산됩니다.</span>
+  <button onclick="fillDemo()">동행자 2명 채우기</button>
+  <button onclick="fillToLimit()">상한까지 채우기 (POL-043)</button>
+  <button onclick="resetAll()">비우기</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="phone">
+  <div class="scr">
+    <div class="u-stat">9:41 ▮▮▮</div>
+    <div class="u-top">
+      <div class="k"><span class="n">1</span>집회 신청 · 2/4</div>
+      <div class="t">함께 오시는 분</div>
+    </div>
+
+    <div class="u-body">
+      <div class="step"><span class="n">2</span>2단계 · 동행자
+        <div class="bar2"><i style="width:50%"></i></div>
+      </div>
+
+      <!-- [3] 동행자 목록 -->
+      <div class="u-card">
+        <span class="n abs">3</span>
+        <div class="u-h">함께 신청하는 분</div>
+        <div id="list"></div>
+      </div>
+
+      <!-- [4] 사람 추가 -->
+      <div style="position:relative">
+        <span class="n abs">4</span>
+        <button class="u-ghost" id="btnAdd" style="margin-top:0" onclick="openAdd()">＋ 사람 추가</button>
+      </div>
+      <div class="hint hidden" id="limitMsg"></div>
+
+      <!-- [5] 총 인원·금액 -->
+      <div class="u-card" style="background:#f0f0f0">
+        <span class="n abs">5</span>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <b style="font-size:17px" id="totalCount">총 1명</b>
+          <b style="font-size:17px" id="totalAmount">80,000원</b>
+        </div>
+        <div style="font-size:13px;color:#666;margin-top:5px">참가비 80,000원 × 인원 수</div>
+      </div>
+
+      <!-- [6] 대표 연락처 안내 -->
+      <div class="hint" style="position:relative">
+        <span class="n abs">6</span>
+        입금 안내와 각종 안내는 <b>인도자(대표자) 연락처</b>로 발송됩니다. (POL-006)
+      </div>
+
+      <!-- [7] 이전/다음 -->
+      <div style="display:flex;gap:8px;margin-top:16px;position:relative">
+        <span class="n abs">7</span>
+        <button class="u-ghost" style="margin:0;flex:1" data-nav="SCR-002 기본 정보">이전</button>
+        <button class="u-primary" style="flex:2" onclick="next()">다음 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 동행자 추가·수정 모달 -->
+<div class="mask" id="mAdd">
+  <div class="modal">
+    <div class="mtop"><h3 id="mTitle">동행자 추가</h3><button class="x" onclick="closeModal('mAdd')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">입력 항목은 기본 정보(SCR-002)와 같습니다. POL-042 형식 검사가 그대로 적용됩니다.</div>
+      <div class="mfield"><label>이름 *</label><input class="tin" id="cName" placeholder="예) 이믿음"><div class="errmsg"></div></div>
+      <div class="mfield"><label>휴대폰 번호 *</label><input class="tin" id="cPhone" placeholder="010-0000-0000" inputmode="numeric"><div class="errmsg"></div></div>
+      <div class="mfield"><label>지역 *</label><input class="tin" id="cRegion" placeholder="예) 안성"><div class="errmsg"></div></div>
+      <div class="mfield"><label>성별 *</label>
+        <div class="pick" id="cSex" style="max-width:220px"><div class="opt">남</div><div class="opt">여</div></div>
+        <div class="errmsg"></div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn" onclick="closeModal('mAdd')">취소</button>
+      <button class="btn pri" id="mSubmit" onclick="saveCompanion()">추가</button>
+    </div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+const FEE = 80000;
+const MAX_TOTAL = 6;   /* POL-043 미확정 — 목업 임시 상한 (OI-10) */
+
+/* 인도자 본인은 index 0 고정 */
+let people = [{ name: '김복음', phone: '01099998888', region: '안성', sex: '남', leader: true }];
+let editIdx = null;
+
+function render() {
+  const list = document.getElementById('list');
+  if (people.length === 1) {
+    list.innerHTML = `
+      <div class="statusrow"><span><b>1.</b> ${people[0].name} <span class="chip neu">인도자·본인</span></span></div>
+      <div class="hint" style="margin-top:10px">아직 추가한 분이 없습니다. 혼자 오시면 그대로 다음으로 넘어가세요.</div>`;
+  } else {
+    list.innerHTML = people.map((p, i) => `
+      <div class="statusrow">
+        <span style="flex:1">
+          <b>${i + 1}.</b> ${p.name}
+          ${p.leader ? '<span class="chip neu">인도자·본인</span>' : `<span style="color:#777;font-size:13px"> ${fmt(p.phone)} · ${p.region} · ${p.sex}</span>`}
+        </span>
+        ${p.leader ? '<span class="chip neu">고정</span>' : `
+          <span style="display:flex;gap:6px">
+            <button class="btn sm" onclick="openEdit(${i})">수정</button>
+            <button class="btn sm" onclick="removeAt(${i})">삭제</button>
+          </span>`}
+      </div>`).join('');
+  }
+
+  const n = people.length;
+  document.getElementById('totalCount').textContent = `총 ${n}명`;
+  document.getElementById('totalAmount').textContent = WF.won(n * FEE);
+
+  /* POL-043 상한 */
+  const btn = document.getElementById('btnAdd');
+  const msg = document.getElementById('limitMsg');
+  if (n >= MAX_TOTAL) {
+    btn.disabled = true; btn.style.opacity = .5; btn.style.cursor = 'not-allowed';
+    msg.textContent = `한 번에 신청할 수 있는 인원은 최대 ${MAX_TOTAL}명입니다. 인원이 더 많으시면 나누어 신청해 주세요.  ·  POL-043(미확정 — 상한 기본값 OI-10)`;
+    msg.classList.remove('hidden');
+  } else {
+    btn.disabled = false; btn.style.opacity = 1; btn.style.cursor = 'pointer';
+    msg.classList.add('hidden');
+  }
+}
+const fmt = p => p.length === 11 ? `${p.slice(0,3)}-${p.slice(3,7)}-${p.slice(7)}` : p;
+
+function openAdd() {
+  editIdx = null;
+  document.getElementById('mTitle').textContent = '동행자 추가';
+  document.getElementById('mSubmit').textContent = '추가';
+  ['cName','cPhone','cRegion'].forEach(id => { const e = document.getElementById(id); e.value = ''; WF.mark(e, null); });
+  document.querySelectorAll('#cSex .opt').forEach(o => o.classList.remove('sel'));
+  openModal('mAdd');
+}
+function openEdit(i) {
+  editIdx = i;
+  const p = people[i];
+  document.getElementById('mTitle').textContent = '동행자 수정';
+  document.getElementById('mSubmit').textContent = '저장';
+  document.getElementById('cName').value = p.name;
+  document.getElementById('cPhone').value = fmt(p.phone);
+  document.getElementById('cRegion').value = p.region;
+  document.querySelectorAll('#cSex .opt').forEach(o => o.classList.toggle('sel', o.textContent.trim() === p.sex));
+  openModal('mAdd');
+}
+function removeAt(i) {
+  const nm = people[i].name;
+  people.splice(i, 1);
+  render();
+  toast(`${nm} 님을 목록에서 뺐습니다. 총 인원과 금액을 다시 계산했습니다.`);
+}
+
+/* POL-042 검증 — 통과해야 목록에 들어간다 */
+function saveCompanion() {
+  const name = document.getElementById('cName');
+  const phone = document.getElementById('cPhone');
+  const region = document.getElementById('cRegion');
+  let bad = false;
+
+  const eN = WF.checkName(name.value); WF.mark(name, eN); bad = bad || !!eN;
+  const eP = WF.checkPhone(phone.value); WF.mark(phone, eP); bad = bad || !!eP;
+  const r = (region.value || '').trim();
+  const eR = !r ? '지역을 입력해 주세요.' : null; WF.mark(region, eR); bad = bad || !!eR;
+  const sex = pickValue('#cSex');
+  WF.mark(document.getElementById('cSex'), sex ? null : '성별을(를) 선택해 주세요.');
+  bad = bad || !sex;
+  if (bad) { toast('입력하신 내용을 확인해 주세요. (POL-042)'); return; }
+
+  const rec = { name: name.value.trim(), phone: WF.normalizePhone(phone.value), region: r, sex };
+  if (editIdx === null) {
+    if (people.length >= MAX_TOTAL) { toast(`최대 ${MAX_TOTAL}명까지 신청할 수 있습니다. (POL-043)`); return; }
+    people.push(rec);
+    toast(`${rec.name} 님을 추가했습니다.`);
+  } else {
+    people[editIdx] = { ...people[editIdx], ...rec };
+    toast(`${rec.name} 님 정보를 수정했습니다.`);
+  }
+  closeModal('mAdd');
+  render();
+}
+
+function next() {
+  goScreen('SCR-004', {
+    message: `총 ${people.length}명 · ${WF.won(people.length * FEE)} · 상태 입력으로 이동합니다`,
+    context: { count: people.length, names: people.map(p => p.name) },
+  });
+}
+
+/* 데모 헬퍼 */
+function fillDemo() {
+  people = [people[0],
+    { name: '이믿음', phone: '01011112222', region: '안성', sex: '여' },
+    { name: '박소망', phone: '01033334444', region: '평택', sex: '남' }];
+  render(); toast('동행자 2명을 채웠습니다.');
+}
+function fillToLimit() {
+  people = [people[0]];
+  for (let i = 1; i < MAX_TOTAL; i++) people.push({ name: `동행자${i}`, phone: `0105555000${i}`, region: '안성', sex: i % 2 ? '남' : '여' });
+  render(); toast(`총 ${MAX_TOTAL}명 — 추가 버튼이 비활성화됩니다. (POL-043)`);
+}
+function resetAll() { people = [people[0]]; render(); toast('인도자 본인만 남겼습니다.'); }
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-025 변경 이력 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-025 변경 이력</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/logs</code> · 관리자(PC)
+  <div class="tags">관련: REQ-068, REQ-069 · POL-033, POL-041 · 정의서: SCR-025-변경이력.md · 원본 A13</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>탭·담당자·기간·검색이 함께 적용됩니다.</span>
+  <button onclick="findPerson()">「김복음」으로 검색 (REQ-069)</button>
+  <button onclick="exportOnly()">명단 내보내기 기록만 (POL-041)</button>
+  <button onclick="resetFilter()">필터 초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/logs</div>
+    <div class="who">노은주 (본부 팀원)</div>
+  </div>
+  <div class="app">
+    <aside class="side"></aside>
+
+    <main class="main">
+      <div class="mh">
+        <h2><span class="n">1</span>변경 이력</h2>
+        <div class="crumb" id="total"></div>
+      </div>
+
+      <!-- [2] 필터 -->
+      <div class="panel-box">
+        <div class="toolbar" style="position:relative">
+          <span class="n">2</span>
+          <div class="tabs" data-tabs="area" style="flex-wrap:wrap">
+            <button data-tab="전체" class="on">전체</button>
+            <button data-tab="접수">접수</button>
+            <button data-tab="입금">입금</button>
+            <button data-tab="환불">환불</button>
+            <button data-tab="숙소">숙소</button>
+            <button data-tab="상담">상담</button>
+            <button data-tab="셔틀">셔틀</button>
+            <button data-tab="설정">설정</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <label style="font-size:12px;color:#555">담당자</label>
+          <select class="tin" id="actor" style="width:140px" onchange="apply()">
+            <option value="">전체</option><option>노은주</option><option>박채림</option><option>권진영</option>
+          </select>
+          <label style="font-size:12px;color:#555">기간</label>
+          <input class="tin" id="from" type="date" value="2026-06-18" onchange="apply()">
+          <span>~</span>
+          <input class="tin" id="to" type="date" value="2026-06-20" onchange="apply()">
+          <input class="tin w" id="q" placeholder="이름 · 등록번호" oninput="apply()">
+          <span class="grow"></span>
+          <span class="sub" style="margin:0" id="shown"></span>
+        </div>
+
+        <!-- [3] 이력 테이블 -->
+        <div style="position:relative">
+          <span class="n abs">3</span>
+          <table class="tbl">
+            <thead><tr>
+              <th style="width:120px">일시</th><th style="width:80px">담당자</th><th style="width:70px">영역</th>
+              <th style="width:120px">처리</th><th style="width:100px">대상</th><th>변경 내용</th>
+            </tr></thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+
+        <!-- [4] 불변 안내 -->
+        <div class="sub" style="margin-top:10px;position:relative">
+          <span class="n">4</span>
+          <b>기록된 이력은 수정·삭제할 수 없습니다.</b> 이력 기록에 실패하면 원 처리도 함께 실패시켜, 기록 없는 변경을 만들지 않습니다. (POL-033)
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+mountSideNav('logs', '본부 팀원');
+
+const LOGS = [
+  { at:'2026-06-20 14:12', actor:'노은주', area:'숙소', action:'좌석 이동',   target:'김복음',
+    before:'A-1방 1층 2번', after:'A-2방 1층 1번', reason:'자리 불만 접수' },
+  { at:'2026-06-20 13:40', actor:'노은주', area:'입금', action:'분할 매칭',   target:'A-101',
+    before:'부분 매칭', after:'매칭 (3명 / 240,000원)', reason:'' },
+  { at:'2026-06-20 13:38', actor:'노은주', area:'입금', action:'엑셀 업로드', target:'입금내역_20260620',
+    before:'—', after:'총 120건 / 신규 96 / 중복 24', reason:'' },
+  { at:'2026-06-20 11:05', actor:'박채림', area:'환불', action:'환불 처리',   target:'최은혜',
+    before:'접수 · 입금 확인', after:'환불 완료 · 80,000원 → 최은혜(국민)', reason:'개인 사정' },
+  { at:'2026-06-20 10:22', actor:'노은주', area:'접수', action:'현장 등록',   target:'한사랑',
+    before:'—', after:'현장(관리자) 등록 · 숙소 사용', reason:'' },
+  { at:'2026-06-19 17:30', actor:'노은주', area:'셔틀', action:'배차 취소',   target:'15:00 터미널행',
+    before:'배차 확정 · 25인승 12가3456', after:'취소', reason:'차량 고장' },
+  { at:'2026-06-19 16:10', actor:'권진영', area:'상담', action:'배치 변경',   target:'정소망',
+    before:'6/19 14:00 상담실 2', after:'6/19 15:00 상담실 1', reason:'' },
+  { at:'2026-06-19 15:02', actor:'노은주', area:'상담', action:'결과 입력',   target:'이믿음',
+    before:'미입력', after:'해결 · 간증 가능', reason:'' },
+  { at:'2026-06-19 09:40', actor:'박채림', area:'설정', action:'명단 내보내기', target:'전체 명단 1,284건',
+    before:'—', after:'CSV 다운로드', reason:'인쇄용 명단 준비' },
+  { at:'2026-06-18 18:20', actor:'박채림', area:'설정', action:'집회 설정',   target:'2026 금수원 대전도집회',
+    before:'총 정원 1,200 / 버퍼 60', after:'총 정원 1,400 / 버퍼 80', reason:'' },
+  { at:'2026-06-18 14:05', actor:'노은주', area:'접수', action:'접수 취소',   target:'정소망',
+    before:'접수', after:'취소', reason:'본인 요청 · 연락 두절' },
+  { at:'2026-06-18 10:15', actor:'노은주', area:'숙소', action:'보류 지정',   target:'A-3방 1층 1번',
+    before:'빈 자리', after:'보류 (현장 대응용)', reason:'' },
+  { at:'2026-06-17 16:40', actor:'박채림', area:'설정', action:'권한 변경',   target:'한운행',
+    before:'본부 팀원 · 12개', after:'셔틀팀 · 1개', reason:'' },
+];
+
+function render() {
+  document.getElementById('logBody').innerHTML = LOGS.map(l => `
+    <tr data-area="${l.area}" data-actor="${l.actor}" data-date="${l.at.slice(0,10)}"
+        data-search="${(l.target + ' ' + l.action + ' ' + l.before + ' ' + l.after).toLowerCase()}">
+      <td>${l.at.slice(5)}</td>
+      <td>${l.actor}</td>
+      <td><span class="chip neu">${l.area}</span></td>
+      <td><b>${l.action}</b></td>
+      <td>${l.target}</td>
+      <td>
+        <span style="color:#777">${l.before}</span> → <b>${l.after}</b>
+        ${l.reason ? `<div style="font-size:12px;color:#777;margin-top:3px">사유: ${l.reason}</div>` : ''}
+      </td>
+    </tr>`).join('');
+  document.getElementById('total').textContent = `총 ${WF.num(LOGS.length)}건`;
+  apply();
+}
+
+function apply() {
+  const area = currentTab('area') || '전체';
+  const actor = document.getElementById('actor').value;
+  const from = document.getElementById('from').value;
+  const to = document.getElementById('to').value;
+  const q = (document.getElementById('q').value || '').trim().toLowerCase();
+  const shown = filterRows('#logBody', tr => {
+    if (area !== '전체' && tr.dataset.area !== area) return false;
+    if (actor && tr.dataset.actor !== actor) return false;
+    const d = tr.dataset.date;
+    if (from && d < from) return false;
+    if (to && d > to) return false;
+    return !q || (tr.dataset.search || '').includes(q);
+  });
+  document.getElementById('shown').textContent = `표시 ${shown}건`;
+  document.getElementById('noRow')?.remove();
+  if (shown === 0) {
+    document.getElementById('logBody').insertAdjacentHTML('beforeend',
+      `<tr id="noRow"><td colspan="6"><div class="empty">조건에 맞는 변경 기록이 없습니다.</div></td></tr>`);
+  }
+}
+onTab('area', apply);
+
+function findPerson() {
+  document.getElementById('q').value = '김복음';
+  document.querySelector('[data-tab="전체"]').click();
+  apply();
+  toast('특정 참가자에게 일어난 변경만 시간순으로 볼 수 있습니다. (REQ-069)', 4200);
+}
+function exportOnly() {
+  document.getElementById('q').value = '내보내기';
+  document.querySelector('[data-tab="설정"]').click();
+  apply();
+  toast('명단 내보내기는 개인정보가 외부로 나가므로 기록 대상입니다. 조회는 기록하지 않습니다. (POL-041, POL-033)', 5200);
+}
+function resetFilter() {
+  document.getElementById('q').value = '';
+  document.getElementById('actor').value = '';
+  document.getElementById('from').value = '2026-06-17';
+  document.getElementById('to').value = '2026-06-20';
+  document.querySelector('[data-tab="전체"]').click();
+  apply();
+  toast('필터를 초기화했습니다.');
+}
+
+render();
+</script>
+</body>
+</html>

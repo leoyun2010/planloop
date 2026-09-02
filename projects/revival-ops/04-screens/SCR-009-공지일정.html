@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-009 공지 · 일정 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-009 공지 · 일정</strong> · v0.1 · 상태: 초안 · 경로 <code>/notice</code> · 사용자(모바일)
+  <div class="tags">관련: REQ-015 · POL-046 · 정의서: SCR-009-공지일정.md · 원본 U9</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>탭이 실제로 전환됩니다. 공지 카드를 누르면 본문이 펼쳐집니다.</span>
+  <button onclick="unpublishAll()">공지 전부 비게시로 (POL-046)</button>
+  <button onclick="clearSchedule()">오늘 일정 비우기</button>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="phone">
+  <div class="scr">
+    <div class="u-stat">9:41 ▮▮▮</div>
+    <div class="u-top">
+      <div class="k"><span class="n">1</span>금수원 대전도집회</div>
+      <div class="t">공지 · 일정</div>
+    </div>
+
+    <div class="u-body">
+      <!-- [2] 탭 -->
+      <div class="tabs" data-tabs="notice" style="margin-bottom:14px;position:relative">
+        <span class="n abs">2</span>
+        <button data-tab="today" class="on" style="flex:1">오늘 일정</button>
+        <button data-tab="all" style="flex:1">전체 일정</button>
+        <button data-tab="notice" style="flex:1">공지</button>
+      </div>
+
+      <!-- [3] 일정 -->
+      <div id="paneSchedule">
+        <div class="u-card">
+          <span class="n abs">3</span>
+          <div class="u-h" id="schTitle">오늘 일정 · 6월 20일(토)</div>
+          <div id="schList"></div>
+        </div>
+      </div>
+
+      <!-- [4] 공지 -->
+      <div id="paneNotice" class="hidden">
+        <div style="position:relative">
+          <span class="n abs">4</span>
+          <div id="noticeList"></div>
+        </div>
+      </div>
+
+      <!-- [5] 종이 배포 안내 -->
+      <div class="hint" style="position:relative">
+        <span class="n abs">5</span>
+        시간표·연대표는 접수처에서 <b>종이로도</b> 받으실 수 있습니다.
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab" data-nav="SCR-001 접수 홈"><span class="ti">📝</span>접수</div>
+      <div class="tab on"><span class="ti">📢</span><span class="n" style="width:14px;height:14px;font-size:9px">6</span>공지/일정</div>
+      <div class="tab" data-nav="SCR-010 셔틀"><span class="ti">🚌</span>셔틀</div>
+      <div class="tab" data-nav="SCR-008 마이페이지"><span class="ti">👤</span>마이페이지</div>
+    </div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+let SCHEDULE = [
+  { date: '6/19', time: '19:00', name: '개회 예배', place: '본당' },
+  { date: '6/20', time: '06:00', name: '새벽 예배', place: '본당' },
+  { date: '6/20', time: '09:00', name: '1부 말씀', place: '본당' },
+  { date: '6/20', time: '12:00', name: '점심', place: '식당' },
+  { date: '6/20', time: '14:00', name: '2부 말씀', place: '본당' },
+  { date: '6/20', time: '19:00', name: '저녁 집회', place: '본당' },
+  { date: '6/21', time: '09:00', name: '폐회 예배', place: '본당' },
+];
+let NOTICES = [
+  { title: '셔틀 시간 변경 안내', date: '6/19', body: '오후 셔틀이 30분 앞당겨졌습니다. 터미널행 15:30 → 15:00으로 변경되니 참고해 주세요.', published: true },
+  { title: '우천 시 이동 경로 안내', date: '6/18', body: '비가 오면 본당 이동은 지하 통로를 이용해 주세요. 안내 요원이 배치됩니다.', published: true },
+  { title: '식사 시간 안내', date: '6/17', body: '식당 혼잡을 줄이기 위해 구역별로 시간을 나눕니다. 자세한 내용은 접수처 게시판을 확인해 주세요.', published: true },
+];
+const TODAY = '6/20';
+let tab = 'today';
+
+onTab('notice', t => { tab = t; render(); });
+
+function render() {
+  document.getElementById('paneSchedule').classList.toggle('hidden', tab === 'notice');
+  document.getElementById('paneNotice').classList.toggle('hidden', tab !== 'notice');
+
+  /* [3] 일정 — 시간 오름차순 (POL-046) */
+  if (tab !== 'notice') {
+    const rows = (tab === 'today' ? SCHEDULE.filter(s => s.date === TODAY) : SCHEDULE)
+      .slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+    document.getElementById('schTitle').textContent = tab === 'today' ? '오늘 일정 · 6월 20일(토)' : '전체 일정 · 6/19 ~ 6/21';
+    const list = document.getElementById('schList');
+    list.innerHTML = rows.length ? rows.map(s => `
+      <div class="statusrow">
+        <span><b style="display:inline-block;width:52px">${s.time}</b> ${tab === 'all' ? `<span style="color:#888;font-size:13px">${s.date}</span> ` : ''}${s.name}</span>
+        <span style="color:#777;font-size:13px">${s.place}</span>
+      </div>`).join('')
+      : `<div class="empty">오늘 등록된 일정이 없습니다.</div>`;
+  }
+
+  /* [4] 공지 — 게시 상태만 최신순 (POL-046) */
+  const pub = NOTICES.filter(n => n.published);
+  const nl = document.getElementById('noticeList');
+  nl.innerHTML = pub.length ? pub.map((n, i) => `
+    <div class="u-card" style="cursor:pointer" onclick="toggleBody(${i})">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <b style="font-size:16px">${n.title}</b>
+        <span style="color:#888;font-size:13px">${n.date}</span>
+      </div>
+      <div class="hidden" id="nb${i}" style="font-size:14px;color:#555;line-height:1.8;margin-top:10px;border-top:1px solid #eee;padding-top:10px">${n.body}</div>
+    </div>`).join('')
+    : `<div class="empty">아직 등록된 공지가 없습니다.</div>`;
+}
+function toggleBody(i) { document.getElementById('nb' + i).classList.toggle('hidden'); }
+
+function unpublishAll() {
+  NOTICES.forEach(n => n.published = false);
+  document.querySelector('[data-tab="notice"]').click();
+  toast('관리자가 전부 비게시로 바꾼 상태입니다. 사용자 화면에서 즉시 사라집니다. (POL-046)', 4000);
+}
+function clearSchedule() {
+  SCHEDULE = SCHEDULE.filter(s => s.date !== TODAY);
+  document.querySelector('[data-tab="today"]').click();
+  toast('빈 화면 대신 안내 문구가 표시됩니다. (POL-046)');
+}
+render();
+</script>
+</body>
+</html>

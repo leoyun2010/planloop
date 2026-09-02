@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전도집회 운영 시스템 — 화면 목록 뷰어</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif; background:#e8e8e8; color:#333; }
+  header { background:#4a4a4a; color:#fff; padding:18px 24px; }
+  header h1 { font-size:19px; }
+  header .sub { font-size:13px; color:#c9c9c9; margin-top:4px; }
+  header .meta { font-size:12px; color:#a8a8a8; margin-top:8px; }
+  .bar { background:#fff; border-bottom:1px solid #ccc; padding:12px 24px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; position:sticky; top:0; z-index:5; }
+  .bar input { border:1px solid #999; padding:7px 10px; font-size:13px; border-radius:3px; width:240px; font-family:inherit; }
+  .bar button { font-family:inherit; font-size:13px; padding:7px 14px; border:1px solid #999; background:#f4f4f4; border-radius:3px; cursor:pointer; }
+  .bar button.on { background:#555; color:#fff; border-color:#333; font-weight:bold; }
+  .bar .count { margin-left:auto; font-size:12px; color:#777; }
+  .wrap { padding:20px 24px 60px; }
+  .grp { font-size:13px; font-weight:bold; color:#555; margin:22px 0 10px; padding-bottom:6px; border-bottom:1px solid #ccc; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+  .card { background:#fff; border:1px solid #bbb; border-radius:5px; overflow:hidden; display:flex; flex-direction:column; }
+  .card.todo { background:#f2f2f2; border-style:dashed; }
+  .card .ch { padding:12px 14px; border-bottom:1px solid #eee; }
+  .card .id { font-size:11px; color:#888; font-weight:bold; letter-spacing:.3px; }
+  .card .nm { font-size:15px; font-weight:bold; color:#222; margin-top:2px; }
+  .card .url { font-size:11px; color:#777; margin-top:4px; font-family:ui-monospace,Consolas,monospace; }
+  .card .cb { padding:10px 14px; font-size:12px; color:#666; flex:1; line-height:1.7; }
+  .card .cb b { color:#444; }
+  .card .cf { padding:10px 14px; border-top:1px solid #eee; display:flex; gap:6px; align-items:center; }
+  .card .cf a { font-size:12px; text-decoration:none; border:1px solid #999; padding:5px 11px; border-radius:3px; color:#333; background:#f4f4f4; }
+  .card .cf a:hover { background:#e4e4e4; }
+  .card .cf a.pri { background:#555; color:#fff; border-color:#333; font-weight:bold; }
+  .chip { display:inline-block; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:9px; border:1px solid; }
+  .chip.draft { background:#eef1f4; color:#555; border-color:#bbb; }
+  .chip.todo { background:#fbf1da; color:#8a5d0f; border-color:#dcc188; }
+  .chip.dev { background:#e6f4ec; color:#1f8a5b; border-color:#9ecfb5; }
+  .hidden { display:none !important; }
+  footer { padding:20px 24px 40px; font-size:12px; color:#777; line-height:1.8; }
+  footer code { background:#ddd; padding:1px 5px; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>전도집회 운영 시스템 — 화면 목록</h1>
+  <div class="sub">2026 금수원 대전도집회 · 사용자 12화면 + 관리자 13화면 = 25화면</div>
+  <div class="meta">기준 산출물: 화면기획 v1.13 · IA: 03-ia.md · 갱신: 2026-09-02</div>
+</header>
+
+<div class="bar">
+  <input id="q" placeholder="화면명·ID·REQ·POL로 검색" oninput="apply()">
+  <button data-f="all" class="on" onclick="setF('all')">전체</button>
+  <button data-f="user" onclick="setF('user')">사용자</button>
+  <button data-f="admin" onclick="setF('admin')">관리자</button>
+  <button data-f="done" onclick="setF('done')">작성 완료</button>
+  <button data-f="todo" onclick="setF('todo')">작성 예정</button>
+  <span class="count" id="count"></span>
+</div>
+
+<div class="wrap" id="wrap"></div>
+
+<footer>
+  <b>보는 방법</b> — 각 카드의 [목업 열기]는 브라우저에서 바로 동작하는 와이어프레임, [정의서]는 화면정의서(.md)입니다.<br>
+  관리자 목업은 <b>화면 안 상태 전이까지 동작</b>합니다. 탭·필터·검색·체크박스·모달이 실제로 반응하고, 목업 안 모의 데이터의 상태가 바뀝니다.<br>
+  <b>화면 간 이동도 동작합니다</b> — 하단 탭·사이드 내비·[다음] 버튼을 누르면 실제로 그 화면으로 넘어갑니다. 각 목업 상단의 [☰ 화면 목록] [← 뒤로]로 돌아올 수 있습니다.
+  다만 목업은 화면마다 독립 파일이라 <b>이동하면 그 화면에서 입력한 모의 데이터는 초기화</b>됩니다(실제 구현에서는 서버에 저장됩니다).<br>
+  공통 스타일·동작은 <code>_wf.css</code> / <code>_wf.js</code>에 있습니다. 화면을 추가·삭제하면 이 파일의 목록도 함께 갱신해야 합니다.
+</footer>
+
+<script>
+const SCREENS = [
+  // ---- 사용자 ----
+  { id:'SCR-001', name:'접수 홈', url:'/', file:'SCR-001-접수홈', grp:'user', done:true,
+    req:'REQ-001, REQ-003, REQ-021', pol:'POL-001, POL-002, POL-003, POL-044',
+    demo:'접수 중 / 접수 전 / 마감 / 정원 마감 4개 상태 전환, 신규·재방문 토글' },
+  { id:'SCR-002', name:'접수폼 · 기본 정보', url:'/apply/1', file:'SCR-002-접수폼-기본정보', grp:'user', done:true,
+    req:'REQ-004, REQ-005', pol:'POL-001, POL-037, POL-042',
+    demo:'5개 필드 유효성 검사, 중복 번호 경고, 참가 구분에 따른 경로 분기' },
+  { id:'SCR-003', name:'동행자 추가', url:'/apply/2', file:'SCR-003-동행자추가', grp:'user', done:true,
+    req:'REQ-006, REQ-007', pol:'POL-006, POL-042, POL-043',
+    demo:'동행자 추가·수정·삭제, 총 인원·청구 금액 재계산, 인원 상한 차단' },
+  { id:'SCR-004', name:'상태 입력', url:'/apply/3', file:'SCR-004-상태입력', grp:'user', done:true,
+    req:'REQ-008, REQ-009', pol:'POL-011, POL-012, POL-017, POL-041, POL-042',
+    demo:'인원별 반복 입력(값 보존), 숙소 미사용 선택 시 특이사항·안내 숨김' },
+  { id:'SCR-005', name:'동의', url:'/apply/4', file:'SCR-005-동의', grp:'user', done:true,
+    req:'REQ-010', pol:'POL-039, POL-041, POL-045',
+    demo:'두 동의 분리 체크, 동의 일시 기록, 정원 초과·마감 시 제출 차단' },
+  { id:'SCR-006', name:'신청 완료', url:'/apply/done', file:'SCR-006-신청완료', grp:'user', done:true,
+    req:'REQ-011, REQ-034', pol:'POL-007, POL-034, POL-038',
+    demo:'인원별 금액 재계산, 문자 도입 토글, 등록번호 채번 형식 확인' },
+  { id:'SCR-007', name:'본인 확인', url:'/me/auth', file:'SCR-007-본인확인', grp:'user', done:true,
+    req:'REQ-012', pol:'POL-029, POL-040, POL-042',
+    demo:'모의 명단 조회, 하이픈 정규화, 10회 실패 시 실제 차단·카운트다운' },
+  { id:'SCR-008', name:'마이페이지', url:'/me', file:'SCR-008-마이페이지', grp:'user', done:true,
+    req:'REQ-013, REQ-014', pol:'POL-004(검토중), POL-007, POL-014, POL-038',
+    demo:'입금 3상태 전환, 취소 버튼 분기, POL-004 대안(본인 취소 금지)도 확인' },
+  { id:'SCR-009', name:'공지 · 일정', url:'/notice', file:'SCR-009-공지일정', grp:'user', done:true,
+    req:'REQ-015', pol:'POL-046',
+    demo:'탭 3종 전환, 공지 아코디언, 비게시·빈 상태 문구' },
+  { id:'SCR-010', name:'셔틀 신청 · 조회', url:'/shuttle', file:'SCR-010-셔틀', grp:'user', done:true,
+    req:'REQ-017, REQ-018', pol:'POL-025, POL-026, POL-028, POL-042, POL-049',
+    demo:'요청 폼 검증, 대기→배차 확정 전이, 출발 10분 전 탑승 확정 마감' },
+  { id:'SCR-011', name:'상담 안내', url:'/counsel', file:'SCR-011-상담안내', grp:'user', done:true,
+    req:'REQ-019', pol:'POL-021',
+    demo:'상담 상태 4단계 전환, 운영 시간 외 안내. 신청 폼 없음(POL-021 검증 포인트)' },
+  { id:'SCR-012', name:'안내문 보관함', url:'/guide', file:'SCR-012-안내문보관함', grp:'user', done:true,
+    req:'REQ-016', pol:'POL-046',
+    demo:'아코디언 펼침, 비표시·빈 상태, 계좌 불일치 경고 조건' },
+
+  // ---- 관리자 ----
+  { id:'SCR-013', name:'통합 대시보드', url:'/admin/dashboard', file:'SCR-013-통합대시보드', grp:'admin', done:true,
+    req:'REQ-070, REQ-071', pol:'POL-002, POL-005, POL-008, POL-009', demo:'환불 3건 처리 시 인원·금액·순 입금액 동시 차감, 조치 목록 빈 상태, 버퍼 경고, 집계 불일치' },
+  { id:'SCR-014', name:'집회 생성 · 설정', url:'/admin/conferences', file:'SCR-014-집회설정', grp:'admin', done:true,
+    req:'REQ-001, REQ-002, REQ-020, REQ-021', pol:'POL-001, POL-002, POL-003, POL-044', demo:'정원·버퍼 입력 시 차단선 실시간 재계산, 버퍼>정원 저장 차단, 마감일 경고, 종료 집회 읽기 전용, 변경 이력 누적' },
+  { id:'SCR-015', name:'접수 · 환불 관리', url:'/admin/registrants', file:'SCR-015-접수환불관리', grp:'admin', done:true,
+    req:'REQ-022 ~ REQ-028', pol:'POL-003, POL-004, POL-005, POL-006, POL-033', demo:'검색·필터, 행마다 다른 POL-005 버튼 분기, 환불 후 명단 존치, 현장 접수 추가, POL-006 대안 전환' },
+  { id:'SCR-016', name:'입금 매칭', url:'/admin/payments', file:'SCR-016-입금매칭', grp:'admin', done:true,
+    req:'REQ-029 ~ REQ-034', pol:'POL-008, POL-009, POL-038, POL-047', demo:'엑셀 업로드→자동 매칭→매칭률 상승, 2회차 전량 중복(POL-047), 수동 매칭 시 등록번호 발급, 분할 매칭 합계 검증' },
+  { id:'SCR-017', name:'명찰 출력', url:'/admin/badges', file:'SCR-017-명찰출력', grp:'admin', done:true,
+    req:'REQ-035, REQ-036, REQ-037', pol:'POL-019, POL-020(미확정)', demo:'입금 미확인 행 체크 차단, 일괄 출력 시 출력 횟수 증가·탭 이동, 재발급 경고, 미리보기, 용지 규격 확정 전환' },
+  { id:'SCR-018', name:'숙소 배치도', url:'/admin/lodging', file:'SCR-018-숙소배치도', grp:'admin', done:true,
+    req:'REQ-038 ~ REQ-047', pol:'POL-010 ~ POL-018, POL-048', demo:'배치도 생성, 좌석 합계 실시간 검사(POL-048), 1층 우선·동행 그룹·보류·일괄 랜덤 배치, 좌석 이동·교환 3클릭' },
+  { id:'SCR-019', name:'상담 현황판', url:'/admin/counseling', file:'SCR-019-상담현황판', grp:'admin', done:true,
+    req:'REQ-055, REQ-056', pol:'POL-023(미확정), POL-024, POL-036', demo:'상담실 상태 전환, 결과 입력 시 지표·간증자 명단 실시간 갱신, 해결≠간증 자동 연동 금지, 결과 미입력 경고' },
+  { id:'SCR-020', name:'상담 스케줄 (타임라인)', url:'/admin/counseling/schedule', file:'SCR-020-상담스케줄', grp:'admin', done:true,
+    req:'REQ-050 ~ REQ-054', pol:'POL-022(미확정), POL-035, POL-036', demo:'날짜 탭, 블록 클릭 드로어, 진행 상태 즉시 반영, 예정선·지연 표시, 상태 역행 차단, 빈 칸 현장 배정, 운영 시간 축소 차단' },
+  { id:'SCR-021', name:'상담 접수 · 배치', url:'/admin/counseling/registration', file:'SCR-021-상담접수배치', grp:'admin', done:true,
+    req:'REQ-048, REQ-049, REQ-050', pol:'POL-021, POL-033, POL-036', demo:'상담 접수 등록, 배치판 빈 칸 클릭 배치, 가용 상담사 필터, 이중 배치 차단, 미사용 상담실 잠금' },
+  { id:'SCR-022', name:'셔틀 관리', url:'/admin/shuttle', file:'SCR-022-셔틀관리', grp:'admin', done:true,
+    req:'REQ-057 ~ REQ-061', pol:'POL-025, POL-026, POL-027, POL-028, POL-049', demo:'IN/OUT 분리, 출발 시간순 정렬, 체크 선택 배차, 차량 정보 미입력 차단, 정원 초과 경고, 탑승 확인, 셔틀팀 계정 전환' },
+  { id:'SCR-023', name:'공지 · 안내문', url:'/admin/content', file:'SCR-023-공지안내문', grp:'admin', done:true,
+    req:'REQ-062, REQ-063, REQ-064', pol:'POL-034(검토중), POL-046', demo:'탭 4종, 공지 게시 토글, 안내문 순서 변경, 계좌 불일치 경고, 발신번호 미등록 시 발송 차단' },
+  { id:'SCR-024', name:'계정 · 권한', url:'/admin/accounts', file:'SCR-024-계정권한', grp:'admin', done:true,
+    req:'REQ-065, REQ-066, REQ-067', pol:'POL-029, POL-030, POL-031, POL-032', demo:'권한 패널 로딩, 역할 변경 시 기본 권한 재적용, 계정·권한 메뉴 잠금, 마지막 어드민 보호, 외부 팀 경고, 진입 차단 화면' },
+  { id:'SCR-025', name:'변경 이력', url:'/admin/logs', file:'SCR-025-변경이력', grp:'admin', done:true,
+    req:'REQ-068, REQ-069', pol:'POL-033', demo:'영역 탭 8종·담당자·기간·검색 동시 적용, 참가자별 추적, 변경 전후·사유 표시, 수정·삭제 버튼 없음' },
+];
+
+let filter = 'all';
+function setF(f) {
+  filter = f;
+  document.querySelectorAll('.bar [data-f]').forEach(b => b.classList.toggle('on', b.dataset.f === f));
+  apply();
+}
+
+function card(s) {
+  const cls = s.done ? '' : ' todo';
+  const chip = s.done ? '<span class="chip draft">초안</span>' : '<span class="chip todo">작성 예정</span>';
+  const links = s.done
+    ? `<a class="pri" href="${encodeURI(s.file)}.html" target="_blank">목업 열기 ↗</a>
+       <a href="${encodeURI(s.file)}.md" target="_blank">정의서</a>`
+    : `<span style="font-size:12px;color:#888">아직 만들지 않았습니다</span>`;
+  return `<div class="card${cls}" data-search="${(s.id + ' ' + s.name + ' ' + s.req + ' ' + s.pol + ' ' + s.url).toLowerCase()}" data-grp="${s.grp}" data-done="${s.done}">
+    <div class="ch">
+      <div class="id">${s.id} ${chip}</div>
+      <div class="nm">${s.name}</div>
+      <div class="url">${s.url}</div>
+    </div>
+    <div class="cb">
+      <b>REQ</b> ${s.req}<br>
+      <b>POL</b> ${s.pol}
+      ${s.demo ? `<br><b>동작</b> ${s.demo}` : ''}
+    </div>
+    <div class="cf">${links}</div>
+  </div>`;
+}
+
+function apply() {
+  const q = (document.getElementById('q').value || '').trim().toLowerCase();
+  const user = SCREENS.filter(s => s.grp === 'user');
+  const admin = SCREENS.filter(s => s.grp === 'admin');
+  const test = s =>
+    (filter === 'all' || (filter === 'done' ? s.done : filter === 'todo' ? !s.done : s.grp === filter)) &&
+    (!q || (s.id + ' ' + s.name + ' ' + s.req + ' ' + s.pol + ' ' + s.url).toLowerCase().includes(q));
+
+  const u = user.filter(test), a = admin.filter(test);
+  let html = '';
+  if (u.length) html += `<div class="grp">사용자 (모바일) — ${u.length}개</div><div class="grid">${u.map(card).join('')}</div>`;
+  if (a.length) html += `<div class="grp">관리자 (PC) — ${a.length}개</div><div class="grid">${a.map(card).join('')}</div>`;
+  if (!html) html = `<div style="padding:40px;text-align:center;color:#888">조건에 맞는 화면이 없습니다.</div>`;
+  document.getElementById('wrap').innerHTML = html;
+
+  const done = SCREENS.filter(s => s.done).length;
+  document.getElementById('count').textContent = `표시 ${u.length + a.length}개 · 전체 ${SCREENS.length}개 중 작성 완료 ${done}개`;
+}
+apply();
+</script>
+</body>
+</html>

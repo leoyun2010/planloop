@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-024 계정 · 권한 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<style>
+  .mgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:8px; }
+  .mitem { border:1px solid #ddd; border-radius:4px; padding:8px 10px; font-size:13px; display:flex; gap:8px; align-items:center; background:#fff; }
+  .mitem.locked { background:#eee; color:#999; }
+</style>
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-024 계정 · 권한</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/accounts</code> · 관리자(PC) · 전체 어드민 전용
+  <div class="tags">관련: REQ-065, REQ-066, REQ-067 · POL-029, POL-030, POL-031, POL-032, POL-033 · 정의서: SCR-024-계정권한.md · 원본 A12</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <button id="guardBtn" onclick="toggleGuard()">권한 없는 계정으로 보기 (POL-030)</button>
+  <button onclick="lastAdmin()">마지막 어드민 역할 바꿔보기</button>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/accounts</div>
+    <div class="who" id="who">박채림 (전체 어드민)</div>
+  </div>
+  <div class="app">
+    <aside class="side"></aside>
+
+    <main class="main">
+      <!-- 권한 차단 화면 (POL-030) -->
+      <div id="blocked" class="hidden">
+        <div class="mh"><h2>접근 제한</h2></div>
+        <div class="errbox">
+          <b>계정 추가와 권한 변경은 전체 관리자만 할 수 있습니다.</b><br>
+          시도 사실이 변경 이력에 기록되었습니다. (POL-030, POL-033)
+          <div style="margin-top:10px"><button class="btn" data-nav="SCR-013 통합 대시보드">대시보드로 →</button></div>
+        </div>
+      </div>
+
+      <div id="allowed">
+        <div class="mh">
+          <h2><span class="n">1</span>계정 · 권한</h2>
+          <div class="crumb">전체 어드민만 접근할 수 있는 메뉴입니다 (POL-030)</div>
+          <div class="right"><button class="btn pri" onclick="openCreate()">+ 계정 추가</button></div>
+        </div>
+
+        <!-- [2] 계정 목록 -->
+        <div class="panel-box">
+          <span class="n abs">2</span>
+          <h3>관리자 계정</h3>
+          <div class="sub">관리자는 개인 단위 아이디/비밀번호로 로그인합니다. 회(단위) 공용 계정은 만들지 않습니다. (POL-029)</div>
+          <table class="tbl">
+            <thead><tr><th style="width:90px">이름</th><th style="width:110px">아이디</th><th style="width:120px">역할</th><th style="width:100px">소속</th><th style="width:100px">접근 메뉴</th><th style="width:80px">관리</th></tr></thead>
+            <tbody id="accBody"></tbody>
+          </table>
+        </div>
+
+        <!-- [3] 권한 설정 -->
+        <div class="panel-box">
+          <span class="n abs">3</span>
+          <h3 id="permTitle">권한 설정</h3>
+          <div class="toolbar">
+            <label style="font-size:12px;color:#555">역할</label>
+            <select class="tin" id="roleSel" style="width:170px" onchange="applyDefaults()"></select>
+            <span class="sub" style="margin:0">역할을 바꾸면 기본 권한이 적용됩니다. 그 뒤 개별 메뉴를 조정할 수 있습니다. (POL-031)</span>
+          </div>
+          <div class="mgrid" id="menuGrid" style="margin-top:10px"></div>
+          <div class="sub" style="margin-top:10px">본부 인원은 계정 관리를 제외한 전체 메뉴 개방이 기본값입니다. 날짜에 따라 담당 업무가 접수에서 상담으로 이동하므로 임의로 좁히지 않습니다. (POL-031)</div>
+          <div class="errmsg" id="ePerm"></div>
+          <div class="toolbar" style="justify-content:flex-end;margin-top:10px">
+            <button class="btn" onclick="loadPerm(selId)">취소</button>
+            <button class="btn pri" onclick="savePerm()">저장</button>
+          </div>
+        </div>
+
+        <!-- [4] 미발급 대상 -->
+        <div class="panel-box">
+          <span class="n abs">4</span>
+          <h3>계정 미발급 대상</h3>
+          <div class="sub" style="line-height:1.9">
+            <b>집회장 팀장·부팀장</b>은 시스템에 들어올 일이 거의 없어 계정을 발급하지 않습니다.<br>
+            외부 팀 중 실제 사용은 <b>셔틀팀</b>뿐입니다. (POL-032)
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 계정 추가 -->
+<div class="mask" id="mCreate">
+  <div class="modal">
+    <div class="mtop"><h3>계정 추가</h3><button class="x" onclick="closeModal('mCreate')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">개인 단위 계정만 발급합니다. 누가 등록했는지, 누가 숙소를 바꿨는지 추적하려면 개인 계정이 전제입니다. (POL-029)</div>
+      <div class="mfield"><label>이름 *</label><input class="tin" id="cName"><div class="errmsg"></div></div>
+      <div class="mfield"><label>아이디 *</label><input class="tin" id="cId" placeholder="영문·숫자 4~20자"><div class="errmsg"></div></div>
+      <div class="mfield"><label>초기 비밀번호 *</label><input class="tin" id="cPw" placeholder="8자 이상"><div class="errmsg"></div>
+        <div class="sub" style="margin-top:4px">최초 로그인 시 비밀번호를 변경해야 다음 화면으로 진행됩니다. (POL-029)</div></div>
+      <div class="mfield"><label>역할 *</label><select class="tin" id="cRole" style="width:200px"></select></div>
+      <div class="mfield"><label>소속</label><input class="tin" id="cOrg"></div>
+      <label class="toolbar" style="cursor:pointer"><input type="checkbox" id="cExt"><span style="font-size:13px">외부 팀</span></label>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mCreate')">취소</button><button class="btn pri" onclick="createAcc()">발급</button></div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+let myRole = '전체 어드민';
+mountSideNav('accounts', myRole);
+
+const ROLES = ['전체 어드민', '본부 총괄', '본부 팀원', '셔틀팀', '국내선교팀'];
+const MENUS = ADMIN_MENUS.filter(m => !m.grp);
+const DEFAULTS = {
+  '전체 어드민': MENUS.map(m => m.id),
+  '본부 총괄': MENUS.filter(m => m.id !== 'accounts').map(m => m.id),
+  '본부 팀원': MENUS.filter(m => m.id !== 'accounts').map(m => m.id),
+  '셔틀팀': ['shuttle'],
+  '국내선교팀': ['registrants'],
+};
+let ACCOUNTS = [
+  { id:1, name:'박채림', uid:'chaerim', role:'전체 어드민', org:'본부', ext:false, menus:[...DEFAULTS['전체 어드민']] },
+  { id:2, name:'노은주', uid:'eunju',   role:'본부 팀원',   org:'본부', ext:false, menus:[...DEFAULTS['본부 팀원']] },
+  { id:3, name:'한운행', uid:'unhaeng', role:'셔틀팀',     org:'셔틀팀', ext:true,  menus:[...DEFAULTS['셔틀팀']] },
+];
+let selId = 2, HIST = [];
+
+document.getElementById('roleSel').innerHTML = ROLES.map(r => `<option>${r}</option>`).join('');
+document.getElementById('cRole').innerHTML = ROLES.map(r => `<option>${r}</option>`).join('');
+
+function renderAcc() {
+  document.getElementById('accBody').innerHTML = ACCOUNTS.map(a => `
+    <tr class="${a.id === selId ? 'sel' : ''}">
+      <td><b>${a.name}</b></td><td>${a.uid}</td>
+      <td><span class="chip ${a.role === '전체 어드민' ? 'ok' : 'neu'}">${a.role}</span></td>
+      <td>${a.org}${a.ext ? ' <span class="chip warn">외부</span>' : ''}</td>
+      <td class="num">${a.menus.length === MENUS.length ? '전체' : a.menus.length + '개'}</td>
+      <td><button class="btn sm" onclick="loadPerm(${a.id})">권한</button></td>
+    </tr>`).join('');
+}
+
+function loadPerm(id) {
+  selId = id;
+  const a = ACCOUNTS.find(x => x.id === id);
+  document.getElementById('permTitle').textContent = `권한 설정 — ${a.name} (${a.role})`;
+  document.getElementById('roleSel').value = a.role;
+  renderMenus(a.menus, a.role);
+  document.getElementById('ePerm').classList.remove('on');
+  renderAcc();
+}
+function renderMenus(menus, role) {
+  document.getElementById('menuGrid').innerHTML = MENUS.map(m => {
+    const locked = m.adminOnly && role !== '전체 어드민';
+    return `<label class="mitem ${locked ? 'locked' : ''}">
+      <input type="checkbox" data-menu="${m.id}" ${menus.includes(m.id) ? 'checked' : ''} ${locked ? 'disabled' : ''}>
+      <span>${m.label}${locked ? ' 🔒' : ''}</span>
+    </label>`;
+  }).join('');
+}
+function applyDefaults() {
+  const role = document.getElementById('roleSel').value;
+  const a = ACCOUNTS.find(x => x.id === selId);
+  /* POL-030 — 마지막 전체 어드민 보호 */
+  const admins = ACCOUNTS.filter(x => x.role === '전체 어드민');
+  if (admins.length === 1 && admins[0].id === a.id && role !== '전체 어드민') {
+    document.getElementById('roleSel').value = a.role;
+    const e = document.getElementById('ePerm');
+    e.classList.add('on'); e.textContent = '마지막 전체 관리자 계정은 역할을 바꾸거나 삭제할 수 없습니다. (POL-030)';
+    toast('마지막 전체 관리자 계정은 역할을 바꿀 수 없습니다. (POL-030)', 4600);
+    return;
+  }
+  document.getElementById('ePerm').classList.remove('on');
+  renderMenus(DEFAULTS[role] || [], role);
+  toast(`«${role}» 기본 권한을 적용했습니다. ${role === '셔틀팀' ? '셔틀 관리 1개만 열립니다.' : '개별 메뉴를 조정할 수 있습니다.'} (POL-031)`, 4400);
+}
+function savePerm() {
+  const a = ACCOUNTS.find(x => x.id === selId);
+  const role = document.getElementById('roleSel').value;
+  const menus = [...document.querySelectorAll('#menuGrid input[data-menu]:checked')].map(c => c.dataset.menu);
+  const before = `${a.role} · ${a.menus.length}개`;
+  a.role = role; a.menus = menus;
+  HIST.unshift({ at: now(), who: '박채림', what: `권한 변경 — ${a.name}: ${before} → ${role} · ${menus.length}개` });
+  loadPerm(selId);
+  toast(`${a.name} 계정의 권한을 저장했습니다. 접근 메뉴 ${menus.length}개. 변경 이력에 기록됩니다. (POL-031, POL-033)`, 4800);
+}
+
+function openCreate() {
+  ['cName','cId','cPw','cOrg'].forEach(id => { const e = document.getElementById(id); e.value = ''; WF.mark(e, null); });
+  document.getElementById('cExt').checked = false;
+  openModal('mCreate');
+}
+function createAcc() {
+  const n = document.getElementById('cName'), u = document.getElementById('cId'), p = document.getElementById('cPw');
+  let bad = false;
+  const eN = WF.checkName(n.value); WF.mark(n, eN); bad = bad || !!eN;
+  const uid = u.value.trim();
+  const eU = !/^[A-Za-z0-9]{4,20}$/.test(uid) ? '아이디는 영문·숫자 4~20자로 입력해 주세요.'
+    : ACCOUNTS.some(a => a.uid === uid) ? '이미 사용 중인 아이디입니다.' : null;
+  WF.mark(u, eU); bad = bad || !!eU;
+  const eP = (p.value || '').length >= 8 ? null : '초기 비밀번호는 8자 이상으로 입력해 주세요.';
+  WF.mark(p, eP); bad = bad || !!eP;
+  if (bad) { toast('입력값을 확인해 주세요.'); return; }
+
+  const role = document.getElementById('cRole').value;
+  const ext = document.getElementById('cExt').checked;
+  /* POL-032 — 외부 팀은 셔틀팀만 */
+  if (ext && role !== '셔틀팀' && !confirm('외부 팀 계정은 셔틀팀만 발급하기로 정해져 있습니다.\n그래도 발급하시겠습니까?')) return;
+
+  ACCOUNTS.push({ id: Date.now(), name: n.value.trim(), uid, role,
+    org: document.getElementById('cOrg').value.trim() || '—', ext, menus: [...(DEFAULTS[role] || [])] });
+  HIST.unshift({ at: now(), who: '박채림', what: `계정 발급 — ${n.value.trim()} (${role})${ext && role !== '셔틀팀' ? ' · 외부 팀 예외 발급' : ''}` });
+  closeModal('mCreate'); renderAcc();
+  toast(`${n.value.trim()} 계정을 발급했습니다. 최초 로그인 시 비밀번호를 변경해야 합니다. (POL-029, POL-033)` +
+    (ext && role !== '셔틀팀' ? ' 외부 팀 예외 발급이 이력에 기록됩니다. (POL-032)' : ''), 5200);
+}
+
+function toggleGuard() {
+  myRole = myRole === '전체 어드민' ? '본부 팀원' : '전체 어드민';
+  const ok = myRole === '전체 어드민';
+  mountSideNav('accounts', myRole);
+  document.getElementById('who').textContent = ok ? '박채림 (전체 어드민)' : '노은주 (본부 팀원)';
+  document.getElementById('guardBtn').textContent = ok ? '권한 없는 계정으로 보기 (POL-030)' : '전체 어드민으로 돌아가기';
+  document.getElementById('allowed').classList.toggle('hidden', !ok);
+  document.getElementById('blocked').classList.toggle('hidden', ok);
+  toast(ok ? '전체 어드민 계정입니다.' : '전체 어드민이 아니면 이 화면에 들어올 수 없습니다. 사이드 내비에서도 잠깁니다. (POL-030)', 4600);
+}
+function lastAdmin() {
+  ACCOUNTS = ACCOUNTS.filter(a => a.role !== '전체 어드민' || a.id === 1);
+  renderAcc(); loadPerm(1);
+  document.getElementById('roleSel').value = '본부 팀원';
+  applyDefaults();
+}
+const now = () => new Date().toLocaleString('ko-KR', { dateStyle:'short', timeStyle:'short' });
+
+renderAcc(); loadPerm(2);
+</script>
+</body>
+</html>

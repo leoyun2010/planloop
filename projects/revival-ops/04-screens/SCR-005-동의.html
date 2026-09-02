@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-005 동의 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-005 동의</strong> · v0.1 · 상태: 초안 · 경로 <code>/apply/4</code> · 사용자(모바일)
+  <div class="tags">관련: REQ-010 · POL-039, POL-041, POL-045 · 정의서: SCR-005-동의.md · 원본 U5</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>두 동의를 각각 체크해야 [신청 완료하기]가 활성화됩니다.</span>
+  <button onclick="setCase('full')">잔여 좌석 부족 (POL-002)</button>
+  <button onclick="setCase('closed')">접수 마감 (POL-001)</button>
+  <button onclick="setCase('ok')">정상으로</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="phone">
+  <div class="scr">
+    <div class="u-stat">9:41 ▮▮▮</div>
+    <div class="u-top">
+      <div class="k"><span class="n">1</span>집회 신청 · 4/4</div>
+      <div class="t">동의</div>
+    </div>
+
+    <div class="u-body">
+      <div class="step"><span class="n">2</span>4단계 · 동의
+        <div class="bar2"><i style="width:100%"></i></div>
+      </div>
+
+      <!-- [3] 개인정보 동의 -->
+      <label class="ckrow" style="align-items:flex-start;position:relative">
+        <span class="n abs">3</span>
+        <input type="checkbox" id="ckPersonal" onchange="onConsent()">
+        <span class="cktx">
+          <b>개인정보 수집·이용 동의</b> <span class="chip bad">필수</span>
+          <div class="cksub" style="margin-top:8px;line-height:1.8">
+            <b>수집 항목</b> 이름, 휴대폰 번호, 지역, 성별<br>
+            <b>이용 목적</b> 집회 참가 신청 처리, 입금 확인, 안내 연락<br>
+            <b>보관 기간</b> 집회 종료 후 <b>1년</b> (POL-039)
+          </div>
+        </span>
+      </label>
+
+      <!-- [4] 민감정보 동의 -->
+      <label class="ckrow" style="align-items:flex-start;position:relative">
+        <span class="n abs">4</span>
+        <input type="checkbox" id="ckSensitive" onchange="onConsent()">
+        <span class="cktx">
+          <b>민감정보 수집·이용 동의</b> <span class="chip bad">필수</span>
+          <div class="cksub" style="margin-top:8px;line-height:1.8">
+            <b>수집 항목</b> 몸 상태, 알러지, 건강 상세, 구원 여부, 마음 상태<br>
+            <b>이용 목적</b> 숙소 배정, 식단 참고, 상담 배치<br>
+            <b>보관 기간</b> 집회 종료 후 <b>3개월</b> (POL-039)<br>
+            <span style="color:#777">암호화해 저장합니다. (POL-041)</span>
+          </div>
+        </span>
+      </label>
+
+      <!-- [5] 처리방침 -->
+      <div class="u-card" style="position:relative">
+        <span class="n abs">5</span>
+        <button class="u-ghost" style="margin:0" onclick="openPolicy()">개인정보 처리방침 전문 보기 ›</button>
+      </div>
+
+      <!-- [6] 동의 안내 -->
+      <div class="hint" id="guardMsg" style="position:relative">
+        <span class="n abs">6</span>
+        신청을 완료하려면 <b>개인정보 수집·이용 동의</b>와 <b>민감정보 수집·이용 동의</b>가 모두 필요합니다.
+      </div>
+
+      <!-- [7] 이전 / 신청 완료 -->
+      <div style="display:flex;gap:8px;margin-top:16px;position:relative">
+        <span class="n abs">7</span>
+        <button class="u-ghost" style="margin:0;flex:1" data-nav="SCR-004 상태 입력">이전</button>
+        <button class="u-primary" style="flex:2" id="btnSubmit" onclick="submitApply()" disabled>신청 완료하기</button>
+      </div>
+
+      <div class="u-card hidden" id="resultBox" style="margin-top:14px;background:#eef4ee;border-color:#9ecfb5">
+        <div class="u-h">기록된 동의</div>
+        <div id="resultBody" style="font-size:14px;color:#444;line-height:1.9"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+let submitCase = 'ok';   /* ok | full | closed */
+const REMAINING = 2;     /* 잔여 좌석 (POL-002 시연용) */
+const REQUEST_COUNT = 3; /* 신청 인원 */
+
+function onConsent() {
+  const p = document.getElementById('ckPersonal').checked;
+  const s = document.getElementById('ckSensitive').checked;
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = !(p && s);
+  const g = document.getElementById('guardMsg');
+  g.style.background = (p && s) ? '#eef4ee' : '#f0f0f0';
+  g.style.borderColor = (p && s) ? '#9ecfb5' : '#aaa';
+}
+
+function submitApply() {
+  const p = document.getElementById('ckPersonal').checked;
+  const s = document.getElementById('ckSensitive').checked;
+
+  /* POL-045 — 둘 다 아니면 완료하지 않는다 */
+  if (!p || !s) {
+    toast('신청을 완료하려면 개인정보 수집·이용 동의와 민감정보 수집·이용 동의가 모두 필요합니다. (POL-045)', 4000);
+    return;
+  }
+  /* POL-001 / POL-002 — 제출 시점 재검사 */
+  if (submitCase === 'closed') {
+    toast('접수 기간이 종료되어 신청을 완료할 수 없습니다. 본부 접수처(연락처)로 문의해 주세요. (POL-001)', 4500);
+    return;
+  }
+  if (submitCase === 'full') {
+    toast(`신청 인원이 남은 자리보다 많습니다. 남은 자리는 ${REMAINING}명입니다. 본부 접수처(연락처)로 문의해 주세요. (POL-002)`, 4500);
+    return;
+  }
+
+  /* 동의 일시를 실제로 기록한다 (POL-045) */
+  const now = new Date();
+  const stamp = now.toLocaleString('ko-KR', { dateStyle: 'medium', timeStyle: 'short' });
+  document.getElementById('resultBox').classList.remove('hidden');
+  document.getElementById('resultBody').innerHTML =
+    `개인정보 수집·이용 동의 — <b>동의</b> · ${stamp}<br>` +
+    `민감정보 수집·이용 동의 — <b>동의</b> · ${stamp}<br>` +
+    `<span style="color:#666;font-size:13px">두 동의의 일시를 각각 기록했습니다. (POL-045)</span>`;
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnSubmit').textContent = '신청을 저장하는 중입니다…';
+  setTimeout(() => {
+    document.getElementById('btnSubmit').textContent = '신청 완료 · 이동 중…';
+    goScreen('SCR-006', { message: '신청이 접수되었습니다 · 신청 완료 화면으로 이동합니다', delay: 1400 });
+  }, 900);
+}
+
+/* [5] 처리방침 — 본문 미확정 (OI-6) */
+function openPolicy() {
+  toast('개인정보 처리방침은 준비 중입니다. (오픈 이슈 OI-6 — 본문 확정 전에는 접수를 열지 않습니다)', 4500);
+}
+
+function setCase(c) {
+  submitCase = c;
+  document.getElementById('btnSubmit').textContent = '신청 완료하기';
+  onConsent();
+  toast(c === 'ok' ? '정상 제출 조건입니다.' : c === 'full' ? '잔여 좌석 부족 상태입니다. 제출해 보세요.' : '접수 마감 상태입니다. 제출해 보세요.');
+}
+onConsent();
+</script>
+</body>
+</html>

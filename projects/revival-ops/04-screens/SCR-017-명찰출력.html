@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-017 명찰 출력 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-017 명찰 출력</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/badges</code> · 관리자(PC)
+  <div class="tags">관련: REQ-035, REQ-036, REQ-037 · POL-019, POL-020(미확정), POL-033, POL-038 · 정의서: SCR-017-명찰출력.md · 원본 A5</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>입금 미확인 행은 체크가 실제로 막힙니다.</span>
+  <button id="paperBtn" onclick="togglePaper()">용지 규격 확정으로 (POL-020)</button>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/badges</div>
+    <div class="who">노은주 (본부 팀원)</div>
+  </div>
+  <div class="app">
+    <aside class="side"></aside>
+
+    <main class="main">
+      <div class="mh">
+        <h2><span class="n">1</span>명찰 출력</h2>
+        <div class="crumb" id="summary"></div>
+      </div>
+
+      <!-- [2] 용지 규격 -->
+      <div class="panel-box" id="paperBox">
+        <span class="n abs">2</span>
+        <h3>용지 규격 <span class="chip warn" id="paperChip">미확정</span></h3>
+        <div class="sub" id="paperText"></div>
+      </div>
+
+      <!-- [3] 탭·필터 -->
+      <div class="panel-box">
+        <div class="toolbar">
+          <span class="n">3</span>
+          <div class="tabs" data-tabs="badge">
+            <button data-tab="queue" class="on">대기열<span class="cnt" id="cQ"></span></button>
+            <button data-tab="printed">출력 완료<span class="cnt" id="cP"></span></button>
+            <button data-tab="reissue">재발급<span class="cnt" id="cR"></span></button>
+          </div>
+          <select class="tin" id="region" onchange="apply()">
+            <option value="">지역: 전체</option>
+            <option>안성</option><option>평택</option><option>수원</option>
+          </select>
+          <input class="tin w" id="q" placeholder="이름 · 등록번호" oninput="apply()">
+          <span class="grow"></span>
+          <span class="sub" style="margin:0" id="shown"></span>
+        </div>
+
+        <!-- [4] 테이블 -->
+        <div style="position:relative">
+          <span class="n abs">4</span>
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:34px"><input type="checkbox" data-all="badge"></th>
+                <th style="width:130px">등록번호</th>
+                <th style="width:90px">이름</th>
+                <th style="width:70px">지역</th>
+                <th style="width:60px">구분</th>
+                <th style="width:90px">입금</th>
+                <th style="width:80px">출력 횟수</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="tb"></tbody>
+          </table>
+        </div>
+
+        <!-- [5] 출력 액션 -->
+        <div class="toolbar" style="margin-top:10px;position:relative">
+          <span class="n">5</span>
+          <span class="sub" style="margin:0" id="selInfo">선택 0건</span>
+          <button class="btn" id="btnSel" onclick="printSelected()" disabled>선택 출력</button>
+          <button class="btn" onclick="printByRegion()">지역별 묶음 출력</button>
+          <button class="btn pri" onclick="printAll()">전체 일괄 출력</button>
+          <span class="grow"></span>
+          <span class="sub" style="margin:0">집회 전날 대기 목록 전체를 한 번에 출력하는 것이 기본 운영 방식입니다. (POL-019)</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 미리보기 모달 -->
+<div class="mask" id="mPrev">
+  <div class="modal" style="max-width:420px">
+    <div class="mtop"><h3>명찰 미리보기</h3><button class="x" onclick="closeModal('mPrev')">✕</button></div>
+    <div class="mbody">
+      <div style="border:2px solid #666;border-radius:6px;padding:22px;text-align:center;background:#fff;max-width:280px;margin:0 auto">
+        <div style="font-size:11px;color:#777">2026 금수원 대전도집회</div>
+        <div style="font-size:26px;font-weight:bold;margin:12px 0;letter-spacing:4px" id="pvName"></div>
+        <div style="font-size:13px;color:#444" id="pvReg"></div>
+        <div style="font-size:12px;color:#777;margin-top:6px" id="pvSub"></div>
+      </div>
+      <div class="sub" style="margin-top:12px;text-align:center">이름 · 등록번호 · 지역 · 구분 4개 항목</div>
+      <div class="errbox" id="pvWarn" style="margin-top:12px">용지 규격이 확정되지 않았습니다. 출력 전에 실물 용지로 확인해 주세요. (POL-020 · OI-4)</div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mPrev')">닫기</button><button class="btn pri" onclick="printFromPreview()">출력</button></div>
+  </div>
+</div>
+
+<!-- 일괄 출력 확인 -->
+<div class="mask" id="mBulk">
+  <div class="modal" style="max-width:420px">
+    <div class="mtop"><h3>전체 일괄 출력</h3><button class="x" onclick="closeModal('mBulk')">✕</button></div>
+    <div class="mbody"><div id="bulkText" style="font-size:14px;line-height:1.8"></div></div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mBulk')">닫기</button><button class="btn pri" onclick="doBulk()">출력</button></div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+mountSideNav('badges', '본부 팀원');
+const ME = '노은주';
+let paperFixed = false;
+let prevTarget = null;
+
+let ROWS = [
+  { id:1, regNo:'20260619-0021', name:'김복음', region:'안성', type:'인도자', pay:'매칭',   print:0 },
+  { id:2, regNo:'20260619-0022', name:'박소망', region:'평택', type:'참여자', pay:'매칭',   print:1 },
+  { id:3, regNo:null,            name:'이믿음', region:'안성', type:'참여자', pay:'미매칭', print:0 },
+  { id:4, regNo:'20260619-0019', name:'최은혜', region:'수원', type:'참여자', pay:'매칭',   print:0 },
+  { id:5, regNo:'20260619-0020', name:'오소망', region:'안성', type:'참여자', pay:'매칭',   print:2 },
+  { id:6, regNo:null,            name:'정소망', region:'평택', type:'참여자', pay:'미매칭', print:0 },
+  { id:7, regNo:'20260619-0023', name:'한사랑', region:'수원', type:'참여자', pay:'매칭',   print:0 },
+];
+
+function renderPaper() {
+  document.getElementById('paperChip').className = paperFixed ? 'chip ok' : 'chip warn';
+  document.getElementById('paperChip').textContent = paperFixed ? 'A6 확정' : '미확정';
+  document.getElementById('paperText').innerHTML = paperFixed
+    ? 'A6(105×148mm) · 여백 상하 8mm / 좌우 6mm — 수양회 설정값 재사용'
+    : '<span style="color:#c2463c">용지 규격이 확정되지 않았습니다. 출력 전에 실물 용지로 확인해 주세요.</span> 소형 용지 프린터를 대여할지 구매할지 정해지면 확정합니다. (POL-020 · 오픈 이슈 OI-4)';
+  document.getElementById('pvWarn').classList.toggle('hidden', paperFixed);
+}
+function togglePaper() {
+  paperFixed = !paperFixed;
+  document.getElementById('paperBtn').textContent = paperFixed ? '용지 규격 미확정으로 (POL-020)' : '용지 규격 확정으로 (POL-020)';
+  renderPaper();
+  toast(paperFixed ? '규격이 확정된 경우의 화면입니다.' : '규격 미확정 — 출력 전 실물 확인 안내가 뜹니다. (POL-020)');
+}
+
+function render() {
+  document.getElementById('tb').innerHTML = ROWS.map(r => {
+    const can = r.pay === '매칭';
+    return `<tr data-id="${r.id}" data-pay="${r.pay}" data-print="${r.print}" data-region="${r.region}"
+        data-search="${(r.name + ' ' + (r.regNo || '미발급')).toLowerCase()}"
+        class="${can ? '' : 'bad'}">
+      <td><input type="checkbox" data-row="badge" ${can ? '' : 'disabled'}></td>
+      <td>${r.regNo || '<span class="chip neu">미발급</span>'}</td>
+      <td><b>${r.name}</b></td>
+      <td>${r.region}</td>
+      <td>${r.type}</td>
+      <td>${can ? '<span class="chip ok">확인</span>' : '<span class="chip bad">미매칭</span>'}</td>
+      <td class="num">${can ? r.print + (r.print > 0 ? ' <span class="chip warn">재발급</span>' : '') : '—'}</td>
+      <td>${can
+        ? `<div class="acts"><button class="btn sm" onclick="preview(${r.id})">미리보기</button><button class="btn sm" onclick="printOne(${r.id})">출력</button></div>`
+        : `<span style="font-size:12px;color:#a63a31">출력 불가</span>`}</td>
+    </tr>`;
+  }).join('');
+
+  const q = ROWS.filter(r => r.pay === '매칭' && r.print === 0).length;
+  const p = ROWS.filter(r => r.pay === '매칭' && r.print > 0).length;
+  const re = ROWS.filter(r => r.pay === '매칭' && r.print > 1).length;
+  document.getElementById('summary').textContent = `대기 ${q}명 · 출력 완료 ${p}명 · 재발급 ${re}건`;
+  document.getElementById('cQ').textContent = ` ${q}`;
+  document.getElementById('cP').textContent = ` ${p}`;
+  document.getElementById('cR').textContent = ` ${re}`;
+  apply();
+}
+
+function apply() {
+  const q = (document.getElementById('q').value || '').trim().toLowerCase();
+  const region = document.getElementById('region').value;
+  const tab = currentTab('badge') || 'queue';
+  const shown = filterRows('#tb', tr => {
+    const pay = tr.dataset.pay, pc = +tr.dataset.print;
+    if (tab === 'queue' && !(pay === '매칭' && pc === 0)) return false;
+    if (tab === 'printed' && !(pay === '매칭' && pc > 0)) return false;
+    if (tab === 'reissue' && !(pay === '매칭' && pc > 1)) return false;
+    if (region && tr.dataset.region !== region) return false;
+    return !q || (tr.dataset.search || '').includes(q);
+  });
+  document.getElementById('shown').textContent = `표시 ${shown}건`;
+  document.getElementById('noRow')?.remove();
+  if (shown === 0) {
+    document.getElementById('tb').insertAdjacentHTML('beforeend',
+      `<tr id="noRow"><td colspan="8"><div class="empty">${
+        tab === 'queue' ? '출력할 명찰이 없습니다. 입금이 확인된 건만 대기열에 올라옵니다.' : '해당하는 건이 없습니다.'
+      }</div></td></tr>`);
+  }
+}
+onTab('badge', apply);
+onSelect('badge', sel => {
+  document.getElementById('selInfo').textContent = `선택 ${sel.length}건`;
+  document.getElementById('btnSel').disabled = sel.length === 0;
+});
+
+/* POL-019 — 입금 확인 건만 출력 */
+function doPrint(rows, label) {
+  const blocked = rows.filter(r => r.pay !== '매칭');
+  if (blocked.length) { toast('입금이 확인되지 않은 신청은 명찰을 출력할 수 없습니다. (POL-019)', 4200); return; }
+  const re = rows.filter(r => r.print > 0);
+  rows.forEach(r => r.print++);
+  clearSelect('badge');
+  render();
+  toast(`${label} — ${rows.length}건 출력했습니다.` +
+    (re.length ? ` 그중 ${re.length}건은 이미 출력한 건이라 재발급으로 기록됩니다. (POL-019)` : ' 출력 횟수를 기록했습니다. (POL-033)'), 4600);
+}
+function printOne(id) {
+  const r = ROWS.find(x => x.id === id);
+  if (r.print > 0) toast('이미 출력한 명찰입니다. 재발급으로 기록됩니다. (POL-019)', 3600);
+  doPrint([r], '개별 출력');
+}
+function printSelected() {
+  const rows = selected('badge').map(c => ROWS.find(r => r.id === +c.closest('tr').dataset.id));
+  doPrint(rows, '선택 출력');
+}
+function printByRegion() {
+  const region = document.getElementById('region').value;
+  if (!region) { toast('지역을 먼저 선택해 주세요. 지역별로 묶어 출력합니다.'); return; }
+  const rows = ROWS.filter(r => r.pay === '매칭' && r.region === region);
+  if (!rows.length) { toast(`${region} 지역에 출력할 건이 없습니다.`); return; }
+  doPrint(rows, `${region} 지역 묶음 출력`);
+}
+function printAll() {
+  const rows = ROWS.filter(r => r.pay === '매칭' && r.print === 0);
+  if (!rows.length) { toast('대기 중인 명찰이 없습니다.'); return; }
+  document.getElementById('bulkText').innerHTML =
+    `대기 중인 <b>${rows.length}건</b>을 모두 출력합니다.<br><br>` +
+    `입금이 확인된 건만 포함됩니다. 미매칭 ${ROWS.filter(r => r.pay !== '매칭').length}건은 제외됩니다. (POL-019)` +
+    (paperFixed ? '' : '<br><br><span style="color:#c2463c">용지 규격이 확정되지 않았습니다. 실물 용지를 먼저 확인해 주세요.</span>');
+  openModal('mBulk');
+}
+function doBulk() {
+  closeModal('mBulk');
+  doPrint(ROWS.filter(r => r.pay === '매칭' && r.print === 0), '전체 일괄 출력');
+}
+
+function preview(id) {
+  prevTarget = ROWS.find(r => r.id === id);
+  document.getElementById('pvName').textContent = prevTarget.name.split('').join(' ');
+  document.getElementById('pvReg').textContent = prevTarget.regNo;
+  document.getElementById('pvSub').textContent = `${prevTarget.region} · ${prevTarget.type}`;
+  openModal('mPrev');
+}
+function printFromPreview() { closeModal('mPrev'); printOne(prevTarget.id); }
+
+renderPaper();
+render();
+
+(function applyNavContext() {
+  const ctx = navContext();
+  if (!ctx || !ctx.filter) return;
+  document.querySelector('[data-tab="queue"]')?.click();
+  toast(`${ctx.from || '이전 화면'}에서 넘어와 "출력 대기열"을 열었습니다.`, 3400);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-010 셔틀 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-010 셔틀 신청 · 조회</strong> · v0.1 · 상태: 초안 · 경로 <code>/shuttle</code> · 사용자(모바일)
+  <div class="tags">관련: REQ-017, REQ-018 · POL-025, POL-026, POL-028, POL-042, POL-049 · 정의서: SCR-010-셔틀.md · 원본 U10</div>
+</div>
+
+<div class="statebar">
+  <b>본부 쪽 동작</b>
+  <button onclick="dispatch()">배차 확정</button>
+  <button onclick="cancelDispatch()">배차 취소</button>
+  <button onclick="nearDeparture()">출발 5분 전으로 (POL-049)</button>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="phone">
+  <div class="scr">
+    <div class="u-stat">9:41 ▮▮▮</div>
+    <div class="u-top">
+      <div class="k"><span class="n">1</span>셔틀</div>
+      <div class="t">타는 곳 · 시간</div>
+    </div>
+
+    <div class="u-body">
+
+      <!-- [2] 정기 운행 -->
+      <div class="u-card">
+        <span class="n abs">2</span>
+        <div class="u-h">정기 운행</div>
+        <div class="hint" style="margin:0 0 10px">시작·마침 시간의 정기편은 <b>신청 없이</b> 이용하실 수 있습니다.</div>
+        <div class="statusrow"><span><b style="display:inline-block;width:54px">07:00</b> 터미널 → 집회장</span></div>
+        <div class="statusrow"><span><b style="display:inline-block;width:54px">08:30</b> 터미널 → 집회장</span></div>
+        <div class="statusrow"><span><b style="display:inline-block;width:54px">21:00</b> 집회장 → 터미널</span></div>
+      </div>
+
+      <!-- [3] 확정된 내 셔틀 -->
+      <div class="u-card">
+        <span class="n abs">3</span>
+        <div class="u-h">확정된 내 셔틀</div>
+        <div id="myBox"></div>
+      </div>
+
+      <!-- [4] 셔틀 요청 -->
+      <div style="position:relative">
+        <span class="n abs">4</span>
+        <div class="hint" style="margin-top:0">중간에 이동이 필요하세요?</div>
+        <button class="u-primary" style="margin-top:8px" onclick="openReq()">셔틀 요청하기</button>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab" data-nav="SCR-001 접수 홈"><span class="ti">📝</span>접수</div>
+      <div class="tab" data-nav="SCR-009 공지·일정"><span class="ti">📢</span>공지/일정</div>
+      <div class="tab on"><span class="ti">🚌</span><span class="n" style="width:14px;height:14px;font-size:9px">5</span>셔틀</div>
+      <div class="tab" data-nav="SCR-008 마이페이지"><span class="ti">👤</span>마이페이지</div>
+    </div>
+  </div>
+</div>
+
+<!-- 요청 모달 -->
+<div class="mask" id="mReq">
+  <div class="modal">
+    <div class="mtop"><h3>셔틀 요청</h3><button class="x" onclick="closeModal('mReq')">✕</button></div>
+    <div class="mbody">
+      <div class="mfield"><label><span class="n">6</span>구분 *</label>
+        <div class="pick" id="pkRider"><div class="opt">참여자</div><div class="opt">스태프</div></div>
+        <div class="errmsg"></div>
+        <div class="mnote" style="margin-top:8px">식당·집회장 스태프도 요청하실 수 있습니다. (POL-028)</div>
+      </div>
+      <div class="mfield"><label><span class="n">7</span>방향 *</label>
+        <div class="pick" id="pkDir"><div class="opt">나가는 편</div><div class="opt">들어오는 편</div></div>
+        <div class="errmsg"></div>
+      </div>
+      <div class="mfield"><label><span class="n">8</span>목적지 *</label><input class="tin" id="rDest" placeholder="예) 안성 터미널"><div class="errmsg"></div></div>
+      <div class="mfield"><label><span class="n">9</span>출발 희망 시간 *</label><input class="tin" id="rTime" type="datetime-local"><div class="errmsg"></div></div>
+      <div class="mfield"><label><span class="n">10</span>동승 인원 *</label><input class="tin" id="rCnt" type="number" min="1" value="1" style="width:120px"><div class="errmsg"></div></div>
+      <div class="mfield"><label><span class="n">11</span>연락처 *</label><input class="tin" id="rPhone" placeholder="010-0000-0000" inputmode="numeric"><div class="errmsg"></div></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn" onclick="closeModal('mReq')">취소</button>
+      <button class="btn pri" onclick="submitReq()">요청하기</button>
+    </div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+let req = null;            /* { dir, dest, departAt, cnt, riderType, status, vehicle, driver, boarded } */
+const CUTOFF_MIN = 10;     /* POL-049 */
+
+function renderMy() {
+  const box = document.getElementById('myBox');
+  if (!req) {
+    box.innerHTML = `<div class="empty" style="padding:24px">신청하신 셔틀이 없습니다.<br>필요하시면 아래에서 요청해 주세요.</div>`;
+    return;
+  }
+  const t = new Date(req.departAt);
+  const when = t.toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  if (req.status === '대기') {
+    box.innerHTML = `
+      <div class="statusrow"><span class="lbl">${when} · ${req.dir}</span><span class="chip warn">대기</span></div>
+      <div class="statusrow"><span class="lbl">목적지</span><span>${req.dest} · ${req.cnt}명</span></div>
+      <div class="hint" style="margin-top:10px">본부에서 배차를 확정하면 여기에 시간과 차량이 표시됩니다.</div>`;
+    return;
+  }
+  if (req.status === '취소') {
+    box.innerHTML = `<div class="hint" style="margin:0">배차가 취소되었습니다. 본부 접수처로 문의해 주세요.</div>`;
+    return;
+  }
+  const cutoff = req.departAt - CUTOFF_MIN * 60 * 1000;
+  const closed = Date.now() > cutoff;
+  box.innerHTML = `
+    <div class="statusrow"><span class="lbl">${when} · ${req.dir}</span><span class="chip ok">배차 확정</span></div>
+    <div class="statusrow"><span class="lbl">목적지</span><span>${req.dest} · ${req.cnt}명</span></div>
+    <div class="statusrow"><span class="lbl">차량</span><span>${req.vehicle}</span></div>
+    <div class="statusrow"><span class="lbl">운전자</span><span>${req.driver}</span></div>
+    <button class="u-primary" style="margin-top:12px" id="btnBoard" ${req.boarded || closed ? 'disabled' : ''} onclick="board()">
+      ${req.boarded ? '탑승 확정됨 ✓' : '탑승 확정하기'}
+    </button>
+    <div class="hint" style="margin-top:8px">${closed && !req.boarded
+      ? '<b>탑승 확정은 출발 10분 전까지만 가능합니다.</b> 셔틀 담당자에게 직접 말씀해 주세요. (POL-049)'
+      : `출발 ${CUTOFF_MIN}분 전까지 눌러 주세요. (POL-049)`}</div>`;
+}
+
+function openReq() {
+  const d = new Date(Date.now() + 3 * 3600 * 1000);
+  d.setSeconds(0, 0);
+  document.getElementById('rTime').value = d.toISOString().slice(0, 16);
+  openModal('mReq');
+}
+
+function submitReq() {
+  let bad = false;
+  const rider = pickValue('#pkRider');
+  WF.mark(document.getElementById('pkRider'), rider ? null : '구분(참여자 / 스태프)을 선택해 주세요.'); bad = bad || !rider;
+  const dir = pickValue('#pkDir');
+  WF.mark(document.getElementById('pkDir'), dir ? null : '가는 방향을 선택해 주세요.'); bad = bad || !dir;
+
+  const dest = document.getElementById('rDest');
+  const eD = !dest.value.trim() ? '목적지를 입력해 주세요.' : (dest.value.trim().length > 30 ? '목적지는 30자 이내로 입력해 주세요.' : null);
+  WF.mark(dest, eD); bad = bad || !!eD;
+
+  const time = document.getElementById('rTime');
+  const ts = time.value ? new Date(time.value).getTime() : 0;
+  const eT = !ts ? '출발 희망 시간을 입력해 주세요.' : (ts < Date.now() ? '출발 희망 시간은 지금 이후로 정해 주세요.' : null);
+  WF.mark(time, eT); bad = bad || !!eT;
+
+  const cnt = document.getElementById('rCnt');
+  const eC = (+cnt.value >= 1) ? null : '동승 인원을 1명 이상으로 입력해 주세요.';
+  WF.mark(cnt, eC); bad = bad || !!eC;
+
+  const ph = document.getElementById('rPhone');
+  const eP = WF.checkPhone(ph.value); WF.mark(ph, eP); bad = bad || !!eP;
+
+  if (bad) { toast('입력하신 내용을 확인해 주세요.'); return; }
+
+  req = { riderType: rider, dir, dest: dest.value.trim(), departAt: ts, cnt: +cnt.value, status: '대기', boarded: false };
+  closeModal('mReq'); renderMy();
+  toast(`요청이 등록되었습니다. 관리자 셔틀 관리(SCR-022)의 "${dir}" 대기 목록에 노출됩니다. (POL-025)`, 4200);
+}
+
+/* 본부 쪽 동작 시연 */
+function dispatch() {
+  if (!req) { toast('먼저 셔틀을 요청해 주세요.'); return; }
+  req.status = '배차 확정'; req.vehicle = '25인승 12가3456'; req.driver = '김운전';
+  renderMy();
+  toast('본부가 배차를 확정했습니다. 차량과 운전자가 표시됩니다. (POL-027)');
+}
+function cancelDispatch() {
+  if (!req) { toast('요청이 없습니다.'); return; }
+  req.status = '취소'; req.boarded = false;
+  renderMy();
+  toast('배차가 취소되어 탑승 확정도 함께 해제되었습니다. (POL-049)');
+}
+function nearDeparture() {
+  if (!req) { toast('먼저 셔틀을 요청해 주세요.'); return; }
+  req.departAt = Date.now() + 5 * 60 * 1000;   /* 출발 5분 전 — 마감 경과 */
+  renderMy();
+  toast('출발 5분 전 상태입니다. 탑승 확정 버튼이 비활성화됩니다. (POL-049)', 4000);
+}
+function board() {
+  req.boarded = true; renderMy();
+  toast('탑승 확정했습니다. 관리자 탑승자 명단에 표시됩니다.');
+}
+renderMy();
+</script>
+</body>
+</html>

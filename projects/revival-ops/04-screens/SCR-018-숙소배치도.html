@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-018 숙소 배치도 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<style>
+  .rooms { display:flex; gap:12px; flex-wrap:wrap; }
+  .room { border:1px solid #bbb; border-radius:5px; background:#fff; padding:10px; min-width:190px; }
+  .room h4 { font-size:13px; margin-bottom:2px; display:flex; align-items:center; gap:6px; }
+  .room .tag { font-size:10px; color:#777; border:1px solid #ddd; border-radius:8px; padding:1px 6px; }
+  .flr { font-size:11px; color:#777; margin:8px 0 4px; }
+  .seats { display:flex; gap:5px; flex-wrap:wrap; }
+  .seat { width:34px; height:34px; border:1px solid #999; border-radius:4px; background:#fff;
+          font-size:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+          color:#666; text-align:center; line-height:1.1; padding:2px; }
+  .seat:hover { outline:2px solid #666; }
+  .seat.assigned { background:#e6f4ec; border-color:#9ecfb5; color:#1f6b4a; font-weight:bold; }
+  .seat.priority { background:#fbeae8; border-color:#e0a49d; color:#a63a31; font-weight:bold; }
+  .seat.hold { background:#fbf1da; border-color:#dcc188; color:#8a5d0f; }
+  body.emptyonly .seat:not(.free) { opacity:.18; }
+  body.emptyonly .seat.free { outline:2px solid #333; }
+  .ulist { max-height:330px; overflow:auto; }
+  .urow { border:1px solid #ddd; border-radius:4px; padding:8px 10px; margin-bottom:6px; background:#fff; font-size:12px; }
+  .urow b { font-size:13px; }
+</style>
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-018 숙소 배치도</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/lodging</code> · 관리자(PC)
+  <div class="tags">관련: REQ-038~047 · POL-010~018, POL-033, POL-048 · 정의서: SCR-018-숙소배치도.md · 원본 A6</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>배치도 생성 → 보류 지정 → 우선 배정 → 일괄 배치 순으로 눌러 보세요.</span>
+  <button onclick="breakCount()">합계 깨뜨리기 (POL-048)</button>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/lodging</div>
+    <div class="who">노은주 (본부 팀원)</div>
+  </div>
+  <div class="app">
+    <aside class="side"></aside>
+
+    <main class="main">
+      <div class="mh">
+        <h2><span class="n">1</span>숙소 배치도</h2>
+        <div class="crumb" id="counter"></div>
+        <div class="right"><button class="btn" onclick="openModal('mRules')">ⓘ 배정 룰</button></div>
+      </div>
+
+      <div class="errbox hidden" id="countWarn" style="margin-bottom:12px"></div>
+
+      <!-- [2] 배치도 만들기 -->
+      <div class="panel-box">
+        <span class="n abs">2</span>
+        <h3>배치도 만들기</h3>
+        <div class="toolbar">
+          <label style="font-size:12px;color:#555">구역명</label><input class="tin" id="bZone" value="A구역" style="width:110px">
+          <label style="font-size:12px;color:#555">방 개수</label><input class="tin" id="bRooms" type="number" value="3" style="width:80px">
+          <label style="font-size:12px;color:#555">1층/방</label><input class="tin" id="bLower" type="number" value="4" style="width:80px">
+          <label style="font-size:12px;color:#555">2층/방</label><input class="tin" id="bUpper" type="number" value="6" style="width:80px">
+          <button class="btn pri" onclick="build()">생성</button>
+          <button class="btn" onclick="resetLayout()">초기화</button>
+          <button class="btn" onclick="reuseFixed()">고정 구역 재사용</button>
+        </div>
+        <div class="errmsg" id="eBuild"></div>
+        <div class="sub">게스트하우스·방갈로처럼 도면이 고정된 구역은 한 번 만들어 두고 재사용합니다. (POL-015)</div>
+      </div>
+
+      <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+        <!-- [3] 미배정 명단 -->
+        <div class="panel-box" style="flex:0 0 300px">
+          <span class="n abs">3</span>
+          <h3>미배정 명단</h3>
+          <div class="tabs" data-tabs="un" style="margin-bottom:10px;flex-wrap:wrap">
+            <button data-tab="special" class="on">특이사항</button>
+            <button data-tab="group">동행</button>
+            <button data-tab="normal">일반</button>
+            <button data-tab="none">미사용</button>
+          </div>
+          <div class="ulist" id="unList"></div>
+        </div>
+
+        <!-- [4] 배치도 -->
+        <div class="panel-box" style="flex:1;min-width:420px">
+          <span class="n abs">4</span>
+          <h3>배치도</h3>
+          <div class="toolbar" style="margin-bottom:10px">
+            <button class="btn" id="emptyBtn" onclick="toggleEmpty()">빈자리만 보기</button>
+            <button class="btn" onclick="holdOnePerRoom()">보류 좌석 지정</button>
+            <button class="btn pri" onclick="bulkAssign()">일괄 랜덤 배치</button>
+            <span class="grow"></span>
+            <span class="sub" style="margin:0">
+              <span class="seat free" style="display:inline-flex;width:16px;height:16px"></span> 빈
+              <span class="seat assigned" style="display:inline-flex;width:16px;height:16px"></span> 배정
+              <span class="seat priority" style="display:inline-flex;width:16px;height:16px"></span> 우선
+              <span class="seat hold" style="display:inline-flex;width:16px;height:16px"></span> 보류
+            </span>
+          </div>
+          <div class="rooms" id="map"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 좌석 상세 -->
+<div class="mask" id="mSeat">
+  <div class="modal" style="max-width:460px">
+    <div class="mtop"><h3 id="stTitle">좌석</h3><button class="x" onclick="closeModal('mSeat')">✕</button></div>
+    <div class="mbody">
+      <div id="stInfo"></div>
+      <div class="mfield" style="margin-top:12px"><label>메모</label><input class="tin" id="stMemo" placeholder="예) 화장실 가까운 자리 요청"></div>
+      <div class="toolbar" style="margin-top:12px;flex-wrap:wrap">
+        <button class="btn" id="btnMove" onclick="startMove()">다른 자리로 이동</button>
+        <button class="btn" id="btnUn" onclick="unassignSeat()">배정 해제</button>
+        <button class="btn" id="btnHold" onclick="toggleHold()">보류 지정</button>
+      </div>
+      <div class="mnote" style="margin-top:12px">모든 좌석 변경은 담당자와 함께 이력에 기록됩니다. (POL-033) · 불만 대응은 3클릭 이내로 끝나야 합니다. (POL-018)</div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mSeat')">닫기</button><button class="btn pri" onclick="saveSeat()">저장</button></div>
+  </div>
+</div>
+
+<!-- 배정 룰 -->
+<div class="mask" id="mRules">
+  <div class="modal wide">
+    <div class="mtop"><h3>배정 룰 · 시점</h3><button class="x" onclick="closeModal('mRules')">✕</button></div>
+    <div class="mbody">
+      <table class="tbl">
+        <thead><tr><th style="width:110px">구분</th><th style="width:90px">정책</th><th>기준</th></tr></thead>
+        <tbody>
+          <tr><td><b>1순위</b></td><td>POL-010</td><td>동행자(인도자-참여자)를 같은 방에 붙여 배치. 성별이 다르면 불가피하게 분리</td></tr>
+          <tr><td><b>필수 반영</b></td><td>POL-011</td><td>특이사항에 거동 불편이 적힌 인원은 1층 침대 우선 배정</td></tr>
+          <tr><td>참고</td><td>POL-012</td><td>연령이 높으면 1층 우선, 방마다 고르게. 지인 근접 배치는 확약하지 않음</td></tr>
+          <tr><td>보류</td><td>POL-013</td><td>방마다 1층 한 자리를 현장 대응용으로 확보. 일괄 배치에서 제외</td></tr>
+          <tr><td>시점 · 일반</td><td>POL-014</td><td>집회 1~2일 전 일괄 배정. 신청 즉시 배정하지 않음</td></tr>
+          <tr><td>시점 · 예외</td><td>POL-015</td><td>게스트하우스·방갈로는 등록·입금 즉시 배정. 다 차면 「더 이상 받을 수 없습니다」</td></tr>
+          <tr><td>시점 · 현장</td><td>POL-016</td><td>현장 접수자는 보류 좌석에 수동 배치</td></tr>
+          <tr><td>제외</td><td>POL-017</td><td>숙소 필요 없음 선택자는 배정 대상에서 자동 제외</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mRules')">닫기</button></div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+mountSideNav('lodging', '본부 팀원');
+const ME = '노은주';
+
+/* 참가자 — 숙소 미사용자는 배정 대상 제외 (POL-017) */
+let PEOPLE = [
+  { id:1, name:'김복음', sex:'남', group:'A-101', use:true,  special:'', priority:false, seat:null },
+  { id:2, name:'이믿음', sex:'여', group:'A-101', use:true,  special:'2층 침대에 못 올라갑니다', priority:false, seat:null },
+  { id:3, name:'박소망', sex:'남', group:'A-101', use:true,  special:'', priority:false, seat:null },
+  { id:4, name:'최은혜', sex:'여', group:'A-102', use:true,  special:'무릎이 불편해 계단이 힘듭니다', priority:false, seat:null },
+  { id:5, name:'오소망', sex:'남', group:'A-105', use:true,  special:'', priority:false, seat:null },
+  { id:6, name:'한사랑', sex:'여', group:'A-104', use:true,  special:'', priority:false, seat:null },
+  { id:7, name:'정소망', sex:'남', group:'A-103', use:false, special:'', priority:false, seat:null },
+  { id:8, name:'윤기쁨', sex:'남', group:'A-106', use:true,  special:'', priority:false, seat:null },
+  { id:9, name:'서평안', sex:'여', group:'A-107', use:true,  special:'', priority:false, seat:null },
+];
+let SEATS = [];        /* { id, zone, room, floor, no, status, personId, memo } */
+let moveFrom = null, curSeat = null, emptyOnly = false, fakeGhost = 0;
+let HIST = [];
+
+function build() {
+  const zone = document.getElementById('bZone').value.trim();
+  const rooms = +document.getElementById('bRooms').value;
+  const lower = +document.getElementById('bLower').value;
+  const upper = +document.getElementById('bUpper').value;
+  const e = document.getElementById('eBuild');
+  const fail = m => { e.classList.add('on'); e.textContent = m; };
+  e.classList.remove('on');
+  if (!zone) return fail('구역명을 입력해 주세요.');
+  if (!(rooms >= 1)) return fail('방 개수를 1개 이상 입력해 주세요.');
+  if (lower + upper < 1) return fail('방에는 좌석이 1개 이상 있어야 합니다.');   /* POL-048 */
+
+  SEATS = [];
+  let id = 1;
+  for (let r = 1; r <= rooms; r++) {
+    for (let i = 1; i <= lower; i++) SEATS.push({ id: id++, zone, room: r, floor: 1, no: i, status: 'free', personId: null, memo: '' });
+    for (let i = 1; i <= upper; i++) SEATS.push({ id: id++, zone, room: r, floor: 2, no: i, status: 'free', personId: null, memo: '' });
+  }
+  PEOPLE.forEach(p => p.seat = null);
+  fakeGhost = 0;
+  log(`배치도 생성 — ${zone} ${rooms}방 (1층 ${lower} / 2층 ${upper})`);
+  render();
+  toast(`${zone} ${rooms}개 방, 총 ${SEATS.length}석을 만들었습니다.`);
+}
+function resetLayout() {
+  if (!SEATS.length) { toast('배치도가 없습니다.'); return; }
+  SEATS = []; PEOPLE.forEach(p => p.seat = null); fakeGhost = 0;
+  log('배치도 초기화');
+  render(); toast('배치도를 초기화했습니다. 배정이 모두 해제됩니다.');
+}
+function reuseFixed() {
+  document.getElementById('bZone').value = '게스트하우스';
+  document.getElementById('bRooms').value = 2;
+  document.getElementById('bLower').value = 2;
+  document.getElementById('bUpper').value = 0;
+  toast('고정 도면 구역 값을 불러왔습니다. [생성]을 누르면 좌석 구조만 가져옵니다(배정 정보는 가져오지 않습니다). (POL-015)', 4600);
+}
+
+/* POL-048 — 배정+보류+빈자리 = 총 좌석 */
+function counts() {
+  const total = SEATS.length + fakeGhost;
+  const assigned = SEATS.filter(s => s.status === 'assigned' || s.status === 'priority').length;
+  const hold = SEATS.filter(s => s.status === 'hold').length;
+  const free = SEATS.filter(s => s.status === 'free').length;
+  return { total, assigned, hold, free, sum: assigned + hold + free };
+}
+function renderCounter() {
+  const c = counts();
+  document.getElementById('counter').innerHTML =
+    `총 <b>${c.total}</b>석 · 배정 <b>${c.assigned}</b> · 보류 <b>${c.hold}</b> · 빈자리 <b>${c.free}</b>`;
+  const w = document.getElementById('countWarn');
+  if (c.sum !== c.total) {
+    w.classList.remove('hidden');
+    w.innerHTML = `<b>좌석 수가 맞지 않습니다.</b> 총 ${c.total}석인데 배정 ${c.assigned} + 보류 ${c.hold} + 빈자리 ${c.free} = ${c.sum}석입니다. 배치도를 확인해 주세요. (POL-048)`;
+  } else w.classList.add('hidden');
+  return c;
+}
+
+function render() {
+  const map = document.getElementById('map');
+  if (!SEATS.length) {
+    map.innerHTML = `<div class="empty" style="width:100%">아직 배치도가 없습니다. 위에서 구역과 방을 입력해 만들어 주세요.</div>`;
+  } else {
+    const rooms = [...new Set(SEATS.map(s => `${s.zone}|${s.room}`))];
+    map.innerHTML = rooms.map(k => {
+      const [zone, room] = k.split('|');
+      const rs = SEATS.filter(s => s.zone === zone && s.room === +room);
+      const grp = [...new Set(rs.filter(s => s.personId).map(s => PEOPLE.find(p => p.id === s.personId).group))];
+      const floor = f => rs.filter(s => s.floor === f).map(s => seatEl(s)).join('') || '<span class="sub">없음</span>';
+      return `<div class="room">
+        <h4>${zone} ${room}방 ${grp.length === 1 ? `<span class="tag">${grp[0]}</span>` : ''}</h4>
+        <div class="flr">1층</div><div class="seats">${floor(1)}</div>
+        <div class="flr">2층</div><div class="seats">${floor(2)}</div>
+      </div>`;
+    }).join('');
+  }
+  renderCounter();
+  renderUnassigned();
+}
+function seatEl(s) {
+  const p = s.personId ? PEOPLE.find(x => x.id === s.personId) : null;
+  const cls = s.status === 'free' ? 'free' : s.status;
+  return `<div class="seat ${cls}" onclick="openSeat(${s.id})" title="${s.zone} ${s.room}방 ${s.floor}층 ${s.no}번">${p ? p.name.slice(1) : s.no}</div>`;
+}
+
+function renderUnassigned() {
+  const tab = currentTab('un') || 'special';
+  let rows = PEOPLE.filter(p => !p.seat);
+  if (tab === 'none') rows = PEOPLE.filter(p => !p.use);
+  else {
+    rows = rows.filter(p => p.use);                              /* POL-017 — 미사용자 제외 */
+    if (tab === 'special') rows = rows.filter(p => p.special);
+    if (tab === 'group') rows = rows.filter(p => PEOPLE.filter(x => x.group === p.group).length > 1);
+    if (tab === 'normal') rows = rows.filter(p => !p.special && PEOPLE.filter(x => x.group === p.group).length === 1);
+  }
+  const el = document.getElementById('unList');
+  if (!rows.length) { el.innerHTML = `<div class="empty" style="padding:22px">${tab === 'none' ? '숙소를 사용하지 않는 인원이 없습니다.' : '배정할 인원이 없습니다.'}</div>`; return; }
+  el.innerHTML = rows.map(p => {
+    if (tab === 'none') return `<div class="urow"><b>${p.name}</b> · ${p.sex}<div class="sub" style="margin:4px 0 0">숙소 필요 없음 — 배정 대상에서 제외됩니다. (POL-017)</div></div>`;
+    const mates = PEOPLE.filter(x => x.group === p.group);
+    return `<div class="urow">
+      <b>${p.name}</b> · ${p.sex} <span class="tag" style="border:1px solid #ddd;border-radius:8px;padding:1px 5px;font-size:10px">${p.group}</span>
+      ${p.special ? `<div style="color:#a63a31;margin-top:4px">특이사항: ${p.special}</div>` : ''}
+      <div class="acts" style="margin-top:6px">
+        ${p.special ? `<button class="btn sm" onclick="assignPriority(${p.id})">1층 우선 배정</button>` : ''}
+        ${mates.length > 1 ? `<button class="btn sm" onclick="assignGroup('${p.group}')">그룹 같은 방 (${mates.length}명)</button>` : ''}
+        ${!p.special && mates.length === 1 ? `<button class="btn sm" onclick="assignAny(${p.id})">빈 자리 배정</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+onTab('un', renderUnassigned);
+
+/* POL-011 — 거동 불편 1층 우선 */
+function assignPriority(pid) {
+  const p = PEOPLE.find(x => x.id === pid);
+  const seat = SEATS.find(s => s.floor === 1 && s.status === 'free');
+  if (!seat) { toast('1층에 남은 자리가 없습니다. 보류 좌석을 해제하거나 배정된 자리를 조정해 주세요. (POL-011)', 4600); return; }
+  place(p, seat, 'priority');
+  log(`우선 배정 — ${p.name} → ${seat.zone} ${seat.room}방 1층 ${seat.no}번`);
+  render();
+  toast(`${p.name} 님을 1층에 우선 배정했습니다. 필수 반영 대상입니다. (POL-011)`);
+}
+/* POL-010 — 동행 같은 방, 성별 다르면 분리 */
+function assignGroup(g) {
+  const mates = PEOPLE.filter(p => p.group === g && !p.seat && p.use);
+  if (!mates.length) { toast('배정할 동행 인원이 없습니다.'); return; }
+  const bySex = {}; mates.forEach(m => (bySex[m.sex] = bySex[m.sex] || []).push(m));
+  const main = Object.values(bySex).sort((a, b) => b.length - a.length)[0];
+  const rooms = [...new Set(SEATS.map(s => `${s.zone}|${s.room}`))];
+  const target = rooms.find(k => {
+    const [z, r] = k.split('|');
+    return SEATS.filter(s => s.zone === z && s.room === +r && s.status === 'free').length >= main.length;
+  });
+  if (!target) { toast(`동행 ${main.length}명을 모두 받을 수 있는 방이 없습니다. (POL-010)`, 4200); return; }
+  const [z, r] = target.split('|');
+  const free = SEATS.filter(s => s.zone === z && s.room === +r && s.status === 'free');
+  main.forEach((m, i) => place(m, free[i], 'assigned'));
+  const sep = mates.filter(m => !main.includes(m));
+  sep.forEach(m => { const s = SEATS.find(x => x.status === 'free'); if (s) place(m, s, 'assigned'); });
+  log(`동행 배정 — ${g} ${main.length}명 → ${z} ${r}방`);
+  render();
+  toast(sep.length
+    ? `${g} 동행을 ${z} ${r}방에 배정했습니다. 성별이 달라 ${sep.map(m => m.name).join(', ')} 님은 다른 방으로 분리 배정했습니다. (POL-010)`
+    : `${g} 동행 ${main.length}명을 ${z} ${r}방에 함께 배정했습니다. (POL-010)`, 5000);
+}
+function assignAny(pid) {
+  const p = PEOPLE.find(x => x.id === pid);
+  const s = SEATS.filter(x => x.status === 'free').sort((a, b) => b.floor - a.floor)[0];  /* 2층부터 */
+  if (!s) { toast('빈 자리가 없습니다.'); return; }
+  place(p, s, 'assigned');
+  log(`배정 — ${p.name} → ${s.zone} ${s.room}방 ${s.floor}층 ${s.no}번`);
+  render(); toast(`${p.name} 님을 배정했습니다.`);
+}
+function place(p, seat, status) { seat.status = status; seat.personId = p.id; p.seat = seat.id; }
+
+/* POL-013 — 방마다 1층 한 자리 보류 */
+function holdOnePerRoom() {
+  if (!SEATS.length) { toast('먼저 배치도를 만들어 주세요.'); return; }
+  const rooms = [...new Set(SEATS.map(s => `${s.zone}|${s.room}`))];
+  let n = 0;
+  rooms.forEach(k => {
+    const [z, r] = k.split('|');
+    const has = SEATS.some(s => s.zone === z && s.room === +r && s.status === 'hold');
+    if (has) return;
+    const s = SEATS.find(x => x.zone === z && x.room === +r && x.floor === 1 && x.status === 'free');
+    if (s) { s.status = 'hold'; n++; }
+  });
+  log(`보류 좌석 지정 — ${n}자리`);
+  render();
+  toast(n ? `방마다 1층 한 자리씩 총 ${n}자리를 보류로 확보했습니다. 일괄 배치에서 제외됩니다. (POL-013)` : '보류로 지정할 1층 빈 자리가 없습니다.', 4600);
+}
+
+/* POL-012·013·014 — 일괄 랜덤 배치 */
+function bulkAssign() {
+  const c = renderCounter();
+  if (c.sum !== c.total) { toast('좌석 수가 맞지 않아 일괄 배치를 실행할 수 없습니다. (POL-048)', 4200); return; }
+  const rooms = [...new Set(SEATS.map(s => `${s.zone}|${s.room}`))];
+  const noHold = rooms.filter(k => { const [z, r] = k.split('|'); return !SEATS.some(s => s.zone === z && s.room === +r && s.status === 'hold'); });
+  const rest = PEOPLE.filter(p => p.use && !p.seat);
+  const free = SEATS.filter(s => s.status === 'free');
+  if (!rest.length) { toast('배정할 인원이 없습니다.'); return; }
+  if (rest.length > free.length) {
+    toast(`남은 자리보다 배정할 인원이 ${rest.length - free.length}명 많습니다. 좌석을 더 만들어 주세요. (POL-012)`, 4600);
+    return;
+  }
+  /* 2층부터 채워 1층 여유를 남긴다 (POL-012) · 방마다 고르게 */
+  const pool = free.slice().sort((a, b) => (b.floor - a.floor) || (a.room - b.room) || (a.no - b.no));
+  rest.forEach((p, i) => place(p, pool[i], 'assigned'));
+  log(`일괄 랜덤 배치 — ${rest.length}명`);
+  render();
+  toast(`${rest.length}명을 일괄 배정했습니다. 2층부터 채워 1층 여유를 남겼고, 보류·기배정 좌석은 건드리지 않았습니다. (POL-012, POL-013)` +
+    (noHold.length ? ` 보류 좌석이 없는 방이 ${noHold.length}개 있습니다.` : ''), 5600);
+}
+
+/* 빈자리만 보기 — POL-018 */
+function toggleEmpty() {
+  emptyOnly = !emptyOnly;
+  document.body.classList.toggle('emptyonly', emptyOnly);
+  document.getElementById('emptyBtn').classList.toggle('pri', emptyOnly);
+  toast(emptyOnly ? '빈 자리만 강조합니다. 좌석을 클릭해 바로 옮길 수 있습니다. (POL-018 — 3클릭 이내)' : '전체 보기로 돌아왔습니다.');
+}
+
+/* 좌석 상세 — 이동·교환·해제·보류·메모 */
+function openSeat(id) {
+  const s = SEATS.find(x => x.id === id);
+  if (moveFrom) { doMove(s); return; }
+  curSeat = s;
+  const p = s.personId ? PEOPLE.find(x => x.id === s.personId) : null;
+  document.getElementById('stTitle').textContent = `${s.zone} ${s.room}방 ${s.floor}층 ${s.no}번`;
+  document.getElementById('stInfo').innerHTML = p
+    ? `<div class="kv"><div class="k">배정</div><div class="v"><b>${p.name}</b> · ${p.sex} · ${p.group}</div></div>
+       <div class="kv"><div class="k">상태</div><div class="v">${s.status === 'priority' ? '<span class="chip bad">우선 배정</span>' : '<span class="chip ok">일반 배정</span>'}</div></div>
+       ${p.special ? `<div class="kv"><div class="k">특이사항</div><div class="v">${p.special}</div></div>` : ''}`
+    : `<div class="kv"><div class="k">상태</div><div class="v">${s.status === 'hold' ? '<span class="chip warn">보류 (현장 대응용)</span>' : '<span class="chip neu">빈 자리</span>'}</div></div>`;
+  document.getElementById('stMemo').value = s.memo || '';
+  document.getElementById('btnMove').disabled = !p;
+  document.getElementById('btnUn').disabled = !p;
+  document.getElementById('btnHold').textContent = s.status === 'hold' ? '보류 해제' : '보류 지정';
+  document.getElementById('btnHold').disabled = !!p;
+  openModal('mSeat');
+}
+function startMove() {
+  moveFrom = curSeat;
+  closeModal('mSeat');
+  if (!emptyOnly) toggleEmpty();
+  toast('옮길 자리를 클릭해 주세요. 이미 배정된 자리를 고르면 교환할지 물어봅니다. (POL-018)', 4200);
+}
+function doMove(to) {
+  const from = moveFrom; moveFrom = null;
+  if (from.id === to.id) { toast('같은 자리입니다.'); return; }
+  const pFrom = PEOPLE.find(x => x.id === from.personId);
+  if (to.personId) {
+    const pTo = PEOPLE.find(x => x.id === to.personId);
+    if (!confirm(`이 자리에는 ${pTo.name} 님이 배정되어 있습니다.\n두 분의 자리를 서로 바꾸시겠습니까?`)) return;
+    const st = from.status;
+    from.personId = pTo.id; from.status = to.status; pTo.seat = from.id;
+    to.personId = pFrom.id; to.status = st; pFrom.seat = to.id;
+    log(`좌석 교환 — ${pFrom.name} ↔ ${pTo.name}`);
+    toast(`${pFrom.name} 님과 ${pTo.name} 님의 자리를 바꿨습니다. (POL-018, POL-033)`, 4200);
+  } else {
+    if (to.status === 'hold') { toast('보류 좌석입니다. 현장 대응용으로 비워 둔 자리라 배정하려면 먼저 보류를 해제해 주세요. (POL-013)', 4600); return; }
+    to.personId = pFrom.id; to.status = from.status; pFrom.seat = to.id;
+    from.personId = null; from.status = 'free'; from.memo = '';
+    log(`좌석 이동 — ${pFrom.name} → ${to.zone} ${to.room}방 ${to.floor}층 ${to.no}번`);
+    toast(`${pFrom.name} 님을 옮겼습니다. 3클릭으로 처리했습니다. (POL-018)`, 4200);
+  }
+  render();
+}
+function unassignSeat() {
+  const p = PEOPLE.find(x => x.id === curSeat.personId);
+  p.seat = null; curSeat.personId = null; curSeat.status = 'free'; curSeat.memo = '';
+  log(`배정 해제 — ${p.name}`);
+  closeModal('mSeat'); render();
+  toast(`${p.name} 님의 배정을 해제했습니다. 미배정 명단으로 돌아갑니다.`);
+}
+function toggleHold() {
+  curSeat.status = curSeat.status === 'hold' ? 'free' : 'hold';
+  log(`${curSeat.status === 'hold' ? '보류 지정' : '보류 해제'} — ${curSeat.zone} ${curSeat.room}방 ${curSeat.floor}층 ${curSeat.no}번`);
+  closeModal('mSeat'); render();
+  toast(curSeat.status === 'hold' ? '보류 좌석으로 지정했습니다. 일괄 배치에서 제외됩니다. (POL-013)' : '보류를 해제했습니다.');
+}
+function saveSeat() {
+  curSeat.memo = document.getElementById('stMemo').value.trim();
+  if (curSeat.memo) log(`메모 — ${curSeat.zone} ${curSeat.room}방 ${curSeat.floor}층 ${curSeat.no}번: ${curSeat.memo}`);
+  closeModal('mSeat'); render();
+  toast('저장했습니다. 변경 이력에 기록됩니다. (POL-033)');
+}
+
+function breakCount() {
+  if (!SEATS.length) { toast('먼저 배치도를 만들어 주세요.'); return; }
+  fakeGhost = 3;
+  renderCounter();
+  toast('총 좌석 수와 상태별 합계가 어긋난 상태입니다. 일괄 배치가 차단됩니다. (POL-048)', 4600);
+}
+function log(what) { HIST.unshift({ at: new Date().toLocaleString('ko-KR', { dateStyle:'short', timeStyle:'short' }), who: ME, what }); }
+
+build();
+</script>
+</body>
+</html>

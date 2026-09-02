@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-006 신청 완료 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-006 신청 완료</strong> · v0.1 · 상태: 초안 · 경로 <code>/apply/done</code> · 사용자(모바일)
+  <div class="tags">관련: REQ-011, REQ-034 · POL-007, POL-034, POL-038 · 정의서: SCR-006-신청완료.md · 원본 U6</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <button onclick="setCount(1)">개인 신청 (1명)</button>
+  <button class="on" onclick="setCount(3)">동행 신청 (3명)</button>
+  <button onclick="toggleSms()">문자 도입 켜기/끄기 (POL-034)</button>
+  <button onclick="issueRegNo()">입금 확인됨으로 가정 (POL-038)</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="phone">
+  <div class="scr">
+    <div class="u-stat">9:41 ▮▮▮</div>
+    <div class="u-top">
+      <div class="k"><span class="n">1</span>신청 완료</div>
+      <div class="t">접수되었습니다</div>
+    </div>
+
+    <div class="u-body">
+
+      <!-- [2] 접수 완료 안내 -->
+      <div class="u-card" style="text-align:center;background:#eef4ee;border-color:#9ecfb5">
+        <span class="n abs">2</span>
+        <div style="font-size:34px">✓</div>
+        <div style="font-size:18px;font-weight:bold;color:#222;margin-top:6px">신청이 접수되었습니다</div>
+        <div style="font-size:14px;color:#555;margin-top:8px">등록번호는 <b>입금 확인 후</b> 발급됩니다.</div>
+        <div class="statusrow" style="margin-top:12px;border-top:1px solid #cfe0d6;padding-top:12px">
+          <span class="lbl">등록번호</span>
+          <span id="regNo" class="chip neu">미발급</span>
+        </div>
+      </div>
+
+      <!-- [3] 참가비·계좌 -->
+      <div class="u-card">
+        <span class="n abs">3</span>
+        <div class="u-h">참가비 안내</div>
+        <div class="statusrow"><span class="lbl">신청 인원</span><b id="cnt">3명</b></div>
+        <div class="statusrow"><span class="lbl">참가비</span><span id="feeLine">80,000원 × 3명</span></div>
+        <div class="statusrow"><span class="lbl">총 입금액</span><b id="amount" style="font-size:17px">240,000원</b></div>
+        <div class="statusrow"><span class="lbl">입금 계좌</span><span>국민 000000-00-000000</span></div>
+        <div class="statusrow"><span class="lbl">예금주</span><span>OOO</span></div>
+        <div class="hint" style="margin-top:10px">
+          <b>입금자명은 신청자 이름으로 보내 주세요.</b>
+          <span id="leaderNote"><br>대표(인도자) 한 분이 한 번에 입금하셔도 됩니다.</span>
+        </div>
+      </div>
+
+      <!-- [4] 입금 확인 소요 (POL-007 — 상시 노출) -->
+      <div class="u-card" style="background:#f7f3e8;border-color:#dcc188">
+        <span class="n abs">4</span>
+        <div style="font-size:15px;color:#444;line-height:1.8">
+          <b>입금 확인까지 2~3일 정도 걸릴 수 있습니다.</b><br>
+          입금하셨다면 조금만 기다려 주세요.
+        </div>
+        <div class="hint" style="margin-top:8px">POL-007 — 이 문구가 노출되지 않으면 정책 위반입니다.</div>
+      </div>
+
+      <!-- [5] 문자 발송 안내 (POL-034) -->
+      <div class="u-card hidden" id="smsBox">
+        <span class="n abs">5</span>
+        <div style="font-size:15px;color:#444">📩 안내 문자를 보냈습니다. 문자의 링크로 내 신청 내역을 바로 확인하실 수 있습니다.</div>
+        <div class="hint" style="margin-top:8px">POL-034 검토중 — 문자를 도입하지 않으면 이 블록은 나타나지 않고, 위 안내만으로 완결되어야 합니다.</div>
+      </div>
+
+      <!-- [6][7] -->
+      <div style="position:relative">
+        <span class="n abs">6</span>
+        <button class="u-ghost" style="margin-top:4px" data-nav="SCR-012 안내문 보관함">안내문 전체 보기</button>
+      </div>
+      <div style="position:relative;margin-top:10px">
+        <span class="n abs">7</span>
+        <button class="u-primary" data-nav="SCR-007 본인 확인">내 신청 확인하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+const FEE = 80000;
+let count = 3, sms = false;
+
+function setCount(n) {
+  count = n;
+  document.querySelectorAll('.statebar button').forEach(b => {
+    if (b.textContent.includes('신청 (')) b.classList.toggle('on', b.textContent.includes(`${n}명`));
+  });
+  document.getElementById('cnt').textContent = `${n}명`;
+  document.getElementById('feeLine').textContent = `${WF.won(FEE)} × ${n}명`;
+  document.getElementById('amount').textContent = WF.won(FEE * n);
+  document.getElementById('leaderNote').style.display = n > 1 ? '' : 'none';
+  toast(n > 1 ? '동행 신청 — 총 입금액이 인원 수로 계산됩니다.' : '개인 신청입니다.');
+}
+
+function toggleSms() {
+  sms = !sms;
+  document.getElementById('smsBox').classList.toggle('hidden', !sms);
+  toast(sms ? '문자 도입 켬 — 발송 안내가 노출됩니다. (POL-034)' : '문자 미도입 — 화면 안내만으로 완결되어야 합니다. (POL-034 예외)');
+}
+
+/* POL-038 채번 시연 — 집회시작일(20260619) + 순번 4자리 */
+function issueRegNo() {
+  const el = document.getElementById('regNo');
+  if (el.textContent !== '미발급') {
+    setChip(el, '미발급');
+    toast('입금 확인 전 상태로 되돌렸습니다. 등록번호는 미발급입니다. (POL-038)');
+    return;
+  }
+  const seq = String(21).padStart(4, '0');
+  el.className = 'chip ok';
+  el.textContent = `20260619-${seq}`;
+  toast('입금 매칭이 완료되면 등록번호가 발급됩니다. 형식: 집회시작일-순번 4자리 (POL-038)', 4000);
+}
+
+setCount(3);
+</script>
+</body>
+</html>

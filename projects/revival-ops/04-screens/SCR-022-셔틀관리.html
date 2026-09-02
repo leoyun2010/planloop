@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-022 셔틀 관리 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<style>
+  .tm { font-size:19px; font-weight:bold; color:#222; font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-022 셔틀 관리</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/shuttle</code> · 관리자(PC) + 셔틀팀
+  <div class="tags">관련: REQ-057~061 · POL-025~028, POL-031, POL-032, POL-033, POL-049 · 정의서: SCR-022-셔틀관리.md · 원본 A10</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>체크 → 차량 정보 입력 → [선택 배차 확정] 순으로 눌러 보세요.</span>
+  <button id="roleBtn" onclick="toggleRole()">셔틀팀 계정으로 보기 (POL-031)</button>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/shuttle</div>
+    <div class="who" id="who">노은주 (본부 팀원)</div>
+  </div>
+  <div class="app">
+    <aside class="side"></aside>
+
+    <main class="main">
+      <div class="mh">
+        <h2><span class="n">1</span>셔틀 관리</h2>
+        <div class="crumb" id="summary"></div>
+        <div class="right"><button class="btn pri" onclick="openPhone()">+ 전화 요청 등록</button></div>
+      </div>
+
+      <!-- [2] 방향 탭 -->
+      <div class="panel-box">
+        <div class="toolbar">
+          <span class="n">2</span>
+          <div class="tabs" data-tabs="dir">
+            <button data-tab="OUT" class="on">나가는 편 (집회장→외부)<span class="cnt" id="cOut"></span></button>
+            <button data-tab="IN">들어오는 편 (외부→집회장)<span class="cnt" id="cIn"></span></button>
+          </div>
+          <span class="grow"></span>
+          <button class="btn" onclick="openRegular()">정기편 관리</button>
+        </div>
+        <div class="sub">두 방향을 한 목록에 섞지 않습니다. 터미널까지 가는 시간 계산이 달라 혼선이 생기기 때문입니다. (POL-025)</div>
+
+        <!-- [3] 요청 테이블 -->
+        <div style="position:relative">
+          <span class="n abs">3</span>
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:34px"><input type="checkbox" data-all="req"></th>
+                <th style="width:100px">출발 시간</th>
+                <th style="width:90px">이름</th>
+                <th style="width:80px">구분</th>
+                <th style="width:130px">목적지</th>
+                <th style="width:60px">인원</th>
+                <th style="width:125px">연락처</th>
+                <th style="width:80px">상태</th>
+              </tr>
+            </thead>
+            <tbody id="reqBody"></tbody>
+          </table>
+          <div class="sub" style="margin-top:6px">사람 이름보다 출발 시간이 핵심입니다. 출발 시간을 첫 열에 가장 크게 두고 빠른 시간 순으로 나열합니다. (POL-026)</div>
+        </div>
+
+        <!-- [4] 배차 바 -->
+        <div class="toolbar" style="margin-top:12px;position:relative;background:#f0f0f0;padding:10px;border-radius:5px">
+          <span class="n abs">4</span>
+          <span class="sub" style="margin:0" id="selInfo">선택 0건 · 0명</span>
+          <label style="font-size:12px;color:#555;margin-left:10px">차량</label>
+          <select class="tin" id="vType" style="width:110px" onchange="updateSel()">
+            <option value="12">12인승</option><option value="25" selected>25인승</option><option value="45">45인승</option>
+          </select>
+          <label style="font-size:12px;color:#555">번호</label><input class="tin" id="vNo" placeholder="12가3456" style="width:120px">
+          <label style="font-size:12px;color:#555">운전자</label><input class="tin" id="vDriver" placeholder="김운전" style="width:110px">
+          <button class="btn pri" onclick="dispatch()">선택 배차 확정</button>
+          <div class="errmsg" id="eDisp" style="width:100%"></div>
+        </div>
+      </div>
+
+      <!-- [5] 배차 현황 -->
+      <div class="panel-box">
+        <span class="n abs">5</span>
+        <h3>배차 현황</h3>
+        <table class="tbl">
+          <thead><tr><th style="width:90px">출발</th><th style="width:170px">노선</th><th style="width:150px">차량</th><th style="width:90px">운전자</th><th style="width:80px">탑승</th><th style="width:130px">관리</th></tr></thead>
+          <tbody id="dispBody"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 배차 상세 -->
+<div class="mask" id="mDetail">
+  <div class="modal">
+    <div class="mtop"><h3 id="dTitle">배차 상세</h3><button class="x" onclick="closeModal('mDetail')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">탑승자 명단·인원·성함을 확인하고 체크로 탑승을 확인합니다. 관리자 탑승 확인은 시간 제한이 없습니다. (POL-049 예외)</div>
+      <div id="dInfo"></div>
+      <table class="tbl" style="margin-top:12px">
+        <thead><tr><th style="width:34px"></th><th style="width:90px">이름</th><th style="width:60px">인원</th><th>목적지</th><th style="width:110px">사용자 확정</th></tr></thead>
+        <tbody id="dBody"></tbody>
+      </table>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mDetail')">닫기</button></div>
+  </div>
+</div>
+
+<!-- 배차 취소 -->
+<div class="mask" id="mCancel">
+  <div class="modal" style="max-width:420px">
+    <div class="mtop"><h3>배차 취소</h3><button class="x" onclick="closeModal('mCancel')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">취소하면 신청자 화면의 확정 정보와 <b>탑승 확정이 함께 해제</b>됩니다. (POL-049)</div>
+      <div class="mfield"><label>취소 사유 *</label><input class="tin" id="cReason" placeholder="예) 차량 고장 · 인원 변동"><div class="errmsg"></div></div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mCancel')">닫기</button><button class="btn pri" onclick="doCancel()">취소하기</button></div>
+  </div>
+</div>
+
+<!-- 전화 요청 등록 -->
+<div class="mask" id="mPhone">
+  <div class="modal">
+    <div class="mtop"><h3>전화 요청 등록</h3><button class="x" onclick="closeModal('mPhone')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">본부가 전화로 받은 요청을 대신 등록합니다. 스태프는 참가자 명단에 없어도 등록할 수 있습니다. (POL-027, POL-028)</div>
+      <div class="mfield"><label>구분 *</label><div class="pick" id="pRider" style="max-width:240px"><div class="opt">참여자</div><div class="opt">스태프</div></div><div class="errmsg"></div></div>
+      <div class="mfield"><label>방향 *</label><div class="pick" id="pDir" style="max-width:300px"><div class="opt" data-value="OUT">나가는 편</div><div class="opt" data-value="IN">들어오는 편</div></div><div class="errmsg"></div></div>
+      <div class="mfield"><label>이름 *</label><input class="tin" id="pName"><div class="errmsg"></div></div>
+      <div class="mfield"><label>목적지 *</label><input class="tin" id="pDest" placeholder="예) 안성 터미널"><div class="errmsg"></div></div>
+      <div class="mfield"><label>출발 희망 시간 *</label><input class="tin" id="pTime" placeholder="예) 16:30" style="width:130px"><div class="errmsg"></div></div>
+      <div class="mfield"><label>동승 인원 *</label><input class="tin" id="pCnt" type="number" min="1" value="1" style="width:110px"><div class="errmsg"></div></div>
+      <div class="mfield"><label>연락처 *</label><input class="tin" id="pPhone" placeholder="010-0000-0000"><div class="errmsg"></div></div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mPhone')">취소</button><button class="btn pri" onclick="addPhone()">등록</button></div>
+  </div>
+</div>
+
+<!-- 정기편 -->
+<div class="mask" id="mRegular">
+  <div class="modal">
+    <div class="mtop"><h3>정기 운행 관리</h3><button class="x" onclick="closeModal('mRegular')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">등록한 정기편은 사용자 셔틀 화면(SCR-010)에 자동 노출되며, 신청 없이 이용 가능함이 함께 안내됩니다.</div>
+      <table class="tbl"><thead><tr><th style="width:90px">시간</th><th>노선</th><th style="width:110px">방향</th></tr></thead>
+        <tbody>
+          <tr><td>07:00</td><td>터미널 → 집회장</td><td>들어오는 편</td></tr>
+          <tr><td>08:30</td><td>터미널 → 집회장</td><td>들어오는 편</td></tr>
+          <tr><td>21:00</td><td>집회장 → 터미널</td><td>나가는 편</td></tr>
+        </tbody></table>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mRegular')">닫기</button></div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+let role = '본부 팀원';
+mountSideNav('shuttle', role);
+const ME = '노은주';
+
+let REQS = [
+  { id:1, dir:'OUT', time:'15:00', name:'김복음', rider:'참여자', dest:'안성 터미널', cnt:2, phone:'01099998888', status:'대기', userConfirmed:false },
+  { id:2, dir:'OUT', time:'15:10', name:'이믿음', rider:'참여자', dest:'안성 터미널', cnt:1, phone:'01011112222', status:'대기', userConfirmed:true },
+  { id:3, dir:'OUT', time:'16:30', name:'박식당', rider:'스태프', dest:'평택역',      cnt:1, phone:'01033334444', status:'대기', userConfirmed:false },
+  { id:4, dir:'OUT', time:'18:00', name:'최은혜', rider:'참여자', dest:'안성 터미널', cnt:3, phone:'01055556666', status:'대기', userConfirmed:false },
+  { id:5, dir:'IN',  time:'09:30', name:'오소망', rider:'참여자', dest:'집회장',      cnt:1, phone:'01077778888', status:'대기', userConfirmed:false },
+];
+let DISPATCH = [
+  { id:900, dir:'OUT', time:'14:00', vehicle:'25인승 12가1111', driver:'박운전', reqIds:[], members:[
+      { name:'윤기쁨', cnt:2, dest:'안성 터미널', boarded:true,  userConfirmed:true },
+      { name:'서평안', cnt:3, dest:'안성 터미널', boarded:false, userConfirmed:false },
+  ]},
+];
+let dir = 'OUT', cancelTarget = null, detailTarget = null, nextId = 500;
+const fmtPhone = p => p.length === 11 ? `${p.slice(0,3)}-${p.slice(3,7)}-${p.slice(7)}` : p;
+
+function render() {
+  const rows = REQS.filter(r => r.dir === dir && r.status === '대기').sort((a, b) => a.time.localeCompare(b.time));
+  document.getElementById('reqBody').innerHTML = rows.length ? rows.map(r => `
+    <tr data-id="${r.id}">
+      <td><input type="checkbox" data-row="req"></td>
+      <td><span class="tm">${r.time}</span></td>
+      <td><b>${r.name}</b></td>
+      <td>${r.rider === '스태프' ? '<span class="chip warn">스태프</span>' : '참여자'}</td>
+      <td>${r.dest}</td>
+      <td class="num">${r.cnt}</td>
+      <td>${fmtPhone(r.phone)}</td>
+      <td><span class="chip warn">대기</span></td>
+    </tr>`).join('')
+    : `<tr><td colspan="8"><div class="empty">이 방향으로 들어온 요청이 없습니다.</div></td></tr>`;
+
+  document.getElementById('cOut').textContent = ` ${REQS.filter(r => r.dir === 'OUT' && r.status === '대기').length}`;
+  document.getElementById('cIn').textContent = ` ${REQS.filter(r => r.dir === 'IN' && r.status === '대기').length}`;
+  document.getElementById('summary').textContent =
+    `대기 ${REQS.filter(r => r.status === '대기').length} · 확정 ${DISPATCH.length}`;
+
+  document.getElementById('dispBody').innerHTML = DISPATCH.length ? DISPATCH
+    .slice().sort((a, b) => a.time.localeCompare(b.time))
+    .map(d => {
+      const total = d.members.reduce((s, m) => s + m.cnt, 0);
+      const on = d.members.filter(m => m.boarded).reduce((s, m) => s + m.cnt, 0);
+      return `<tr>
+        <td><span class="tm" style="font-size:15px">${d.time}</span></td>
+        <td>${d.dir === 'OUT' ? '집회장 → 외부' : '외부 → 집회장'}</td>
+        <td>${d.vehicle}</td><td>${d.driver}</td>
+        <td class="num">${on}/${total}</td>
+        <td><div class="acts"><button class="btn sm" onclick="openDetail(${d.id})">상세</button><button class="btn sm" onclick="openCancel(${d.id})">취소</button></div></td>
+      </tr>`;
+    }).join('')
+    : `<tr><td colspan="6"><div class="empty">확정된 배차가 없습니다.</div></td></tr>`;
+  updateSel();
+}
+onTab('dir', t => { dir = t; clearSelect('req'); render(); });
+onSelect('req', updateSel);
+
+function updateSel() {
+  const sel = selected('req');
+  const people = sel.reduce((s, c) => s + (REQS.find(r => r.id === +c.closest('tr').dataset.id)?.cnt || 0), 0);
+  document.getElementById('selInfo').textContent = `선택 ${sel.length}건 · ${people}명`;
+  const cap = +document.getElementById('vType').value;
+  const e = document.getElementById('eDisp');
+  if (people > cap) {
+    e.classList.add('on');
+    e.textContent = `선택하신 인원(${people}명)이 차량 정원(${cap}명)을 넘습니다. 나눠 배차해 주세요. (POL-026)`;
+  } else e.classList.remove('on');
+}
+
+/* [4] 배차 확정 — POL-027 */
+function dispatch() {
+  const sel = selected('req');
+  const e = document.getElementById('eDisp');
+  if (!sel.length) { e.classList.add('on'); e.textContent = '배차할 요청을 선택해 주세요.'; return; }
+  const no = document.getElementById('vNo').value.trim(), dr = document.getElementById('vDriver').value.trim();
+  if (!no || !dr) { e.classList.add('on'); e.textContent = '차량번호와 운전자를 입력해 주세요. (POL-027)'; return; }
+  const rows = sel.map(c => REQS.find(r => r.id === +c.closest('tr').dataset.id));
+  const people = rows.reduce((s, r) => s + r.cnt, 0);
+  const cap = +document.getElementById('vType').value;
+  if (people > cap && !confirm(`선택 인원 ${people}명이 차량 정원 ${cap}명을 넘습니다.\n그래도 배차하시겠습니까?`)) return;
+  e.classList.remove('on');
+
+  DISPATCH.push({ id: nextId++, dir, time: rows[0].time,
+    vehicle: `${cap}인승 ${no}`, driver: dr,
+    members: rows.map(r => ({ name: r.name, cnt: r.cnt, dest: r.dest, boarded: false, userConfirmed: r.userConfirmed })) });
+  rows.forEach(r => r.status = '배차 확정');
+  clearSelect('req');
+  document.getElementById('vNo').value = ''; document.getElementById('vDriver').value = '';
+  render();
+  toast(`${rows.length}건 · ${people}명을 ${cap}인승 ${no}(${dr})에 배차했습니다. 신청자의 셔틀 화면과 마이페이지에 확정 시간이 표시됩니다. (POL-027)`, 5400);
+}
+
+/* [5] 상세 — 탑승 확인 */
+function openDetail(id) {
+  detailTarget = DISPATCH.find(d => d.id === id);
+  document.getElementById('dTitle').textContent = `${detailTarget.time} · ${detailTarget.vehicle}`;
+  document.getElementById('dInfo').innerHTML = `
+    <div class="kv"><div class="k">방향</div><div class="v">${detailTarget.dir === 'OUT' ? '나가는 편 (집회장→외부)' : '들어오는 편 (외부→집회장)'}</div></div>
+    <div class="kv"><div class="k">운전자</div><div class="v">${detailTarget.driver}</div></div>`;
+  renderDetail();
+  openModal('mDetail');
+}
+function renderDetail() {
+  document.getElementById('dBody').innerHTML = detailTarget.members.map((m, i) => `
+    <tr>
+      <td><input type="checkbox" ${m.boarded ? 'checked' : ''} onchange="toggleBoard(${i}, this.checked)"></td>
+      <td><b>${m.name}</b></td><td class="num">${m.cnt}</td><td>${m.dest}</td>
+      <td>${m.userConfirmed ? '<span class="chip ok">확정</span>' : '<span class="chip neu">미확정</span>'}</td>
+    </tr>`).join('');
+}
+function toggleBoard(i, v) {
+  detailTarget.members[i].boarded = v;
+  renderDetail(); render();
+  toast(v ? `${detailTarget.members[i].name} 님 탑승을 확인했습니다.` : '탑승 확인을 해제했습니다.');
+}
+
+/* 취소 — POL-033, POL-049 */
+function openCancel(id) {
+  cancelTarget = DISPATCH.find(d => d.id === id);
+  const el = document.getElementById('cReason'); el.value = ''; WF.mark(el, null);
+  openModal('mCancel');
+}
+function doCancel() {
+  const el = document.getElementById('cReason');
+  if (!el.value.trim()) { WF.mark(el, '취소 사유를 입력해 주세요.'); return; }
+  const names = cancelTarget.members.map(m => m.name);
+  DISPATCH = DISPATCH.filter(d => d.id !== cancelTarget.id);
+  REQS.filter(r => names.includes(r.name)).forEach(r => { r.status = '대기'; r.userConfirmed = false; });
+  closeModal('mCancel'); render();
+  toast(`배차를 취소했습니다. 신청자 화면의 확정 정보와 탑승 확정이 함께 해제됩니다. 사유와 함께 이력에 기록됩니다. (POL-049, POL-033)`, 5400);
+}
+
+/* 전화 요청 등록 */
+function openPhone() {
+  ['pName','pDest','pTime','pPhone'].forEach(id => { const e = document.getElementById(id); e.value = ''; WF.mark(e, null); });
+  document.getElementById('pCnt').value = 1;
+  document.querySelectorAll('#mPhone .opt').forEach(o => o.classList.remove('sel'));
+  openModal('mPhone');
+}
+function addPhone() {
+  let bad = false;
+  const rider = pickValue('#pRider'); if (!WF.mark(document.getElementById('pRider'), rider ? null : '구분(참여자 / 스태프)을 선택해 주세요.')) bad = true;
+  const d = pickValue('#pDir'); if (!WF.mark(document.getElementById('pDir'), d ? null : '가는 방향을 선택해 주세요.')) bad = true;
+  const n = document.getElementById('pName'); const eN = WF.checkName(n.value); WF.mark(n, eN); bad = bad || !!eN;
+  const de = document.getElementById('pDest'); const eD = de.value.trim() ? null : '목적지를 입력해 주세요.'; WF.mark(de, eD); bad = bad || !!eD;
+  const t = document.getElementById('pTime'); const eT = /^\d{1,2}:\d{2}$/.test(t.value.trim()) ? null : '출발 희망 시간을 HH:MM 형식으로 입력해 주세요.'; WF.mark(t, eT); bad = bad || !!eT;
+  const c = document.getElementById('pCnt'); const eC = +c.value >= 1 ? null : '동승 인원을 1명 이상으로 입력해 주세요.'; WF.mark(c, eC); bad = bad || !!eC;
+  const ph = document.getElementById('pPhone'); const eP = WF.checkPhone(ph.value); WF.mark(ph, eP); bad = bad || !!eP;
+  if (bad) { toast('입력값을 확인해 주세요.'); return; }
+
+  REQS.push({ id: nextId++, dir: d, time: t.value.trim().padStart(5, '0'), name: n.value.trim(), rider,
+    dest: de.value.trim(), cnt: +c.value, phone: WF.normalizePhone(ph.value), status: '대기', userConfirmed: false });
+  closeModal('mPhone');
+  if (d !== dir) { document.querySelector(`[data-tab="${d}"]`).click(); } else render();
+  toast(`${n.value.trim()} 님(${rider}) 요청을 «${d === 'OUT' ? '나가는 편' : '들어오는 편'}» 목록에 등록했습니다. (POL-027, POL-028)`, 4600);
+}
+function openRegular() { openModal('mRegular'); }
+
+function toggleRole() {
+  role = role === '셔틀팀' ? '본부 팀원' : '셔틀팀';
+  mountSideNav('shuttle', role);
+  document.getElementById('who').textContent = role === '셔틀팀' ? '한운행 (셔틀팀)' : '노은주 (본부 팀원)';
+  document.getElementById('roleBtn').textContent = role === '셔틀팀' ? '본부 계정으로 보기' : '셔틀팀 계정으로 보기 (POL-031)';
+  toast(role === '셔틀팀'
+    ? '셔틀팀 계정입니다. 사이드 내비에 셔틀 관리만 남습니다. 배차와 탑승 확인은 그대로 할 수 있습니다. (POL-027, POL-031, POL-032)'
+    : '본부 계정으로 돌아왔습니다.', 5200);
+}
+
+render();
+
+(function applyNavContext() {
+  const ctx = navContext();
+  if (!ctx || !ctx.filter) return;
+  toast(`${ctx.from || '이전 화면'}에서 넘어와 "배차 대기 목록"을 열었습니다.`, 3400);
+})();
+</script>
+</body>
+</html>

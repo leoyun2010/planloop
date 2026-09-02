@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-023 공지 · 안내문 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-023 공지 · 안내문</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/content</code> · 관리자(PC)
+  <div class="tags">관련: REQ-062, REQ-063, REQ-064 · POL-034(검토중), POL-046 · 정의서: SCR-023-공지안내문.md · 원본 A11</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <button onclick="breakAccount()">계좌 바꿔보기 (POL-046 경고)</button>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/content</div>
+    <div class="who">노은주 (본부 팀원)</div>
+  </div>
+  <div class="app">
+    <aside class="side"></aside>
+
+    <main class="main">
+      <div class="mh"><h2><span class="n">1</span>공지 · 안내문</h2></div>
+
+      <div class="toolbar" style="position:relative">
+        <span class="n">2</span>
+        <div class="tabs" data-tabs="ct">
+          <button data-tab="notice" class="on">공지</button>
+          <button data-tab="sched">일정</button>
+          <button data-tab="guide">안내문</button>
+          <button data-tab="sms">문자</button>
+        </div>
+        <span class="grow"></span>
+        <button class="btn pri" id="addBtn" onclick="addItem()">+ 공지 작성</button>
+      </div>
+
+      <!-- 공지 -->
+      <div class="panel-box" id="paneNotice">
+        <span class="n abs">3</span>
+        <h3>공지 관리</h3>
+        <div class="sub">게시로 설정한 공지만 사용자 화면(SCR-009)에 노출되고, 바꾸면 즉시 반영됩니다. 사용자는 열람만 가능합니다. (POL-046)</div>
+        <table class="tbl">
+          <thead><tr><th style="width:60px">게시</th><th>제목</th><th style="width:90px">작성일</th><th style="width:150px">관리</th></tr></thead>
+          <tbody id="noticeBody"></tbody>
+        </table>
+      </div>
+
+      <!-- 일정 -->
+      <div class="panel-box hidden" id="paneSched">
+        <h3>일정 관리</h3>
+        <div class="sub">등록한 일정은 사용자 화면 상단에 오늘 일정으로 시간순 고정 노출됩니다. (POL-046)</div>
+        <table class="tbl">
+          <thead><tr><th style="width:80px">날짜</th><th style="width:80px">시간</th><th>일정명</th><th style="width:110px">장소</th><th style="width:80px">관리</th></tr></thead>
+          <tbody id="schedBody"></tbody>
+        </table>
+      </div>
+
+      <!-- 안내문 -->
+      <div class="panel-box hidden" id="paneGuide">
+        <span class="n abs">4</span>
+        <h3>안내문 보관함 항목</h3>
+        <div class="sub">표시로 설정한 항목만 사용자 보관함(SCR-012)에 지정한 순서대로 노출됩니다. (POL-046)</div>
+        <div class="errbox hidden" id="feeWarn" style="margin-bottom:10px"></div>
+        <table class="tbl">
+          <thead><tr><th style="width:60px">표시</th><th style="width:60px">순서</th><th>항목명</th><th style="width:190px">관리</th></tr></thead>
+          <tbody id="guideBody"></tbody>
+        </table>
+      </div>
+
+      <!-- 문자 -->
+      <div class="panel-box hidden" id="paneSms">
+        <span class="n abs">5</span>
+        <h3>문자 발송 <span class="chip warn">POL-034 검토중</span></h3>
+        <div class="sub">유료 문자 도입 여부가 결정되지 않았습니다. 도입하지 않으면 SCR-006·SCR-008의 화면 안내만으로 안내가 완결되어야 합니다. (오픈 이슈 OI-15 · 담당 총괄 · 기한 D-45)</div>
+        <div class="toolbar" style="margin-top:10px">
+          <label style="font-size:12px;color:#555;width:80px">발신번호</label>
+          <input class="tin" id="sender" placeholder="0311234567" style="width:180px">
+          <button class="btn" onclick="registerSender()">사전등록</button>
+          <span id="senderState" class="chip bad">미등록</span>
+          <span class="sub" style="margin:0">법규에 따라 발신번호를 사전등록해야 발송할 수 있습니다.</span>
+        </div>
+        <div class="errmsg" id="eSender"></div>
+
+        <div style="font-size:13px;font-weight:bold;color:#222;margin-top:14px"><span class="n">6</span>문자 템플릿</div>
+        <table class="tbl" style="margin-top:8px">
+          <thead><tr><th style="width:70px">사용</th><th style="width:180px">템플릿</th><th>내용</th><th style="width:170px">관리</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" id="tpl1" checked></td>
+              <td><b>등록 완료 문자</b></td>
+              <td><span style="font-size:12px;color:#666">[대전도집회] 신청이 접수되었습니다. 등록번호는 입금 확인 후 발급됩니다. 내 신청 확인 ▶ {링크}</span></td>
+              <td><div class="acts"><button class="btn sm" onclick="toast('템플릿 편집 (목업)')">템플릿 편집</button><button class="btn sm" onclick="testSend('등록 완료')">테스트 발송</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" id="tpl2"></td>
+              <td><b>입금 확인 완료 문자</b> <span class="chip warn">검토</span></td>
+              <td><span style="font-size:12px;color:#666">[대전도집회] 입금이 확인되었습니다. 등록번호 {등록번호}</span></td>
+              <td><div class="acts"><button class="btn sm" onclick="toast('템플릿 편집 (목업)')">템플릿 편집</button><button class="btn sm" onclick="testSend('입금 확인')">테스트 발송</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sub" style="margin-top:8px">문자 링크로 본인 확인을 건너뛰는 기능(SCR-007)을 쓰려면 링크 유효기간 정책을 함께 정해야 합니다. (POL-034)</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+mountSideNav('content', '본부 팀원');
+
+const CONF = { fee: 80000, account: '국민 000000-00-000000' };
+let NOTICES = [
+  { id:1, title:'셔틀 시간 변경 안내', date:'6/19', pub:true },
+  { id:2, title:'우천 시 이동 경로 안내', date:'6/18', pub:true },
+  { id:3, title:'주차 안내 (초안)', date:'6/17', pub:false },
+];
+let SCHED = [
+  { id:1, date:'6/20', time:'06:00', name:'새벽 예배', place:'본당' },
+  { id:2, date:'6/20', time:'09:00', name:'1부 말씀', place:'본당' },
+  { id:3, date:'6/20', time:'14:00', name:'2부 말씀', place:'본당' },
+];
+let GUIDES = [
+  { id:1, order:1, title:'참가비 · 입금 계좌', visible:true, fee:80000, account:'국민 000000-00-000000' },
+  { id:2, order:2, title:'성경책 구매 안내', visible:true },
+  { id:3, order:3, title:'숙소 위치 · 준비물', visible:true },
+  { id:4, order:4, title:'자주 묻는 질문', visible:true },
+];
+let senderVerified = false;
+let tab = 'notice';
+
+onTab('ct', t => {
+  tab = t;
+  ['Notice','Sched','Guide','Sms'].forEach(p => document.getElementById('pane' + p).classList.add('hidden'));
+  document.getElementById('pane' + t.charAt(0).toUpperCase() + t.slice(1).replace('sms','Sms').replace('sched','Sched').replace('guide','Guide').replace('notice','Notice')).classList.remove('hidden');
+  const btn = document.getElementById('addBtn');
+  btn.classList.toggle('hidden', t === 'sms');
+  btn.textContent = t === 'notice' ? '+ 공지 작성' : t === 'sched' ? '+ 일정 추가' : '+ 안내문 항목';
+});
+
+function renderNotices() {
+  document.getElementById('noticeBody').innerHTML = NOTICES.length ? NOTICES.map(n => `
+    <tr>
+      <td><input type="checkbox" ${n.pub ? 'checked' : ''} onchange="togglePub(${n.id}, this.checked)"></td>
+      <td><b>${n.title}</b> ${n.pub ? '' : '<span class="chip neu">비게시</span>'}</td>
+      <td>${n.date}</td>
+      <td><div class="acts">
+        <button class="btn sm" onclick="toast('공지 편집기를 엽니다 (목업)')">수정</button>
+        <button class="btn sm" onclick="togglePub(${n.id}, ${!n.pub})">${n.pub ? '비게시' : '게시'}</button>
+      </div></td>
+    </tr>`).join('')
+    : `<tr><td colspan="4"><div class="empty">등록된 공지가 없습니다.</div></td></tr>`;
+}
+function togglePub(id, v) {
+  const n = NOTICES.find(x => x.id === id);
+  n.pub = v; renderNotices();
+  toast(v ? `«${n.title}»을(를) 게시했습니다. 사용자 공지 화면에 즉시 나타납니다. (POL-046)`
+          : `«${n.title}»을(를) 비게시로 바꿨습니다. 사용자 화면에서 즉시 사라집니다. (POL-046)`, 4200);
+}
+
+function renderSched() {
+  document.getElementById('schedBody').innerHTML = SCHED
+    .slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+    .map(s => `<tr><td>${s.date}</td><td><b>${s.time}</b></td><td>${s.name}</td><td>${s.place}</td>
+      <td><button class="btn sm" onclick="toast('일정 편집 (목업)')">수정</button></td></tr>`).join('');
+}
+
+function renderGuides() {
+  const list = GUIDES.slice().sort((a, b) => a.order - b.order);
+  document.getElementById('guideBody').innerHTML = list.map((g, i) => `
+    <tr>
+      <td><input type="checkbox" ${g.visible ? 'checked' : ''} onchange="toggleVis(${g.id}, this.checked)"></td>
+      <td class="num">${g.order}</td>
+      <td><b>${g.title}</b>${g.visible ? '' : ' <span class="chip neu">숨김</span>'}</td>
+      <td><div class="acts">
+        <button class="btn sm" onclick="toast('안내문 편집기를 엽니다 (목업)')">수정</button>
+        <button class="btn sm" ${i === 0 ? 'disabled' : ''} onclick="move(${g.id}, -1)">▲</button>
+        <button class="btn sm" ${i === list.length - 1 ? 'disabled' : ''} onclick="move(${g.id}, 1)">▼</button>
+      </div></td>
+    </tr>`).join('');
+  checkFee();
+}
+function toggleVis(id, v) {
+  const g = GUIDES.find(x => x.id === id); g.visible = v; renderGuides();
+  toast(v ? `«${g.title}»을(를) 표시로 바꿨습니다. 사용자 보관함에 나타납니다.`
+          : `«${g.title}»을(를) 숨겼습니다. 사용자 보관함에서 사라집니다. (POL-046)`, 4000);
+}
+function move(id, d) {
+  const list = GUIDES.slice().sort((a, b) => a.order - b.order);
+  const i = list.findIndex(g => g.id === id);
+  const j = i + d;
+  if (j < 0 || j >= list.length) return;
+  const a = list[i].order; list[i].order = list[j].order; list[j].order = a;
+  renderGuides();
+  toast('순서를 바꿨습니다. 사용자 보관함의 표시 순서가 그대로 따라갑니다. (POL-046)');
+}
+
+/* POL-046 — 안내문 계좌와 집회 설정 대조 */
+function checkFee() {
+  const g = GUIDES.find(x => x.fee != null);
+  const w = document.getElementById('feeWarn');
+  if (!g) { w.classList.add('hidden'); return; }
+  const ok = g.fee === CONF.fee && g.account === CONF.account;
+  if (ok) w.classList.add('hidden');
+  else {
+    w.classList.remove('hidden');
+    w.innerHTML = `<b>안내문에 적힌 참가비·계좌가 집회 설정과 다릅니다. 확인해 주세요.</b><br>
+      안내문 ${WF.won(g.fee)} · ${g.account} / 집회 설정 ${WF.won(CONF.fee)} · ${CONF.account}
+      <span style="color:#8a5045">— 사용자 화면에는 이 경고를 노출하지 않습니다. (POL-046)</span>`;
+  }
+}
+function breakAccount() {
+  const g = GUIDES.find(x => x.fee != null);
+  g.account = '농협 111111-11-111111';
+  document.querySelector('[data-tab="guide"]').click();
+  renderGuides();
+  toast('안내문 계좌를 집회 설정과 다르게 바꿨습니다. 경고가 뜹니다. (POL-046)', 4600);
+}
+
+/* POL-034 — 발신번호 사전등록 없이는 발송 차단 */
+function registerSender() {
+  const el = document.getElementById('sender');
+  const v = WF.normalizePhone(el.value);
+  if (!/^\d{9,11}$/.test(v)) { WF.mark(el, '발신번호를 숫자 9~11자리로 입력해 주세요.'); return; }
+  WF.mark(el, null);
+  senderVerified = true;
+  const s = document.getElementById('senderState');
+  s.className = 'chip ok'; s.textContent = '등록 완료';
+  toast('발신번호를 사전등록했습니다. 이제 문자를 보낼 수 있습니다. (POL-034)', 4200);
+}
+function testSend(kind) {
+  if (!senderVerified) {
+    toast('발신번호가 등록되지 않아 문자를 보낼 수 없습니다. 발신번호를 먼저 등록해 주세요. (POL-034)', 4600);
+    return;
+  }
+  const on = kind === '등록 완료' ? document.getElementById('tpl1').checked : document.getElementById('tpl2').checked;
+  if (!on) { toast(`«${kind} 문자» 템플릿이 사용 안 함으로 되어 있어 발송하지 않습니다. (POL-034)`, 4200); return; }
+  toast(`«${kind} 문자»를 테스트 발송했습니다. 발송 이력에 기록됩니다. (POL-033)`, 4200);
+}
+
+function addItem() {
+  if (tab === 'notice') {
+    NOTICES.unshift({ id: Date.now(), title: '새 공지 (초안)', date: '6/20', pub: false });
+    renderNotices();
+    toast('공지를 초안으로 추가했습니다. 게시로 바꾸면 사용자 화면에 나타납니다. (POL-046)', 4200);
+  } else if (tab === 'sched') {
+    SCHED.push({ id: Date.now(), date: '6/20', time: '16:00', name: '새 일정', place: '본당' });
+    renderSched(); toast('일정을 추가했습니다.');
+  } else {
+    GUIDES.push({ id: Date.now(), order: GUIDES.length + 1, title: '새 안내문 항목', visible: false });
+    renderGuides(); toast('안내문 항목을 추가했습니다. 표시로 바꾸면 사용자 보관함에 나타납니다.');
+  }
+}
+
+renderNotices(); renderSched(); renderGuides();
+</script>
+</body>
+</html>

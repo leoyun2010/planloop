@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-014 집회 생성 · 설정 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-014 집회 생성 · 설정</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/conferences</code> · 관리자(PC)
+  <div class="tags">관련: REQ-001, REQ-002, REQ-020, REQ-021 · POL-001, POL-002, POL-003, POL-033, POL-044 · 정의서: SCR-014-집회설정.md · 원본 A2</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>정원·버퍼를 바꾸면 차단선이 즉시 재계산됩니다.</span>
+  <button onclick="badBuffer()">버퍼 &gt; 정원 (POL-002)</button>
+  <button onclick="lateDeadline()">마감을 집회 2일 전으로 (POL-001)</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/conferences</div>
+    <div class="who">노은주 (본부 팀원)</div>
+  </div>
+  <div class="app">
+    <aside class="side"></aside>
+
+    <main class="main">
+      <div class="mh">
+        <h2><span class="n">1</span>집회 생성 · 설정</h2>
+        <div class="right"><button class="btn pri" onclick="toast('새 집회 만들기 모달을 엽니다 (목업)')">+ 새 집회 만들기</button></div>
+      </div>
+
+      <!-- [2] 집회 목록 -->
+      <div class="panel-box">
+        <span class="n abs">2</span>
+        <h3>집회 목록</h3>
+        <table class="tbl">
+          <thead><tr><th style="width:40px"></th><th>집회명</th><th style="width:110px">상태</th><th style="width:130px">장소</th><th style="width:150px">기간</th></tr></thead>
+          <tbody id="confList"></tbody>
+        </table>
+      </div>
+
+      <div id="ro-banner" class="errbox hidden" style="background:#eee;border-color:#bbb;color:#555;margin-bottom:14px">
+        종료·보관된 집회입니다. 기록만 조회할 수 있습니다.
+      </div>
+
+      <!-- [3] 기본 정보 -->
+      <div class="panel-box">
+        <span class="n abs">3</span>
+        <h3>기본 정보</h3>
+        <div class="toolbar">
+          <label style="font-size:12px;color:#555;width:70px">집회명 *</label>
+          <input class="tin" id="fName" style="width:300px">
+          <label style="font-size:12px;color:#555;width:50px">장소 *</label>
+          <input class="tin" id="fPlace" style="width:180px">
+        </div>
+        <div class="toolbar">
+          <label style="font-size:12px;color:#555;width:70px">기간 *</label>
+          <input class="tin" id="fStart" type="date">
+          <span>~</span>
+          <input class="tin" id="fEnd" type="date">
+          <label style="font-size:12px;color:#555;width:50px;margin-left:14px">상태</label>
+          <select class="tin" id="fStatus" onchange="applyReadonly()">
+            <option>운영 중</option><option>종료·보관</option>
+          </select>
+        </div>
+        <div class="errmsg" id="eBasic"></div>
+      </div>
+
+      <!-- [4] 접수 기간 -->
+      <div class="panel-box">
+        <span class="n abs">4</span>
+        <h3>접수 기간 <span class="chip neu">POL-001</span></h3>
+        <div class="toolbar">
+          <label style="font-size:12px;color:#555;width:70px">시작 *</label>
+          <input class="tin" id="fApplyStart" type="datetime-local" onchange="recalc()">
+          <label style="font-size:12px;color:#555;width:50px">마감 *</label>
+          <input class="tin" id="fApplyEnd" type="datetime-local" onchange="recalc()">
+        </div>
+        <div class="sub" id="leadInfo"></div>
+        <div class="errmsg" id="eApply"></div>
+      </div>
+
+      <!-- [5] 정원 · 버퍼 -->
+      <div class="panel-box">
+        <span class="n abs">5</span>
+        <h3>정원 · 현장 버퍼 <span class="chip neu">POL-002</span></h3>
+        <div class="toolbar">
+          <label style="font-size:12px;color:#555;width:70px">총 정원 *</label>
+          <input class="tin" id="fCap" type="number" style="width:110px" oninput="recalc()">
+          <label style="font-size:12px;color:#555;width:80px">현장 버퍼 *</label>
+          <input class="tin" id="fBuf" type="number" style="width:110px" oninput="recalc()">
+          <span style="margin-left:14px;font-size:13px;color:#333">→ 온라인 접수 차단선 <b id="vLine" style="font-size:15px">1,320</b>명</span>
+        </div>
+        <div class="errmsg" id="eCap"></div>
+        <label class="toolbar" style="cursor:pointer;margin-top:6px">
+          <input type="checkbox" id="fBlocked" onchange="onBlockedChange()">
+          <span style="font-size:13px">정원 도달로 접수 차단됨</span>
+          <span class="sub" style="margin:0">자동으로 다시 열리지 않습니다. 다시 받으시려면 정원을 조정하거나 이 항목을 직접 해제하세요. (POL-044)</span>
+        </label>
+      </div>
+
+      <!-- [6] 참가비 · 계좌 -->
+      <div class="panel-box">
+        <span class="n abs">6</span>
+        <h3>참가비 · 계좌</h3>
+        <div class="toolbar">
+          <label style="font-size:12px;color:#555;width:70px">참가비 *</label>
+          <input class="tin" id="fFee" type="number" style="width:130px"> <span style="font-size:13px">원</span>
+          <label style="font-size:12px;color:#555;width:70px;margin-left:14px">입금 계좌 *</label>
+          <input class="tin" id="fAcct" style="width:260px">
+        </div>
+        <div class="sub">SCR-006 신청 완료와 SCR-012 안내문에 그대로 표시됩니다. 안내문과 다르면 SCR-023에 경고가 뜹니다. (POL-046)</div>
+        <div class="errmsg" id="eFee"></div>
+      </div>
+
+      <!-- [7] 현장 접수 방침 -->
+      <div class="panel-box">
+        <span class="n abs">7</span>
+        <h3>현장 접수 방침 <span class="chip neu">POL-003</span></h3>
+        <label class="toolbar" style="cursor:pointer">
+          <input type="checkbox" id="fNoOnsite" checked>
+          <span style="font-size:13px">사용자 화면·안내문에 「현장 접수는 받지 않습니다」 표기</span>
+        </label>
+        <div class="sub">표기는 사전 신청을 유도하기 위한 것이며, 관리자 현장 수동 접수(SCR-015) 기능은 항상 동작합니다.</div>
+      </div>
+
+      <!-- [8] 반영 위치 -->
+      <div class="panel-box">
+        <span class="n abs">8</span>
+        <h3>이 설정이 반영되는 곳</h3>
+        <div class="kv"><div class="k">SCR-001 접수 홈</div><div class="v">접수 기간 배너 · 신청 버튼 차단 · 현장 접수 없음 표기</div></div>
+        <div class="kv"><div class="k">SCR-006 신청 완료</div><div class="v">참가비 · 입금 계좌</div></div>
+        <div class="kv"><div class="k">SCR-012 안내문 보관함</div><div class="v">참가비 · 계좌 안내 항목</div></div>
+        <div class="kv"><div class="k">SCR-013 대시보드</div><div class="v">총 정원 · 현장 버퍼 잔여 지표</div></div>
+      </div>
+
+      <!-- [9] 액션 -->
+      <div class="toolbar" style="position:relative;justify-content:flex-end">
+        <span class="n abs">9</span>
+        <button class="btn" onclick="openHistory()">이력</button>
+        <button class="btn" onclick="loadConf(cur)">취소</button>
+        <button class="btn pri" id="btnSave" onclick="save()">저장</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 변경 이력 모달 -->
+<div class="mask" id="mHist">
+  <div class="modal wide">
+    <div class="mtop"><h3>이 집회의 변경 이력</h3><button class="x" onclick="closeModal('mHist')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">접수·입금·환불·숙소·상담·셔틀·<b>설정</b>의 변경을 담당자·사유와 함께 기록합니다. 기록은 수정·삭제할 수 없습니다. (POL-033)</div>
+      <table class="tbl"><thead><tr><th style="width:150px">일시</th><th style="width:100px">담당자</th><th>항목</th><th>변경 전 → 후</th></tr></thead>
+        <tbody id="histBody"></tbody></table>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mHist')">닫기</button></div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+mountSideNav('conferences', '본부 팀원');
+
+const CONFS = [
+  { id: 1, name: '2026 금수원 대전도집회', status: '운영 중', place: '금수원(안성)',
+    start: '2026-06-19', end: '2026-06-21', applyStart: '2026-06-01T09:00', applyEnd: '2026-06-16T23:59',
+    cap: 1400, buf: 80, fee: 80000, acct: '국민 000000-00-000000', blocked: false, noOnsite: true },
+  { id: 2, name: '2025 가을 수양회', status: '종료·보관', place: '금수원(안성)',
+    start: '2025-09-12', end: '2025-09-14', applyStart: '2025-08-20T09:00', applyEnd: '2025-09-09T23:59',
+    cap: 900, buf: 40, fee: 70000, acct: '국민 000000-00-000000', blocked: true, noOnsite: false },
+];
+let cur = 1;
+let HIST = [
+  { at: '2026-05-28 10:12', who: '박채림', field: '총 정원', from: '1,200', to: '1,400' },
+  { at: '2026-05-28 10:12', who: '박채림', field: '현장 버퍼', from: '60', to: '80' },
+];
+
+function renderList() {
+  document.getElementById('confList').innerHTML = CONFS.map(c => `
+    <tr class="${c.id === cur ? 'sel' : ''}" style="cursor:pointer" onclick="loadConf(${c.id})">
+      <td>${c.id === cur ? '●' : '○'}</td>
+      <td><b>${c.name}</b></td>
+      <td><span class="chip ${c.status === '운영 중' ? 'ok' : 'neu'}">${c.status}</span></td>
+      <td>${c.place}</td>
+      <td>${c.start.slice(5)} ~ ${c.end.slice(5)}</td>
+    </tr>`).join('');
+}
+
+function loadConf(id) {
+  cur = id;
+  const c = CONFS.find(x => x.id === id);
+  document.getElementById('fName').value = c.name;
+  document.getElementById('fPlace').value = c.place;
+  document.getElementById('fStart').value = c.start;
+  document.getElementById('fEnd').value = c.end;
+  document.getElementById('fStatus').value = c.status;
+  document.getElementById('fApplyStart').value = c.applyStart;
+  document.getElementById('fApplyEnd').value = c.applyEnd;
+  document.getElementById('fCap').value = c.cap;
+  document.getElementById('fBuf').value = c.buf;
+  document.getElementById('fFee').value = c.fee;
+  document.getElementById('fAcct').value = c.acct;
+  document.getElementById('fBlocked').checked = c.blocked;
+  document.getElementById('fNoOnsite').checked = c.noOnsite;
+  document.querySelectorAll('.errmsg').forEach(e => { e.classList.remove('on'); e.textContent = ''; });
+  renderList(); recalc(); applyReadonly();
+}
+
+/* [5] 차단선 실시간 재계산 + [4] 마감 리드타임 안내 */
+function recalc() {
+  const cap = +document.getElementById('fCap').value || 0;
+  const buf = +document.getElementById('fBuf').value || 0;
+  document.getElementById('vLine').textContent = WF.num(Math.max(cap - buf, 0));
+
+  const s = document.getElementById('fStart').value;
+  const end = document.getElementById('fApplyEnd').value;
+  const info = document.getElementById('leadInfo');
+  if (s && end) {
+    const days = Math.floor((new Date(s) - new Date(end)) / 86400000);
+    info.innerHTML = days >= 3
+      ? `집회 시작 <b>${days}일 전</b> 마감입니다. 기준(3일 전)을 만족합니다.`
+      : `<span style="color:#c2463c">집회 시작 <b>${days}일 전</b> 마감입니다. 기준은 3일 전입니다.</span>`;
+  } else info.textContent = '';
+}
+
+function applyReadonly() {
+  const ro = document.getElementById('fStatus').value === '종료·보관';
+  document.getElementById('ro-banner').classList.toggle('hidden', !ro);
+  ['fName','fPlace','fStart','fEnd','fApplyStart','fApplyEnd','fCap','fBuf','fFee','fAcct','fBlocked','fNoOnsite']
+    .forEach(id => { const e = document.getElementById(id); e.disabled = ro; });
+  document.getElementById('btnSave').disabled = ro;
+}
+
+function onBlockedChange() {
+  const on = document.getElementById('fBlocked').checked;
+  toast(on ? '접수가 차단됩니다. 취소·환불로 자리가 비어도 자동으로 다시 열리지 않습니다. (POL-044)'
+           : '접수 차단을 직접 해제했습니다. 변경 이력에 기록됩니다. (POL-044, POL-033)', 4200);
+}
+
+/* [9] 저장 — POL-001 / POL-002 검증 */
+function save() {
+  let ok = true;
+  const clr = id => { const e = document.getElementById(id); e.classList.remove('on'); e.textContent = ''; };
+  const err = (id, msg) => { const e = document.getElementById(id); e.classList.add('on'); e.textContent = msg; ok = false; };
+  ['eBasic','eApply','eCap','eFee'].forEach(clr);
+
+  const c = CONFS.find(x => x.id === cur);
+  const name = document.getElementById('fName').value.trim();
+  const place = document.getElementById('fPlace').value.trim();
+  const start = document.getElementById('fStart').value, end = document.getElementById('fEnd').value;
+  if (!name) err('eBasic', '집회명을 입력해 주세요.');
+  else if (!place) err('eBasic', '장소를 입력해 주세요.');
+  else if (start && end && start > end) err('eBasic', '종료일은 시작일 이후로 정해 주세요.');
+
+  const aS = document.getElementById('fApplyStart').value, aE = document.getElementById('fApplyEnd').value;
+  if (!aS || !aE) err('eApply', '접수 시작·마감 일시를 입력해 주세요.');
+  else if (aE <= aS) err('eApply', '접수 마감은 접수 시작 이후여야 합니다.');
+  else if (start && new Date(aE) >= new Date(start)) err('eApply', '접수 마감은 집회 시작일 이전이어야 합니다.');
+
+  const cap = +document.getElementById('fCap').value, buf = +document.getElementById('fBuf').value;
+  if (!(cap >= 1)) err('eCap', '총 정원을 1명 이상으로 입력해 주세요.');
+  else if (buf >= cap) err('eCap', '현장 버퍼 좌석은 총 정원보다 클 수 없습니다.');   /* POL-002 */
+
+  const fee = +document.getElementById('fFee').value, acct = document.getElementById('fAcct').value.trim();
+  if (!(fee >= 0)) err('eFee', '참가비를 입력해 주세요.');
+  else if (!acct) err('eFee', '입금 계좌를 입력해 주세요.');
+
+  if (!ok) { toast('입력값을 확인해 주세요.'); return; }
+
+  /* POL-001 경고 — 저장은 된다 */
+  const days = Math.floor((new Date(start) - new Date(aE)) / 86400000);
+  const warn = days < 3;
+
+  /* 변경 이력 기록 (POL-033) */
+  const now = new Date().toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' });
+  const diffs = [];
+  const push = (f, from, to) => { if (String(from) !== String(to)) diffs.push({ at: now, who: '노은주', field: f, from, to }); };
+  push('집회명', c.name, name); push('장소', c.place, place);
+  push('접수 마감', c.applyEnd.replace('T',' '), aE.replace('T',' '));
+  push('총 정원', WF.num(c.cap), WF.num(cap)); push('현장 버퍼', c.buf, buf);
+  push('참가비', WF.num(c.fee), WF.num(fee)); push('입금 계좌', c.acct, acct);
+  push('접수 차단', c.blocked ? '차단' : '해제', document.getElementById('fBlocked').checked ? '차단' : '해제');
+  HIST = [...diffs, ...HIST];
+
+  Object.assign(c, { name, place, start, end, applyStart: aS, applyEnd: aE, cap, buf, fee, acct,
+    status: document.getElementById('fStatus').value,
+    blocked: document.getElementById('fBlocked').checked,
+    noOnsite: document.getElementById('fNoOnsite').checked });
+
+  renderList();
+  toast(warn
+    ? `저장했습니다. 다만 접수 마감이 집회 시작 3일 전보다 늦습니다. 숙소 배정과 명찰 출력 시간이 부족할 수 있습니다. (POL-001) · 변경 ${diffs.length}건 기록`
+    : `저장했습니다. 변경 ${diffs.length}건을 이력에 기록했습니다. (POL-033)`, 5000);
+}
+
+function openHistory() {
+  document.getElementById('histBody').innerHTML = HIST.length
+    ? HIST.map(h => `<tr><td>${h.at}</td><td>${h.who}</td><td>${h.field}</td><td>${h.from} → <b>${h.to}</b></td></tr>`).join('')
+    : `<tr><td colspan="4"><div class="empty">기록된 변경이 없습니다.</div></td></tr>`;
+  openModal('mHist');
+}
+
+function badBuffer() { document.getElementById('fBuf').value = 1500; recalc(); save(); }
+function lateDeadline() {
+  const c = CONFS.find(x => x.id === cur);
+  const d = new Date(c.start); d.setDate(d.getDate() - 2);
+  document.getElementById('fApplyEnd').value = d.toISOString().slice(0, 10) + 'T23:59';
+  recalc(); toast('마감을 집회 2일 전으로 바꿨습니다. [저장]을 눌러 POL-001 경고를 확인해 보세요.', 4200);
+}
+
+loadConf(1);
+</script>
+</body>
+</html>

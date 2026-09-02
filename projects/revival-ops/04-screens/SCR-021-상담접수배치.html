@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-021 상담 접수 · 배치 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<style>
+  .board td { text-align:center; height:44px; }
+  .board .slot { border:1px dashed #bbb; border-radius:4px; padding:6px 4px; font-size:12px; cursor:pointer; color:#888; background:#fafafa; }
+  .board .slot:hover { background:#eee; }
+  .board .slot.on { background:#e6f4ec; border:1px solid #9ecfb5; color:#1f6b4a; font-weight:bold; cursor:default; }
+  .board .slot.off { background:#eee; border:1px solid #ddd; color:#bbb; cursor:not-allowed; }
+</style>
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-021 상담 접수 · 배치</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/counseling/registration</code> · 관리자(PC)
+  <div class="tags">관련: REQ-048, REQ-049, REQ-050 · POL-021, POL-033, POL-035, POL-036 · 정의서: SCR-021-상담접수배치.md · 원본 A9</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>배치판 빈 칸을 클릭하거나 대기 목록 [배치]를 눌러 보세요. 오전에는 이상담사가 비활성입니다.</span>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/counseling/registration</div>
+    <div class="who">노은주 (본부 팀원)</div>
+  </div>
+  <div class="app">
+    <aside class="side"></aside>
+
+    <main class="main">
+      <div class="mh">
+        <h2><span class="n">1</span>상담 접수 · 배치</h2>
+        <div class="crumb" id="waitCount"></div>
+        <div class="right"><button class="btn pri" onclick="openIntake()">+ 상담 접수</button></div>
+      </div>
+
+      <!-- [2] 배치 대기 -->
+      <div class="panel-box">
+        <span class="n abs">2</span>
+        <h3>배치 대기 목록</h3>
+        <div class="sub">상담 신청은 본부에서만 접수합니다(현장 방문·전화). 사용자 화면에는 신청 폼이 없습니다. (POL-021)</div>
+        <div class="toolbar">
+          <input class="tin w" id="q" placeholder="이름 · 번호" oninput="renderWait()">
+          <span class="grow"></span>
+        </div>
+        <table class="tbl">
+          <thead><tr><th style="width:70px">접수</th><th style="width:90px">이름</th><th style="width:125px">연락처</th><th style="width:110px">희망 일시</th><th style="width:80px">구원</th><th>상담 사유</th><th style="width:80px">관리</th></tr></thead>
+          <tbody id="waitBody"></tbody>
+        </table>
+      </div>
+
+      <!-- [3] 배치판 -->
+      <div class="panel-box">
+        <span class="n abs">3</span>
+        <h3>상담실 배치판</h3>
+        <div class="toolbar">
+          <div class="tabs" data-tabs="bday">
+            <button data-tab="6/19" class="on">6/19</button>
+            <button data-tab="6/20">6/20</button>
+            <button data-tab="6/21">6/21</button>
+          </div>
+          <span class="sub" style="margin:0">빈 칸을 클릭하면 대기자 중에서 골라 배치합니다. 미사용 상담실은 클릭할 수 없습니다. (POL-036)</span>
+        </div>
+        <table class="tbl board" id="board"></table>
+      </div>
+
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <!-- [4] 확정된 배치 -->
+        <div class="panel-box" style="flex:2;min-width:380px">
+          <span class="n abs">4</span>
+          <h3>확정된 배치</h3>
+          <table class="tbl">
+            <thead><tr><th style="width:90px">이름</th><th style="width:130px">일시</th><th style="width:90px">상담실</th><th style="width:90px">상담사</th><th style="width:80px">관리</th></tr></thead>
+            <tbody id="confBody"></tbody>
+          </table>
+        </div>
+        <!-- [5] 사용자 연동 -->
+        <div class="panel-box" style="flex:1;min-width:260px">
+          <span class="n abs">5</span>
+          <h3>사용자 화면 연동</h3>
+          <div class="sub" style="line-height:1.9">
+            배치가 확정되면 신청자의<br>
+            · <b>SCR-008 마이페이지</b><br>
+            · <b>SCR-011 상담 안내</b><br>
+            두 화면에 확정 일시와 상담실이 표시됩니다.<br><br>
+            확정된 일정이 실제로 어떻게 흘러가는지는 <b>SCR-020 타임라인</b>에서 봅니다. (POL-036)
+          </div>
+          <button class="btn" style="margin-top:10px" data-nav="SCR-020 상담 스케줄">상담 스케줄 타임라인으로 →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 접수 모달 -->
+<div class="mask" id="mIntake">
+  <div class="modal">
+    <div class="mtop"><h3>상담 접수 (본부 전용)</h3><button class="x" onclick="closeModal('mIntake')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">신청자별 특이사항이 많아 실시간 대화로 정합니다. 사용자 모바일에는 신청 폼을 두지 않습니다. (POL-021)</div>
+      <div class="mfield"><label>접수 경로 *</label>
+        <div class="pick" id="iCh" style="max-width:220px"><div class="opt">현장</div><div class="opt">전화</div></div>
+        <div class="errmsg"></div></div>
+      <div class="mfield"><label>이름 *</label><input class="tin" id="iName"><div class="errmsg"></div></div>
+      <div class="mfield"><label>휴대폰 *</label><input class="tin" id="iPhone" placeholder="010-0000-0000"><div class="errmsg"></div></div>
+      <div class="mfield"><label>희망 일시 *</label><input class="tin" id="iWhen" placeholder="예) 6/19 오후"><div class="errmsg"></div></div>
+      <div class="mfield"><label>상담 사유</label><input class="tin" id="iReason" maxlength="500" placeholder="선택"></div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mIntake')">취소</button><button class="btn pri" onclick="addIntake()">접수</button></div>
+  </div>
+</div>
+
+<!-- 배치 모달 -->
+<div class="mask" id="mAssign">
+  <div class="modal">
+    <div class="mtop"><h3 id="asTitle">상담 배치</h3><button class="x" onclick="closeModal('mAssign')">✕</button></div>
+    <div class="mbody">
+      <div id="asTarget"></div>
+      <div class="mfield" style="margin-top:12px"><label>날짜 *</label>
+        <select class="tin" id="asDate" style="width:160px" onchange="renderCounselorOptions()">
+          <option>6/19</option><option>6/20</option><option>6/21</option></select></div>
+      <div class="mfield"><label>시간 *</label>
+        <select class="tin" id="asTime" style="width:160px" onchange="renderCounselorOptions()"></select></div>
+      <div class="mfield"><label>상담실 *</label>
+        <select class="tin" id="asRoom" style="width:200px"></select></div>
+      <div class="mfield"><label>상담사 *</label>
+        <select class="tin" id="asCounselor" style="width:240px"></select>
+        <div class="sub" style="margin-top:4px">그 시간에 가능한 상담사만 선택할 수 있습니다. 불가한 상담사는 비활성으로 표시됩니다. (POL-035 · 가능 시간 입력 위치 미확정 OI-7)</div>
+        <div class="errmsg" id="eAssign"></div></div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mAssign')">닫기</button><button class="btn pri" onclick="confirmAssign()">확정</button></div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+mountSideNav('cregist', '본부 팀원');
+const ME = '노은주';
+const TIMES = ['09:00','10:00','11:00','13:00','14:00','15:00','16:00'];
+const ROOMS = [
+  { no:1, status:'사용' }, { no:2, status:'사용' }, { no:3, status:'사용' }, { no:4, status:'미사용' },
+];
+/* 상담사 가능 시간 (POL-035) */
+const COUNSELORS = [
+  { id:1, name:'김상담', avail:{ '6/19':['09:00','18:00'], '6/20':['09:00','18:00'], '6/21':['09:00','13:00'] } },
+  { id:2, name:'이상담', avail:{ '6/19':['13:00','18:00'], '6/20':['09:00','18:00'], '6/21':['09:00','18:00'] } },
+  { id:3, name:'박상담', avail:{ '6/19':['09:00','15:00'], '6/20':['13:00','18:00'], '6/21':['09:00','18:00'] } },
+];
+let WAIT = [
+  { id:101, ch:'전화', name:'정소망', phone:'01077778888', when:'6/19 오후', salv:'미해결', reason:'구원 확신 문의' },
+  { id:102, ch:'현장', name:'오소망', phone:'01044445555', when:'6/20 오전', salv:'재확인', reason:'가정 문제 상담' },
+  { id:103, ch:'전화', name:'윤기쁨', phone:'01066667777', when:'6/19 오전', salv:'미해결', reason:'재상담 요청' },
+];
+let BOOK = [
+  { id:1, day:'6/19', time:'09:00', room:3, cid:1, name:'최은혜' },
+  { id:2, day:'6/19', time:'10:00', room:1, cid:1, name:'김복음' },
+  { id:3, day:'6/19', time:'11:00', room:1, cid:1, name:'이믿음' },
+];
+let day = '6/19', target = null, nextId = 200, HIST = [];
+const fmtPhone = p => p.length === 11 ? `${p.slice(0,3)}-${p.slice(3,7)}-${p.slice(7)}` : p;
+
+function renderWait() {
+  const q = (document.getElementById('q').value || '').trim().toLowerCase().replace(/-/g,'');
+  const rows = WAIT.filter(w => !q || (w.name + w.phone).toLowerCase().includes(q));
+  document.getElementById('waitBody').innerHTML = rows.length ? rows.map(w => `
+    <tr>
+      <td><span class="chip neu">${w.ch}</span></td>
+      <td><b>${w.name}</b></td>
+      <td>${fmtPhone(w.phone)}</td>
+      <td>${w.when}</td>
+      <td><span class="chip ${w.salv === '해결' ? 'ok' : w.salv === '재확인' ? 'warn' : 'bad'}">${w.salv}</span></td>
+      <td><span style="font-size:12px;color:#666">${w.reason}</span></td>
+      <td><button class="btn sm" onclick="openAssign(${w.id})">배치</button></td>
+    </tr>`).join('')
+    : `<tr><td colspan="7"><div class="empty">배치할 상담이 없습니다.<br>본부 접수처에서 받은 신청을 [+ 상담 접수]로 등록해 주세요.</div></td></tr>`;
+  document.getElementById('waitCount').textContent = `배치 대기 ${WAIT.length}건`;
+}
+
+function renderBoard() {
+  const head = `<thead><tr><th style="width:70px">시간</th>${ROOMS.map(r =>
+    `<th>상담실 ${r.no}${r.status === '미사용' ? ' <span class="chip neu">미사용</span>' : ''}</th>`).join('')}</tr></thead>`;
+  const body = TIMES.map(t => `<tr><td><b>${t}</b></td>${ROOMS.map(r => {
+    const b = BOOK.find(x => x.day === day && x.time === t && x.room === r.no);
+    if (r.status === '미사용') return `<td><div class="slot off">미사용</div></td>`;
+    if (b) {
+      const c = COUNSELORS.find(x => x.id === b.cid);
+      return `<td><div class="slot on">${b.name}<div style="font-size:10px;font-weight:normal">${c ? c.name : ''}</div></div></td>`;
+    }
+    return `<td><div class="slot" onclick="openAssignAt('${t}', ${r.no})">＋</div></td>`;
+  }).join('')}</tr>`).join('');
+  document.getElementById('board').innerHTML = head + `<tbody>${body}</tbody>`;
+}
+
+function renderConfirmed() {
+  document.getElementById('confBody').innerHTML = BOOK.length ? BOOK.map(b => {
+    const c = COUNSELORS.find(x => x.id === b.cid);
+    return `<tr><td><b>${b.name}</b></td><td>${b.day} ${b.time}</td><td>상담실 ${b.room}</td><td>${c ? c.name : '—'}</td>
+      <td><button class="btn sm" onclick="reassign(${b.id})">변경</button></td></tr>`;
+  }).join('') : `<tr><td colspan="5"><div class="empty">확정된 배치가 없습니다.</div></td></tr>`;
+}
+onTab('bday', t => { day = t; renderBoard(); });
+
+/* 접수 (POL-021) */
+function openIntake() {
+  ['iName','iPhone','iWhen','iReason'].forEach(id => { const e = document.getElementById(id); e.value = ''; WF.mark(e, null); });
+  document.querySelectorAll('#iCh .opt').forEach(o => o.classList.remove('sel'));
+  openModal('mIntake');
+}
+function addIntake() {
+  let bad = false;
+  const ch = pickValue('#iCh');
+  if (!WF.mark(document.getElementById('iCh'), ch ? null : '접수 경로를 선택해 주세요.')) bad = true;
+  const n = document.getElementById('iName'), p = document.getElementById('iPhone'), w = document.getElementById('iWhen');
+  const eN = WF.checkName(n.value); WF.mark(n, eN); bad = bad || !!eN;
+  const eP = WF.checkPhone(p.value); WF.mark(p, eP); bad = bad || !!eP;
+  const eW = w.value.trim() ? null : '희망 일시를 입력해 주세요.'; WF.mark(w, eW); bad = bad || !!eW;
+  if (bad) { toast('입력값을 확인해 주세요.'); return; }
+  WAIT.push({ id: nextId++, ch, name: n.value.trim(), phone: WF.normalizePhone(p.value),
+    when: w.value.trim(), salv: '미해결', reason: document.getElementById('iReason').value.trim() || '—' });
+  closeModal('mIntake'); renderWait();
+  toast(`${n.value.trim()} 님을 «${ch}» 접수로 등록했습니다. 배치 대기 목록에 추가됩니다. (POL-021)`, 4200);
+}
+
+/* 배치 */
+function openAssign(id) {
+  target = WAIT.find(w => w.id === id);
+  document.getElementById('asTitle').textContent = '상담 배치';
+  document.getElementById('asTarget').innerHTML = `
+    <div class="kv"><div class="k">대상</div><div class="v"><b>${target.name}</b> · ${fmtPhone(target.phone)}</div></div>
+    <div class="kv"><div class="k">구원 여부</div><div class="v">${target.salv} <span class="sub" style="margin:0">— 접수폼 입력값 (SCR-004)</span></div></div>
+    <div class="kv"><div class="k">희망 일시</div><div class="v">${target.when}</div></div>
+    <div class="kv"><div class="k">상담 사유</div><div class="v">${target.reason}</div></div>`;
+  document.getElementById('asDate').value = day;
+  document.getElementById('asTime').innerHTML = TIMES.map(t => `<option>${t}</option>`).join('');
+  document.getElementById('asRoom').innerHTML = ROOMS.filter(r => r.status !== '미사용')
+    .map(r => `<option value="${r.no}">상담실 ${r.no}</option>`).join('');
+  document.getElementById('eAssign').classList.remove('on');
+  renderCounselorOptions();
+  openModal('mAssign');
+}
+function openAssignAt(time, room) {
+  if (!WAIT.length) { toast('배치할 대기자가 없습니다. 먼저 상담을 접수해 주세요.'); return; }
+  openAssign(WAIT[0].id);
+  document.getElementById('asDate').value = day;
+  document.getElementById('asTime').value = time;
+  document.getElementById('asRoom').value = room;
+  renderCounselorOptions();
+  toast(`${day} ${time} 상담실 ${room}에 배치합니다. 대기자를 바꾸려면 목록에서 [배치]를 눌러 주세요.`, 4000);
+}
+
+/* POL-035 — 그 시간에 가능한 상담사만 */
+function renderCounselorOptions() {
+  const d = document.getElementById('asDate').value;
+  const t = document.getElementById('asTime').value || TIMES[0];
+  const sel = document.getElementById('asCounselor');
+  sel.innerHTML = COUNSELORS.map(c => {
+    const av = c.avail[d];
+    const ok = av && t >= av[0] && t < av[1];
+    const busy = BOOK.some(b => b.day === d && b.time === t && b.cid === c.id);
+    const label = !ok ? `${c.name} (가능 시간 밖)` : busy ? `${c.name} (이미 배정됨)` : `${c.name} (가능)`;
+    return `<option value="${c.id}" ${(!ok || busy) ? 'disabled' : ''}>${label}</option>`;
+  }).join('');
+  const anyOk = [...sel.options].some(o => !o.disabled);
+  const e = document.getElementById('eAssign');
+  if (!anyOk) { e.classList.add('on'); e.textContent = '이 시간에 가능한 상담사가 없습니다. 다른 시간을 골라 주세요.'; }
+  else e.classList.remove('on');
+}
+function confirmAssign() {
+  const d = document.getElementById('asDate').value;
+  const t = document.getElementById('asTime').value;
+  const room = +document.getElementById('asRoom').value;
+  const sel = document.getElementById('asCounselor');
+  const opt = sel.options[sel.selectedIndex];
+  const e = document.getElementById('eAssign');
+  if (!opt || opt.disabled) { e.classList.add('on'); e.textContent = '이 시간에 가능한 상담사를 선택해 주세요.'; return; }
+  if (BOOK.some(b => b.day === d && b.time === t && b.cid === +opt.value)) {
+    e.classList.add('on'); e.textContent = '이 시간에 이미 배정된 상담이 있습니다. (POL-036)'; return;
+  }
+  if (BOOK.some(b => b.day === d && b.time === t && b.room === room)) {
+    e.classList.add('on'); e.textContent = '이 상담실은 그 시간에 이미 사용 중입니다.'; return;
+  }
+  e.classList.remove('on');
+  BOOK.push({ id: nextId++, day: d, time: t, room, cid: +opt.value, name: target.name });
+  WAIT = WAIT.filter(w => w.id !== target.id);
+  HIST.unshift({ at: now(), who: ME, what: `배치 확정 — ${target.name} ${d} ${t} 상담실 ${room}` });
+  closeModal('mAssign'); renderWait(); renderBoard(); renderConfirmed();
+  toast(`${target.name} 님 배치를 확정했습니다. SCR-020 타임라인에 블록이 생기고, 마이페이지·상담 안내에 표시됩니다. (POL-036)`, 5400);
+}
+function reassign(id) {
+  const b = BOOK.find(x => x.id === id);
+  WAIT.unshift({ id: nextId++, ch: '전화', name: b.name, phone: '01000000000', when: `${b.day} ${b.time}`, salv: '재확인', reason: '배치 변경' });
+  BOOK = BOOK.filter(x => x.id !== id);
+  HIST.unshift({ at: now(), who: ME, what: `배치 해제(변경) — ${b.name}` });
+  renderWait(); renderBoard(); renderConfirmed();
+  toast(`${b.name} 님 배치를 풀어 대기 목록으로 되돌렸습니다. 변경 이력에 기록됩니다. (POL-033)`, 4600);
+}
+const now = () => new Date().toLocaleString('ko-KR', { dateStyle:'short', timeStyle:'short' });
+
+renderWait(); renderBoard(); renderConfirmed();
+</script>
+</body>
+</html>

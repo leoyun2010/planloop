@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-013 통합 대시보드 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-013 통합 대시보드</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/dashboard</code> · 관리자(PC)
+  <div class="tags">관련: REQ-070, REQ-071 · POL-002, POL-005, POL-008, POL-009, POL-031 · 정의서: SCR-013-통합대시보드.md · 원본 A1</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <button onclick="refundDone()">환불 3건 처리 완료 (POL-005)</button>
+  <button onclick="clearActions()">조치 전부 해소</button>
+  <button onclick="bufferLow()">버퍼 소진 임박</button>
+  <button onclick="mismatch()">집계 불일치 만들기 (POL-008)</button>
+  <button onclick="showState('loading')">로딩</button>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/dashboard</div>
+    <div class="who">노은주 (본부 팀원)</div>
+  </div>
+  <div class="app">
+
+    <!-- [1] 사이드 내비 -->
+    <aside class="side"></aside>
+
+    <main class="main">
+      <div class="mh">
+        <h2><span class="n">2</span>통합 대시보드</h2>
+        <div class="crumb">집회 2일차 · 14:20 기준</div>
+        <div class="right"><button class="btn" onclick="location.reload()">새로고침</button></div>
+      </div>
+
+      <!-- 로딩 -->
+      <div id="st-loading" class="hidden">
+        <div class="stats">
+          <div class="stat"><div class="skel" style="width:50%"></div><div class="skel" style="height:26px"></div></div>
+          <div class="stat"><div class="skel" style="width:50%"></div><div class="skel" style="height:26px"></div></div>
+          <div class="stat"><div class="skel" style="width:50%"></div><div class="skel" style="height:26px"></div></div>
+          <div class="stat"><div class="skel" style="width:50%"></div><div class="skel" style="height:26px"></div></div>
+        </div>
+        <div class="loading">집계를 불러오는 중…</div>
+      </div>
+
+      <!-- 집계 불일치 (POL-008) -->
+      <div id="st-error" class="hidden">
+        <div class="errbox">
+          <b>집계가 맞지 않습니다.</b> 대시보드 인원과 개인 단위 매칭 인원이 다릅니다. 입금 매칭을 확인해 주세요.<br>
+          <span style="color:#8a5045">POL-008 — 불일치 상태에서는 지표를 표시하지 않고 오류로 기록합니다.</span>
+          <div style="margin-top:10px"><button class="btn" data-nav="SCR-016 입금 매칭">입금 매칭으로 →</button></div>
+        </div>
+      </div>
+
+      <div id="st-default">
+        <!-- [3] 핵심 지표 -->
+        <div class="stats">
+          <div class="stat"><span class="n abs">3</span><div class="sl">접수 인원</div><div class="sv" id="vReg">1,284</div><div class="sd">명 · 취소·환불 제외</div></div>
+          <div class="stat"><div class="sl">입금 확인 인원</div><div class="sv" id="vPaid">1,102</div><div class="sd">명 · 매칭된 사람 수만 (POL-008)</div></div>
+          <div class="stat"><div class="sl">숙소 미배정</div><div class="sv" id="vLodge">182</div><div class="sd">명 · 숙소 사용자 기준</div></div>
+          <div class="stat"><div class="sl">상담 대기</div><div class="sv" id="vCounsel">14</div><div class="sd">건 · 배치 대기</div></div>
+        </div>
+
+        <!-- [4] 환불 집계 · 실 참가 인원 -->
+        <div style="display:flex;gap:14px;flex-wrap:wrap">
+          <div class="panel-box" style="flex:1;min-width:300px">
+            <span class="n abs">4</span>
+            <h3>환불 집계</h3>
+            <div class="kv"><div class="k">환불 인원 · 금액</div><div class="v"><b id="vRefundCnt">12</b>명 · <b id="vRefundAmt">960,000원</b></div></div>
+            <div class="kv"><div class="k">처리 완료 / 대기</div><div class="v"><span id="vRefundDone">9</span>건 / <span id="vRefundWait">3</span>건</div></div>
+            <div class="sub" style="margin-top:8px">처리 완료분만 인원·금액에서 차감합니다. (POL-005)</div>
+          </div>
+          <div class="panel-box" style="flex:1;min-width:300px">
+            <h3>실 참가 인원</h3>
+            <div class="kv"><div class="k">접수 − 환불</div><div class="v"><b id="vActual">1,272</b>명</div></div>
+            <div class="kv"><div class="k">총 정원</div><div class="v">1,400명 (온라인 차단선 1,320명)</div></div>
+            <div class="kv"><div class="k">현장 버퍼</div><div class="v" id="vBuffer">80석 중 <b>68석</b> 남음</div></div>
+            <div class="sub hidden" id="bufferWarn" style="margin-top:8px;color:#c2463c"><b>현장 버퍼가 얼마 남지 않았습니다.</b> 현장 방문자 수용 여력을 확인해 주세요. (POL-002)</div>
+          </div>
+        </div>
+
+        <!-- [5] 누적 입금액 -->
+        <div class="panel-box">
+          <span class="n abs">5</span>
+          <h3>누적 입금액 (환불 반영)</h3>
+          <div style="font-size:26px;font-weight:bold;color:#222" id="vNet">88,160,000원</div>
+          <div class="sub" style="margin-top:6px">총 입금 89,120,000원 − 환불 <span id="vNetRefund">960,000원</span></div>
+        </div>
+
+        <!-- [6] 조치 필요 목록 -->
+        <div class="panel-box">
+          <span class="n abs">6</span>
+          <h3>조치가 필요한 일</h3>
+          <div id="actionList"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+mountSideNav('dashboard', '본부 팀원');
+
+const FEE = 80000;
+let S = {
+  registered: 1284, paid: 1102, unassigned: 182, counselWaiting: 14,
+  refundCount: 12, refundDone: 9, refundWait: 3,
+  depositTotal: 89120000,
+  bufferTotal: 80, bufferUsed: 12,
+};
+let ACTIONS = [
+  { label: '미매칭',         count: 12,  to: 'SCR-016 입금 매칭', filter: '미매칭 탭' },
+  { label: '부분 매칭',      count: 7,   to: 'SCR-016 입금 매칭', filter: '부분 매칭 탭' },
+  { label: '명찰 출력 대기', count: 182, to: 'SCR-017 명찰 출력', filter: '대기열' },
+  { label: '배차 대기',      count: 5,   to: 'SCR-022 셔틀 관리', filter: '대기 목록' },
+  { label: '환불 요청',      count: 3,   to: 'SCR-015 접수·환불 관리', filter: '환불만 필터' },
+];
+
+function render() {
+  const refundAmt = S.refundDone * FEE;             /* 처리 완료분만 (POL-005) */
+  const actual = S.registered - S.refundDone;
+  const net = S.depositTotal - refundAmt;
+  const bufLeft = S.bufferTotal - S.bufferUsed;
+
+  document.getElementById('vReg').textContent = WF.num(S.registered);
+  document.getElementById('vPaid').textContent = WF.num(S.paid);
+  document.getElementById('vLodge').textContent = WF.num(S.unassigned);
+  document.getElementById('vCounsel').textContent = WF.num(S.counselWaiting);
+
+  document.getElementById('vRefundCnt').textContent = S.refundDone;
+  document.getElementById('vRefundAmt').textContent = WF.won(refundAmt);
+  document.getElementById('vRefundDone').textContent = S.refundDone;
+  document.getElementById('vRefundWait').textContent = S.refundWait;
+
+  document.getElementById('vActual').textContent = WF.num(actual);
+  document.getElementById('vBuffer').innerHTML = `${S.bufferTotal}석 중 <b>${bufLeft}석</b> 남음`;
+  document.getElementById('bufferWarn').classList.toggle('hidden', bufLeft >= 20);
+
+  document.getElementById('vNet').textContent = WF.won(net);
+  document.getElementById('vNetRefund').textContent = WF.won(refundAmt);
+
+  const list = document.getElementById('actionList');
+  const live = ACTIONS.filter(a => a.count > 0);
+  list.innerHTML = live.length ? `
+    <table class="tbl">
+      <tbody>
+        ${live.map((a, i) => `
+          <tr>
+            <td style="width:180px"><b>${a.label}</b></td>
+            <td class="num" style="width:90px"><b>${WF.num(a.count)}</b>건</td>
+            <td><button class="btn sm" onclick="goAction(${i})">${a.to.split(' ')[1] || a.to}으로 →</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`
+    : `<div class="empty">지금 조치가 필요한 일이 없습니다.</div>`;
+}
+
+function goAction(i) {
+  const live = ACTIONS.filter(a => a.count > 0);
+  const a = live[i];
+  goScreen(a.to, {
+    message: `${a.to} 화면을 "${a.filter}"이(가) 적용된 상태로 엽니다`,
+    context: { filter: a.filter, from: 'SCR-013' },
+  });
+}
+
+/* 환불 처리 완료 → 인원·금액·순 입금액이 함께 줄어든다 (POL-005) */
+function refundDone() {
+  if (S.refundWait === 0) { toast('처리 대기 중인 환불이 없습니다.'); return; }
+  const n = S.refundWait;
+  S.refundDone += n; S.refundWait = 0;
+  S.registered -= 0;                                  /* 접수 인원은 그대로, 실 인원에서 차감 */
+  const idx = ACTIONS.findIndex(a => a.label === '환불 요청');
+  if (idx >= 0) ACTIONS[idx].count = 0;
+  render();
+  toast(`환불 ${n}건을 처리 완료했습니다. 실 참가 인원 −${n}명, 순 입금액 −${WF.won(n * FEE)} 반영되었습니다. (POL-005)`, 5000);
+}
+function clearActions() { ACTIONS.forEach(a => a.count = 0); render(); toast('조치 목록이 비었을 때의 표시입니다.'); }
+function bufferLow() { S.bufferUsed = 68; render(); toast('현장 버퍼 12석 남음 — 경고가 표시됩니다. (POL-002 · 리스크 R-2)'); }
+function mismatch() { showState('error'); toast('대시보드 인원과 개인 단위 매칭 인원이 어긋난 상태입니다. (POL-008)', 4500); }
+
+render();
+</script>
+</body>
+</html>

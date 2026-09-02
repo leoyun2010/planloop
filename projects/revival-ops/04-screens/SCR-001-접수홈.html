@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-001 접수 홈 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-001 접수 홈</strong> · v0.1 · 상태: 초안 · 경로 <code>/</code> · 사용자(모바일)
+  <div class="tags">관련: REQ-001, REQ-003, REQ-021 · POL-001, POL-002, POL-003, POL-044 · 정의서: SCR-001-접수홈.md · 원본 U1</div>
+</div>
+
+<div class="statebar">
+  <b>접수 상태</b>
+  <button data-apply="open" class="on" onclick="setApply('open')">접수 중</button>
+  <button data-apply="before" onclick="setApply('before')">접수 전</button>
+  <button data-apply="closed" onclick="setApply('closed')">접수 마감 (POL-001)</button>
+  <button data-apply="full" onclick="setApply('full')">정원 마감 (POL-002·044)</button>
+  <span style="margin-left:auto"></span>
+  <button data-state="loading" onclick="showState('loading')">로딩</button>
+  <button data-state="error" onclick="showState('error')">에러</button>
+  <button data-state="default" class="on" onclick="showState('default')">기본으로</button>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="phone">
+  <div class="scr">
+    <div class="u-stat">9:41 ▮▮▮</div>
+
+    <!-- [1] 상단 헤더 -->
+    <div class="u-top">
+      <div class="k"><span class="n">1</span>금수원 대전도집회</div>
+      <div class="t">반갑습니다</div>
+    </div>
+
+    <div class="u-body">
+
+      <!-- 로딩 상태 -->
+      <div id="st-loading" class="hidden">
+        <div class="u-card"><div class="skel" style="width:60%"></div><div class="skel"></div><div class="skel" style="width:80%"></div></div>
+        <div class="u-card"><div class="skel" style="height:54px"></div></div>
+        <div class="loading">집회 정보를 불러오는 중…</div>
+      </div>
+
+      <!-- 에러 상태 -->
+      <div id="st-error" class="hidden">
+        <div class="errbox">
+          집회 정보를 불러오지 못했습니다.<br>
+          잠시 후 다시 시도해 주세요.
+        </div>
+        <button class="u-primary" style="margin-top:12px" onclick="showState('default')">다시 시도</button>
+      </div>
+
+      <!-- 기본 상태 -->
+      <div id="st-default">
+
+        <!-- [2] 접수 기간 배너 -->
+        <div class="gbanner">
+          <span class="n abs">2</span>
+          <b id="bannerTitle">온라인 접수 기간</b><br>
+          <span id="bannerRange">6월 1일(월) ~ <b>6월 16일(화) 밤 12시</b></span><br>
+          <span style="color:#555" id="bannerNote">집회 시작 3일 전에 접수가 마감됩니다. 현장 접수는 받지 않으니 기간 내에 꼭 신청해 주세요.</span>
+        </div>
+
+        <!-- [3] 진입 분기 토글 -->
+        <div class="hseg" style="position:relative">
+          <span class="n abs">3</span>
+          <button id="segNew" class="hon" onclick="setMode('new')">신청하기</button>
+          <button id="segRet" onclick="setMode('ret')">이미 신청했어요</button>
+        </div>
+
+        <!-- 신규 -->
+        <div id="modeNew">
+          <!-- [4] 집회 신청 CTA -->
+          <div style="position:relative">
+            <span class="n abs">4</span>
+            <button class="hero-cta" id="applyCta" onclick="startApply()">
+              <div class="ht" id="ctaTitle">집회 신청하기</div>
+              <div class="hd" id="ctaDesc">처음 오셨다면 여기서 시작하세요 · 약 2분</div>
+            </button>
+          </div>
+          <div class="hint hidden" id="blockMsg"></div>
+
+          <!-- [5] 자주 찾는 정보 -->
+          <div class="u-h" style="margin-top:18px"><span class="n">5</span>자주 찾는 정보</div>
+          <button class="rowbtn" data-nav="SCR-009 공지·일정">📢 &nbsp;공지 · 오늘 일정</button>
+          <button class="rowbtn" data-nav="SCR-010 셔틀">🚌 &nbsp;셔틀 시간 보기</button>
+          <button class="rowbtn" data-nav="SCR-011 상담 안내">💬 &nbsp;상담 안내</button>
+          <button class="rowbtn" data-nav="SCR-012 안내문 보관함">📩 &nbsp;안내문 다시 보기</button>
+          <div class="hint">로그인·비밀번호 없이 휴대폰 번호와 이름으로 신청합니다. (POL-029)</div>
+        </div>
+
+        <!-- 재방문 -->
+        <div id="modeRet" class="hidden">
+          <div class="u-card" style="cursor:pointer" data-nav="SCR-007 본인 확인">
+            <span class="n abs">6</span>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b style="font-size:16px">내 신청 확인하기</b>
+              <span class="chip neu">본인 확인</span>
+            </div>
+            <div style="font-size:14px;color:#666;margin-top:6px">휴대폰 번호 + 이름으로 조회</div>
+            <div style="font-size:13px;color:#888;margin-top:8px">등록번호 · 입금 상태 · 숙소 확인 ›</div>
+          </div>
+          <div class="u-h" style="margin-top:18px"><span class="n">5</span>자주 보는 것</div>
+          <button class="rowbtn" data-nav="SCR-009 공지·일정">📢 &nbsp;오늘 일정 · 공지</button>
+          <button class="rowbtn" data-nav="SCR-010 셔틀">🚌 &nbsp;셔틀 신청 · 확인</button>
+          <button class="rowbtn" data-nav="SCR-011 상담 안내">💬 &nbsp;상담 안내</button>
+          <button class="rowbtn" data-nav="SCR-012 안내문 보관함">📩 &nbsp;안내문 다시 보기</button>
+        </div>
+
+      </div><!-- /st-default -->
+    </div>
+
+    <!-- [7] 하단 탭바 -->
+    <div class="tabbar">
+      <div class="tab on"><span class="ti">📝</span><span class="n" style="width:14px;height:14px;font-size:9px">7</span>접수</div>
+      <div class="tab" data-nav="SCR-009 공지·일정"><span class="ti">📢</span>공지/일정</div>
+      <div class="tab" data-nav="SCR-010 셔틀"><span class="ti">🚌</span>셔틀</div>
+      <div class="tab" data-nav="SCR-008 마이페이지"><span class="ti">👤</span>마이페이지</div>
+    </div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+/* ---- 모의 집회 설정 (POL-001 / POL-002) ---- */
+const CONF = {
+  name: '2026 금수원 대전도집회',
+  applyStart: '6월 1일(월)', applyEnd: '6월 16일(화) 밤 12시',
+  totalCapacity: 1400, buffer: 80,          // 온라인 차단선 = 1320 (POL-002)
+};
+let applyState = 'open';
+let mode = 'new';
+
+/* [3] 진입 분기 — 화면 구성이 실제로 바뀐다 */
+function setMode(m) {
+  mode = m;
+  document.getElementById('segNew').classList.toggle('hon', m === 'new');
+  document.getElementById('segRet').classList.toggle('hon', m === 'ret');
+  document.getElementById('modeNew').classList.toggle('hidden', m !== 'new');
+  document.getElementById('modeRet').classList.toggle('hidden', m !== 'ret');
+}
+
+/* [2][4] 접수 상태에 따른 배너·CTA — POL-001, POL-002, POL-044 */
+function setApply(s) {
+  applyState = s;
+  showState('default');
+  document.querySelectorAll('.statebar [data-apply]').forEach(b => b.classList.toggle('on', b.dataset.apply === s));
+
+  const cta = document.getElementById('applyCta');
+  const title = document.getElementById('ctaTitle');
+  const desc = document.getElementById('ctaDesc');
+  const block = document.getElementById('blockMsg');
+  const bTitle = document.getElementById('bannerTitle');
+  const bNote = document.getElementById('bannerNote');
+
+  const online = CONF.totalCapacity - CONF.buffer;
+  cta.disabled = false;
+  cta.style.opacity = 1; cta.style.cursor = 'pointer';
+  block.classList.add('hidden');
+  bTitle.textContent = '온라인 접수 기간';
+  bNote.textContent = '집회 시작 3일 전에 접수가 마감됩니다. 현장 접수는 받지 않으니 기간 내에 꼭 신청해 주세요.';
+
+  if (s === 'open') {
+    title.textContent = '집회 신청하기';
+    desc.textContent = '처음 오셨다면 여기서 시작하세요 · 약 2분';
+  }
+  if (s === 'before') {
+    title.textContent = '아직 접수 전입니다';
+    desc.textContent = `접수는 ${CONF.applyStart}부터 시작합니다.`;
+    disableCta(`접수는 ${CONF.applyStart}부터 시작합니다.`);
+  }
+  if (s === 'closed') {
+    bTitle.textContent = '온라인 접수 마감';
+    title.textContent = '접수가 마감되었습니다';
+    desc.textContent = `마감: ${CONF.applyEnd}`;
+    disableCta(`온라인 접수가 마감되었습니다. (마감: ${CONF.applyEnd})  ·  POL-001`);
+  }
+  if (s === 'full') {
+    bTitle.textContent = '접수 인원 마감';
+    bNote.textContent = `온라인 접수 정원 ${WF.num(online)}명이 모두 찼습니다. 취소가 생겨도 온라인 접수는 다시 열리지 않습니다.`;
+    title.textContent = '접수 인원이 모두 찼습니다';
+    desc.textContent = '본부 접수처로 문의해 주세요.';
+    disableCta('접수 인원이 모두 찼습니다. 본부 접수처(연락처)로 문의해 주세요.  ·  POL-002, POL-044');
+  }
+}
+function disableCta(msg) {
+  const cta = document.getElementById('applyCta');
+  cta.disabled = true; cta.style.opacity = .5; cta.style.cursor = 'not-allowed';
+  const block = document.getElementById('blockMsg');
+  block.textContent = msg;
+  block.classList.remove('hidden');
+}
+
+/* [4] 신청 시작 — 서버 재검사를 흉내낸다 */
+function startApply() {
+  if (applyState !== 'open') { toast('지금은 신청할 수 없습니다.'); return; }
+  goScreen('SCR-002', { message: '접수 가능 여부를 확인했습니다 · 기본 정보 입력으로 이동합니다' });
+}
+
+setApply('open');
+</script>
+</body>
+</html>

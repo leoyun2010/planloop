@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-008 마이페이지 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-008 마이페이지</strong> · v0.1 · 상태: 초안 · 경로 <code>/me</code> · 사용자(모바일)
+  <div class="tags">관련: REQ-013, REQ-014 · POL-004(검토중), POL-007, POL-014, POL-029, POL-038 · 정의서: SCR-008-마이페이지.md · 원본 U8</div>
+</div>
+
+<div class="statebar">
+  <b>입금 상태</b>
+  <button data-pay="미매칭" class="on" onclick="setPay('미매칭')">미매칭</button>
+  <button data-pay="부분 매칭" onclick="setPay('부분 매칭')">부분 매칭</button>
+  <button data-pay="매칭" onclick="setPay('매칭')">매칭(확인)</button>
+  <span style="border-left:1px solid #ccc;padding-left:10px"><b>POL-004</b></span>
+  <button id="polBtn" onclick="togglePol004()">대안: 본인 취소 전면 금지</button>
+  <button onclick="location.reload()">초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="phone">
+  <div class="scr">
+    <div class="u-stat">9:41 ▮▮▮</div>
+    <div class="u-top">
+      <div class="k"><span class="n">1</span>김복음 님</div>
+      <div class="t">내 신청 내역</div>
+    </div>
+
+    <div class="u-body">
+
+      <!-- 취소됨 배너 -->
+      <div class="u-card hidden" id="cancelledBox" style="background:#eee;border-color:#aaa">
+        <div style="font-size:16px;font-weight:bold;color:#555">이 신청은 취소되었습니다.</div>
+        <div class="hint" style="margin-top:8px">다시 참가하시려면 새로 신청해 주세요. 변경 이력에 기록되었습니다. (POL-033)</div>
+      </div>
+
+      <div id="liveArea">
+        <!-- [2] 상태 통합 패널 -->
+        <div class="u-card">
+          <span class="n abs">2</span>
+          <div class="u-h">내 상태</div>
+
+          <div class="statusrow"><span class="lbl">등록번호</span><span id="chRegNo" class="chip neu">미발급</span></div>
+
+          <div class="statusrow"><span class="lbl">입금</span><span id="chPay" class="chip bad">확인 중</span></div>
+          <div class="hint" style="margin:0 0 10px">입금 확인까지 <b>2~3일</b> 정도 걸릴 수 있습니다. 입금하셨다면 조금만 기다려 주세요. <span style="color:#888">(POL-007)</span></div>
+          <div class="hint hidden" id="partialNote" style="margin:0 0 10px">함께 신청하신 3명 중 <b>2명</b>의 입금이 확인되었습니다.</div>
+
+          <div class="statusrow"><span class="lbl">숙소</span><span id="chLodge" class="chip neu">배정 전</span></div>
+          <div class="hint" style="margin:0 0 10px">숙소는 집회 <b>1~2일 전</b>에 일괄 배정됩니다. <span style="color:#888">(POL-014)</span></div>
+
+          <div class="statusrow"><span class="lbl">셔틀</span><span class="chip neu">해당 없음</span></div>
+          <div class="statusrow"><span class="lbl">상담</span><span class="chip neu">해당 없음</span></div>
+        </div>
+
+        <!-- [3] 신청 정보 -->
+        <div class="u-card">
+          <span class="n abs">3</span>
+          <div class="u-h">신청 정보</div>
+          <div class="statusrow"><span class="lbl">참가 구분</span><b>인도자</b></div>
+          <div class="statusrow"><span class="lbl">함께 신청</span><b>총 3명</b> </div>
+          <div class="statusrow"><span class="lbl">청구 금액</span><b>240,000원</b></div>
+        </div>
+
+        <!-- [4] 취소 영역 (POL-004) -->
+        <div style="position:relative">
+          <span class="n abs">4</span>
+          <div id="cancelArea"></div>
+        </div>
+
+        <!-- [5] 바로가기 -->
+        <div style="display:flex;gap:8px;margin-top:14px;position:relative">
+          <span class="n abs">5</span>
+          <button class="u-ghost" style="margin:0;flex:1" data-nav="SCR-010 셔틀">셔틀 신청·확인</button>
+          <button class="u-ghost" style="margin:0;flex:1" data-nav="SCR-011 상담 안내">상담 안내</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab" data-nav="SCR-001 접수 홈"><span class="ti">📝</span>접수</div>
+      <div class="tab" data-nav="SCR-009 공지·일정"><span class="ti">📢</span>공지/일정</div>
+      <div class="tab" data-nav="SCR-010 셔틀"><span class="ti">🚌</span>셔틀</div>
+      <div class="tab on"><span class="ti">👤</span><span class="n" style="width:14px;height:14px;font-size:9px">6</span>마이페이지</div>
+    </div>
+  </div>
+</div>
+
+<!-- 취소 확인 모달 -->
+<div class="mask" id="mCancel">
+  <div class="modal" style="max-width:420px">
+    <div class="mtop"><h3>신청 취소</h3><button class="x" onclick="closeModal('mCancel')">✕</button></div>
+    <div class="mbody">
+      <div style="font-size:14px;line-height:1.8">
+        신청을 취소하시겠습니까?<br>
+        <b>취소하시면 되돌릴 수 없고 다시 신청하셔야 합니다.</b>
+      </div>
+      <div class="mnote" style="margin-top:12px">입금 확인 전이므로 본인이 직접 취소할 수 있습니다. (POL-004)</div>
+    </div>
+    <div class="mfoot">
+      <button class="btn" onclick="closeModal('mCancel')">닫기</button>
+      <button class="btn pri" onclick="doCancel()">취소하기</button>
+    </div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+let pay = '미매칭';
+let pol004Alt = false;   /* true = 본인 취소 전면 금지 (POL-004 대안) */
+
+function render() {
+  /* 등록번호 — POL-038 */
+  const reg = document.getElementById('chRegNo');
+  if (pay === '매칭') { reg.className = 'chip ok'; reg.textContent = '20260619-0021'; }
+  else { reg.className = 'chip neu'; reg.textContent = '미발급'; }
+
+  /* 입금 배지 — POL-009 용어만 사용 */
+  const p = document.getElementById('chPay');
+  if (pay === '매칭') { p.className = 'chip ok'; p.textContent = '확인'; }
+  else if (pay === '부분 매칭') { p.className = 'chip warn'; p.textContent = '부분 매칭'; }
+  else { p.className = 'chip bad'; p.textContent = '확인 중'; }
+  document.getElementById('partialNote').classList.toggle('hidden', pay !== '부분 매칭');
+
+  /* 숙소 */
+  const l = document.getElementById('chLodge');
+  if (pay === '매칭') { l.className = 'chip ok'; l.textContent = 'A구역 3방 1층 2번'; }
+  else { l.className = 'chip neu'; l.textContent = '배정 전'; }
+
+  /* [4] 취소 영역 — POL-004 */
+  const area = document.getElementById('cancelArea');
+  const canSelf = !pol004Alt && pay !== '매칭';
+  if (canSelf) {
+    area.innerHTML = `
+      <button class="u-ghost" style="margin-top:14px" onclick="openModal('mCancel')">신청 취소하기</button>
+      <div class="hint">입금 확인 전이라 직접 취소하실 수 있습니다. (POL-004)</div>`;
+  } else {
+    const why = pol004Alt
+      ? '신청 취소는 본부에서만 처리합니다.'
+      : '입금이 확인된 신청은 본인이 취소하실 수 없습니다.';
+    area.innerHTML = `
+      <div class="u-card" style="margin-top:14px;background:#f7f3e8;border-color:#dcc188">
+        <div style="font-size:15px;color:#444;line-height:1.8">${why}<br>본부 접수처로 연락해 주세요.</div>
+        <div class="statusrow" style="margin-top:8px;border-top:1px solid #e5d5ae;padding-top:10px">
+          <span class="lbl">본부 접수처</span><b>010-0000-0000</b>
+        </div>
+        <button class="u-ghost" onclick="toast('전화 앱을 엽니다 (목업)')">📞 전화 걸기</button>
+        <div class="hint" style="margin-top:8px">POL-004 ${pol004Alt ? '대안안 — 본인 취소 전면 금지' : '현재 기준'}</div>
+      </div>`;
+  }
+}
+
+function setPay(v) {
+  pay = v;
+  document.querySelectorAll('.statebar [data-pay]').forEach(b => b.classList.toggle('on', b.dataset.pay === v));
+  render();
+  toast(v === '매칭' ? '입금이 확인되어 등록번호가 발급되고 본인 취소가 막힙니다. (POL-038, POL-004)'
+       : v === '부분 매칭' ? '동행 3명 중 2명만 입금된 상태입니다. (POL-008)'
+       : '입금 확인 전 상태입니다.');
+}
+
+function togglePol004() {
+  pol004Alt = !pol004Alt;
+  document.getElementById('polBtn').textContent = pol004Alt ? '현재 기준으로 되돌리기' : '대안: 본인 취소 전면 금지';
+  render();
+  toast(pol004Alt
+    ? 'POL-004 대안 — 본인 취소를 전면 금지한 경우입니다. (오픈 이슈 OI-2)'
+    : 'POL-004 현재 기준 — 입금 전 본인 취소 / 입금 후 관리자 문의');
+}
+
+function doCancel() {
+  closeModal('mCancel');
+  document.getElementById('liveArea').classList.add('hidden');
+  document.getElementById('cancelledBox').classList.remove('hidden');
+  toast('신청이 취소되었습니다. 변경 이력에 기록됩니다. (POL-033)', 4000);
+}
+
+render();
+</script>
+</body>
+</html>

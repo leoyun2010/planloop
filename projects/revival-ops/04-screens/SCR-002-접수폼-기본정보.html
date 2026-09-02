@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-002 접수폼 기본 정보 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-002 접수폼 · 기본 정보</strong> · v0.1 · 상태: 초안 · 경로 <code>/apply/1</code> · 사용자(모바일)
+  <div class="tags">관련: REQ-004, REQ-005 · POL-001, POL-037, POL-042 · 정의서: SCR-002-접수폼-기본정보.md · 원본 U2</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>필드를 비운 채 [다음]을 누르면 POL-042 검사가 돕니다.</span>
+  <button onclick="fillDup()">중복 번호 넣기 (POL-037)</button>
+  <button onclick="resetForm()">폼 초기화</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="phone">
+  <div class="scr">
+    <div class="u-stat">9:41 ▮▮▮</div>
+
+    <div class="u-top">
+      <div class="k"><span class="n">1</span>집회 신청 · 1/4</div>
+      <div class="t">기본 정보</div>
+    </div>
+
+    <div class="u-body">
+
+      <!-- [2] 단계 진행 -->
+      <div class="step"><span class="n">2</span>1단계 · 기본 정보
+        <div class="bar2"><i style="width:25%"></i></div>
+      </div>
+
+      <!-- [3] 이름 -->
+      <div class="field">
+        <span class="n">3</span><label>이름 <span class="req">*</span></label>
+        <input class="inp" id="fName" placeholder="예) 김복음" maxlength="30">
+        <div class="errmsg"></div>
+      </div>
+
+      <!-- [4] 휴대폰 -->
+      <div class="field">
+        <span class="n">4</span><label>휴대폰 번호 <span class="req">*</span></label>
+        <input class="inp" id="fPhone" placeholder="010-0000-0000" inputmode="numeric" onblur="checkDup()">
+        <div class="errmsg"></div>
+      </div>
+
+      <!-- [5] 지역 -->
+      <div class="field">
+        <span class="n">5</span><label>지역 <span class="req">*</span></label>
+        <input class="inp" id="fRegion" placeholder="예) 안성" maxlength="20">
+        <div class="errmsg"></div>
+      </div>
+
+      <!-- [6] 성별 -->
+      <div class="field">
+        <span class="n">6</span><label>성별 <span class="req">*</span></label>
+        <div class="pick" id="pkSex"><div class="opt">남</div><div class="opt">여</div></div>
+        <div class="errmsg"></div>
+      </div>
+
+      <!-- [7] 참가 구분 -->
+      <div class="field">
+        <span class="n">7</span><label>참가 구분 <span class="req">*</span></label>
+        <div class="pick" id="pkType"><div class="opt">참여자</div><div class="opt">인도자</div></div>
+        <div class="errmsg"></div>
+        <div class="hint" id="typeHint">참가 구분을 선택해 주세요. <b>인도자</b>를 고르시면 다음 단계에서 함께 오시는 분을 같이 신청할 수 있어요.</div>
+      </div>
+
+      <!-- [8] 중복 신청 경고 (POL-037) -->
+      <div class="u-card hidden" id="dupBox" style="border-color:#dcc188;background:#fdf8ec">
+        <span class="n abs">8</span>
+        <div style="font-size:15px;color:#333;line-height:1.7">
+          이 번호로 접수된 신청이 이미 있습니다.<br>
+          새로 신청하시려면 그대로 진행하시고, 신청 내역을 확인하시려면 아래 버튼을 눌러 주세요.
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="u-ghost" style="margin:0;flex:1" onclick="dismissDup()">계속 신청</button>
+          <button class="u-ghost" style="margin:0;flex:1" data-nav="SCR-007 본인 확인">내 신청 확인하기</button>
+        </div>
+        <div class="hint" style="margin-top:10px">POL-037 — 차단하지 않고 안내만 합니다. 가족이 번호를 공유하는 경우를 막지 않기 위한 것입니다.</div>
+      </div>
+
+      <!-- [9] 다음 -->
+      <div style="position:relative;margin-top:16px">
+        <span class="n abs">9</span>
+        <button class="u-primary" id="btnNext" onclick="submitStep()">다음 →</button>
+      </div>
+      <div class="hint" id="nextHint">유효성 검사를 통과하면 다음 단계로 넘어갑니다.</div>
+
+    </div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+/* 이미 접수된 번호 (모의 데이터) — POL-037 중복 검사용 */
+const EXISTING_PHONES = ['01000000000', '01012345678'];
+let dupDismissed = false;
+
+/* [7] 참가 구분 선택 시 다음 단계 안내가 실제로 바뀐다 */
+document.getElementById('pkType').addEventListener('picked', e => {
+  const v = e.detail.value;
+  const hint = document.getElementById('typeHint');
+  const btn = document.getElementById('btnNext');
+  if (v === '인도자') {
+    hint.innerHTML = '다음 단계에서 <b>함께 오시는 분(동행자)</b>을 추가합니다. → SCR-003';
+    btn.textContent = '다음 → 동행자 추가';
+  } else {
+    hint.innerHTML = '다음 단계는 <b>상태 입력</b>입니다. → SCR-004';
+    btn.textContent = '다음 → 상태 입력';
+  }
+  WF.mark(document.querySelector('#pkType').closest('.field').querySelector('.pick'), null);
+});
+
+/* [4] 중복 검사 — POL-037 (경고, 차단 아님) */
+function checkDup() {
+  const el = document.getElementById('fPhone');
+  const p = WF.normalizePhone(el.value);
+  const box = document.getElementById('dupBox');
+  if (!dupDismissed && p && EXISTING_PHONES.includes(p)) {
+    box.classList.remove('hidden');
+    toast('이 번호로 접수된 신청이 이미 있습니다 (POL-037 — 진행은 가능합니다)');
+  } else {
+    box.classList.add('hidden');
+  }
+}
+function dismissDup() {
+  dupDismissed = true;
+  document.getElementById('dupBox').classList.add('hidden');
+  toast('그대로 진행합니다.');
+}
+function fillDup() {
+  document.getElementById('fPhone').value = '010-0000-0000';
+  dupDismissed = false;
+  checkDup();
+}
+
+/* [9] 제출 — POL-042 검증 의사코드를 그대로 실행한다 */
+function submitStep() {
+  let firstBad = null;
+  const name = document.getElementById('fName');
+  const phone = document.getElementById('fPhone');
+  const region = document.getElementById('fRegion');
+
+  const eName = WF.checkName(name.value);
+  WF.mark(name, eName); if (eName && !firstBad) firstBad = name;
+
+  const ePhone = WF.checkPhone(phone.value);
+  WF.mark(phone, ePhone); if (ePhone && !firstBad) firstBad = phone;
+
+  const r = (region.value || '').trim();
+  const eRegion = !r ? '지역을 입력해 주세요.' : (r.length > 20 ? '지역은 20자 이하로 입력해 주세요.' : null);
+  WF.mark(region, eRegion); if (eRegion && !firstBad) firstBad = region;
+
+  const sex = pickValue('#pkSex');
+  const sexBox = document.getElementById('pkSex');
+  WF.mark(sexBox, sex ? null : '성별을(를) 선택해 주세요.');
+  if (!sex && !firstBad) firstBad = sexBox;
+
+  const type = pickValue('#pkType');
+  const typeBox = document.getElementById('pkType');
+  WF.mark(typeBox, type ? null : '참가 구분을(를) 선택해 주세요.');
+  if (!type && !firstBad) firstBad = typeBox;
+
+  if (firstBad) {
+    firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (firstBad.focus) firstBad.focus();
+    toast('입력하신 내용을 확인해 주세요. (POL-042)');
+    return;
+  }
+
+  const nextId = type === '인도자' ? 'SCR-003' : 'SCR-004';
+  const nextLabel = type === '인도자' ? '동행자 추가' : '상태 입력';
+  document.getElementById('nextHint').innerHTML =
+    `저장값 — 이름 <b>${name.value.trim()}</b> · 휴대폰 <b>${WF.normalizePhone(phone.value)}</b> · 지역 <b>${r}</b> · 성별 <b>${sex}</b> · 구분 <b>${type}</b><br>다음 단계: <b>${nextId} ${nextLabel}</b>`;
+  goScreen(nextId, {
+    message: `검증 통과 · ${nextLabel}(으)로 이동합니다`,
+    context: { joinType: type, name: name.value.trim() },
+  });
+}
+
+function resetForm() {
+  ['fName','fPhone','fRegion'].forEach(id => { const e = document.getElementById(id); e.value = ''; WF.mark(e, null); });
+  document.querySelectorAll('.pick .opt').forEach(o => o.classList.remove('sel'));
+  document.getElementById('dupBox').classList.add('hidden');
+  document.getElementById('btnNext').textContent = '다음 →';
+  document.getElementById('nextHint').textContent = '유효성 검사를 통과하면 다음 단계로 넘어갑니다.';
+  dupDismissed = false;
+  toast('초기화했습니다.');
+}
+</script>
+</body>
+</html>

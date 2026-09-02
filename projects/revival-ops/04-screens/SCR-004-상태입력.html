@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-004 상태 입력 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-004 상태 입력</strong> · v0.1 · 상태: 초안 · 경로 <code>/apply/3</code> · 사용자(모바일)
+  <div class="tags">관련: REQ-008, REQ-009 · POL-011, POL-012, POL-017, POL-041, POL-042 · 정의서: SCR-004-상태입력.md · 원본 U4</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>동행자 3명 시나리오입니다. 인원을 옮겨 다녀도 입력값이 각각 보존됩니다.</span>
+  <button onclick="setLodging('숙소 필요 없음')">숙소 필요 없음 (POL-017)</button>
+  <button onclick="dumpAll()">저장값 보기</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="phone">
+  <div class="scr">
+    <div class="u-stat">9:41 ▮▮▮</div>
+    <div class="u-top">
+      <div class="k"><span class="n">1</span>집회 신청 · 3/4</div>
+      <div class="t">상태 입력</div>
+    </div>
+
+    <div class="u-body">
+      <div class="step"><span class="n">2</span>3단계 · 상태
+        <div class="bar2"><i style="width:75%"></i></div>
+      </div>
+
+      <!-- [3] 인원 전환기 -->
+      <div class="u-card" style="background:#ededed;padding:10px 12px">
+        <span class="n abs">3</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn sm" onclick="movePerson(-1)">‹</button>
+          <b style="flex:1;text-align:center;font-size:15px" id="pTitle"></b>
+          <button class="btn sm" onclick="movePerson(1)">›</button>
+        </div>
+        <div style="display:flex;gap:5px;margin-top:8px" id="pJump"></div>
+      </div>
+
+      <!-- [4] 구원 여부 -->
+      <div class="field">
+        <span class="n">4</span><label>구원 여부 <span class="req">*</span></label>
+        <div class="pick" id="pkSalv"><div class="opt">해결</div><div class="opt">재확인</div><div class="opt">미해결</div></div>
+        <div class="errmsg"></div>
+        <div class="hint">상담 배치(SCR-021) 시 참고 자료로 사용합니다.</div>
+      </div>
+
+      <!-- [5] 마음 상태 -->
+      <div class="field">
+        <span class="n">5</span><label>지금 마음 상태 <span style="color:#888;font-weight:normal">(선택)</span></label>
+        <textarea class="inp" id="fMind" maxlength="500" placeholder="편하게 적어 주세요"></textarea>
+        <div class="errmsg"></div>
+      </div>
+
+      <!-- [6] 건강 상태 -->
+      <div class="field">
+        <span class="n">6</span><label>몸 상태 <span class="req">*</span></label>
+        <div class="pick" id="pkBody"><div class="opt">불편함</div><div class="opt">양호</div></div>
+        <div class="errmsg"></div>
+      </div>
+      <div class="field">
+        <label>알러지 <span class="req">*</span></label>
+        <div class="pick" id="pkAllergy"><div class="opt">있음</div><div class="opt">없음</div></div>
+        <div class="errmsg"></div>
+      </div>
+      <div class="field">
+        <label>건강 상세 <span style="color:#888;font-weight:normal">(선택)</span></label>
+        <textarea class="inp" id="fHealth" maxlength="500" placeholder="예) 무릎 관절염이 있어요"></textarea>
+        <div class="hint">숙소 배정과 식단에 참고합니다. 민감정보로 암호화 저장됩니다. (POL-041)</div>
+      </div>
+
+      <!-- [7] 숙소 사용 여부 -->
+      <div class="field">
+        <span class="n">7</span><label>숙소 사용 여부 <span class="req">*</span></label>
+        <div class="pick" id="pkLodge"><div class="opt">숙소 사용</div><div class="opt">숙소 필요 없음</div></div>
+        <div class="errmsg"></div>
+      </div>
+      <div class="hint hidden" id="noLodgeMsg">
+        숙소를 사용하지 않으시면 자리 배정 대상에서 제외되고 별도 명단으로 관리됩니다. (POL-017)
+      </div>
+
+      <!-- [8] 숙소 특이사항 -->
+      <div class="field" id="lodgeNoteBox">
+        <span class="n">8</span><label>숙소 특이사항 <span style="color:#888;font-weight:normal">(선택)</span></label>
+        <textarea class="inp" id="fLodgeNote" maxlength="500" placeholder="예) 2층 침대에 못 올라갑니다"></textarea>
+        <div class="hint">선택 항목 없이 자유롭게 적어 주세요. 적어 주시면 배정 담당자가 직접 확인합니다.</div>
+      </div>
+
+      <!-- [9] 배정 기준 안내 -->
+      <div class="u-card" id="ruleBox" style="background:#f0f0f0">
+        <span class="n abs">9</span>
+        <div class="u-h">자리 배정 기준을 먼저 알려드립니다</div>
+        <div style="font-size:14px;color:#444;line-height:1.8">
+          · <b>거동이 불편하시면 1층 침대를 우선 배정합니다.</b> (반드시 반영합니다 · POL-011)<br>
+          · 아는 분과 가까운 자리는 <b>확약해 드리기 어렵습니다.</b> (POL-012)<br>
+          · 숙소는 집회 1~2일 전에 일괄 배정됩니다. (POL-014)
+        </div>
+      </div>
+
+      <!-- [10] 이전/다음 -->
+      <div style="display:flex;gap:8px;margin-top:16px;position:relative">
+        <span class="n abs">10</span>
+        <button class="u-ghost" style="margin:0;flex:1" onclick="movePerson(-1)">이전</button>
+        <button class="u-primary" style="flex:2" id="btnNext" onclick="nextPerson()">다음 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+/* 동행 신청 시나리오 — 인원별 반복 입력 (REQ-008) */
+const PEOPLE = ['김복음(본인)', '이믿음', '박소망'];
+let idx = 0;
+const data = PEOPLE.map(() => ({ salv: null, mind: '', body: null, allergy: null, health: '', lodge: null, note: '' }));
+
+function renderPager() {
+  document.getElementById('pTitle').textContent = `${idx + 1}/${PEOPLE.length}명 · ${PEOPLE[idx]}`;
+  document.getElementById('pJump').innerHTML = PEOPLE.map((p, i) => {
+    const done = data[i].salv && data[i].body && data[i].allergy && data[i].lodge;
+    return `<button class="btn sm ${i === idx ? 'pri' : ''}" style="flex:1" onclick="jump(${i})">${i + 1}${done ? ' ✓' : ''}</button>`;
+  }).join('');
+  document.getElementById('btnNext').textContent = idx === PEOPLE.length - 1 ? '다음 → 동의 (SCR-005)' : `다음 (${idx + 2}/${PEOPLE.length}명) →`;
+}
+
+function load() {
+  const d = data[idx];
+  setPick('#pkSalv', d.salv); setPick('#pkBody', d.body);
+  setPick('#pkAllergy', d.allergy); setPick('#pkLodge', d.lodge);
+  document.getElementById('fMind').value = d.mind;
+  document.getElementById('fHealth').value = d.health;
+  document.getElementById('fLodgeNote').value = d.note;
+  document.querySelectorAll('.errmsg').forEach(e => e.classList.remove('on'));
+  document.querySelectorAll('.inp,.pick').forEach(e => e.classList.remove('err'));
+  applyLodgeVisibility();
+  renderPager();
+}
+function save() {
+  const d = data[idx];
+  d.salv = pickValue('#pkSalv'); d.body = pickValue('#pkBody');
+  d.allergy = pickValue('#pkAllergy'); d.lodge = pickValue('#pkLodge');
+  d.mind = document.getElementById('fMind').value;
+  d.health = document.getElementById('fHealth').value;
+  d.note = document.getElementById('fLodgeNote').value;
+}
+function setPick(sel, v) {
+  document.querySelectorAll(`${sel} .opt`).forEach(o => o.classList.toggle('sel', v && o.textContent.trim() === v));
+}
+
+/* [7] 숙소 미사용 시 [8][9] 숨김 — POL-017 */
+document.getElementById('pkLodge').addEventListener('picked', applyLodgeVisibility);
+function applyLodgeVisibility() {
+  const v = pickValue('#pkLodge');
+  const off = v === '숙소 필요 없음';
+  document.getElementById('lodgeNoteBox').classList.toggle('hidden', off);
+  document.getElementById('ruleBox').classList.toggle('hidden', off);
+  document.getElementById('noLodgeMsg').classList.toggle('hidden', !off);
+}
+function setLodging(v) { setPick('#pkLodge', v); applyLodgeVisibility(); save(); toast(`숙소 사용 여부: ${v}`); }
+
+/* [10] POL-042 필수 검사 후 다음 인원으로 */
+function validate() {
+  let ok = true;
+  const checks = [['#pkSalv', '구원 여부'], ['#pkBody', '몸 상태'], ['#pkAllergy', '알러지'], ['#pkLodge', '숙소 사용 여부']];
+  for (const [sel, label] of checks) {
+    const v = pickValue(sel);
+    if (!WF.mark(document.querySelector(sel), v ? null : `${label}을(를) 선택해 주세요.`)) ok = false;
+  }
+  return ok;
+}
+function nextPerson() {
+  if (!validate()) { toast('필수 항목을 선택해 주세요. (POL-042)'); return; }
+  save();
+  if (idx === PEOPLE.length - 1) {
+    goScreen('SCR-005', { message: '모든 인원 입력 완료 · 동의 단계로 이동합니다' });
+    return;
+  }
+  idx++; load();
+  toast(`${PEOPLE[idx]} 님 차례입니다.`);
+}
+function movePerson(d) {
+  save();
+  const n = idx + d;
+  if (n < 0) { goScreen('SCR-003', { message: '이전 단계(동행자 추가)로 돌아갑니다' }); return; }
+  if (n >= PEOPLE.length) { nextPerson(); return; }
+  idx = n; load();
+}
+function jump(i) { save(); idx = i; load(); }
+
+function dumpAll() {
+  save();
+  const lines = PEOPLE.map((p, i) => {
+    const d = data[i];
+    return `${p} — 구원 ${d.salv || '-'} / 몸 ${d.body || '-'} / 알러지 ${d.allergy || '-'} / 숙소 ${d.lodge || '-'}${d.note ? ` / 특이 "${d.note}"` : ''}`;
+  });
+  alert('인원별 저장값\n\n' + lines.join('\n'));
+}
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-015 접수 · 환불 관리 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+</head>
+<body>
+
+<div class="wf-meta">
+  <strong>SCR-015 접수 · 환불 관리</strong> · v0.1 · 상태: 초안 · 경로 <code>/admin/registrants</code> · 관리자(PC)
+  <div class="tags">관련: REQ-022~028 · POL-003, POL-004, POL-005, POL-006(미확정), POL-009, POL-033, POL-042 · 정의서: SCR-015-접수환불관리.md · 원본 A3</div>
+</div>
+
+<div class="statebar">
+  <b>동작 확인</b>
+  <span>행마다 관리 버튼이 POL-005대로 다르게 나옵니다.</span>
+  <button id="polBtn" onclick="togglePol006()">POL-006 대안으로 전환 (수취인=본인)</button>
+  <button onclick="showState('empty')">빈 상태</button>
+  <button onclick="showState('default')">기본으로</button>
+  <span style="margin-left:auto"></span>
+  <button id="pinBtn" onclick="togglePins()">주석 번호 끄기</button>
+</div>
+
+<div class="browser">
+  <div class="bchrome">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <div class="url">conf.안성교회.org / admin/registrants</div>
+    <div class="who">노은주 (본부 팀원)</div>
+  </div>
+  <div class="app">
+    <aside class="side"></aside>
+
+    <main class="main">
+      <div class="mh">
+        <h2><span class="n">1</span>접수 · 환불 관리</h2>
+        <div class="crumb" id="summary"></div>
+        <div class="right"><button class="btn pri" onclick="openOnsite()">+ 현장 접수</button></div>
+      </div>
+
+      <div id="st-empty" class="hidden">
+        <div class="empty">아직 접수된 신청이 없습니다.<br><br><button class="btn pri" onclick="openOnsite()">+ 현장 접수</button></div>
+      </div>
+
+      <div id="st-default">
+        <div class="panel-box">
+          <div class="toolbar">
+            <span class="n">2</span>
+            <input class="tin w" id="q" placeholder="이름 · 등록번호 · 휴대폰" oninput="apply()">
+            <span class="n" style="margin-left:8px">3</span>
+            <div class="tabs" data-tabs="reg">
+              <button data-tab="all" class="on">전체</button>
+              <button data-tab="unmatched">미매칭만</button>
+              <button data-tab="refund">환불만</button>
+            </div>
+            <span class="grow"></span>
+            <span class="sub" style="margin:0" id="shown"></span>
+          </div>
+
+          <div style="position:relative">
+            <span class="n abs">4</span>
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th style="width:34px"><input type="checkbox" data-all="reg"></th>
+                  <th style="width:130px">등록번호</th>
+                  <th style="width:90px">이름</th>
+                  <th style="width:125px">휴대폰</th>
+                  <th style="width:60px">구분</th>
+                  <th style="width:90px">입금</th>
+                  <th style="width:150px">등록</th>
+                  <th>관리</th>
+                </tr>
+              </thead>
+              <tbody id="tb"></tbody>
+            </table>
+          </div>
+          <div class="toolbar" style="margin-top:10px;position:relative">
+            <span class="n">5</span>
+            <span class="sub" style="margin:0" id="selInfo">선택 0건</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 수정 모달 -->
+<div class="mask" id="mEdit">
+  <div class="modal">
+    <div class="mtop"><h3>참가자 정보 수정</h3><button class="x" onclick="closeModal('mEdit')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">수정은 입금 상태와 무관하게 항상 사용할 수 있습니다. (POL-005)</div>
+      <div class="mfield"><label>이름 *</label><input class="tin" id="eName"><div class="errmsg"></div></div>
+      <div class="mfield"><label>휴대폰 *</label><input class="tin" id="ePhone"><div class="errmsg"></div>
+        <div class="sub" style="margin-top:4px">휴대폰 번호를 바꾸면 본인 확인에 쓰이는 값이 함께 바뀝니다. (POL-029)</div></div>
+      <div class="mfield"><label>지역 *</label><input class="tin" id="eRegion"><div class="errmsg"></div></div>
+      <div class="mfield"><label>숙소 특이사항</label><input class="tin" id="eNote" placeholder="예) 2층 침대에 못 올라갑니다"></div>
+      <div class="mfield"><label>수정 사유</label><input class="tin" id="eReason" placeholder="선택 — 이력에 함께 남습니다"></div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mEdit')">취소</button><button class="btn pri" onclick="saveEdit()">저장</button></div>
+  </div>
+</div>
+
+<!-- 환불 모달 -->
+<div class="mask" id="mRefund">
+  <div class="modal">
+    <div class="mtop"><h3>환불 처리</h3><button class="x" onclick="closeModal('mRefund')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote" id="rNote"></div>
+      <div class="kv"><div class="k">대상</div><div class="v" id="rTarget"></div></div>
+      <div class="kv"><div class="k">환불 금액</div><div class="v" id="rAmount"></div></div>
+      <div class="mfield" style="margin-top:12px"><label>은행 *</label><input class="tin" id="rBank" placeholder="예) 국민"><div class="errmsg"></div></div>
+      <div class="mfield"><label>계좌번호 *</label><input class="tin" id="rAcct" placeholder="숫자만"><div class="errmsg"></div></div>
+      <div class="mfield"><label>예금주 *</label><input class="tin" id="rHolder"><div class="errmsg"></div>
+        <div class="sub" style="margin-top:4px" id="rPayeeHint"></div></div>
+      <div class="mfield"><label>환불 사유 *</label><input class="tin" id="rReason"><div class="errmsg"></div></div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mRefund')">닫기</button><button class="btn pri" onclick="doRefund()">환불 처리</button></div>
+  </div>
+</div>
+
+<!-- 접수 취소 모달 — 계좌 입력란 없음 (POL-005) -->
+<div class="mask" id="mCancel">
+  <div class="modal" style="max-width:440px">
+    <div class="mtop"><h3>접수 취소</h3><button class="x" onclick="closeModal('mCancel')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">입금 내역이 없어 돌려드릴 금액이 없습니다. <b>환불이 아니라 접수 취소</b>로 처리합니다. 환불 계좌를 받지 않습니다. (POL-005)</div>
+      <div class="kv"><div class="k">대상</div><div class="v" id="cTarget"></div></div>
+      <div class="mfield" style="margin-top:12px"><label>취소 사유 *</label><input class="tin" id="cReason" placeholder="예) 본인 요청 · 연락 두절"><div class="errmsg"></div></div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mCancel')">닫기</button><button class="btn pri" onclick="doCancel()">취소하기</button></div>
+  </div>
+</div>
+
+<!-- 현장 접수 모달 -->
+<div class="mask" id="mOnsite">
+  <div class="modal">
+    <div class="mtop"><h3>현장 수동 접수</h3><button class="x" onclick="closeModal('mOnsite')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">사용자 화면에는 「현장 접수 없음」으로 표기하지만, 실제 방문자는 버퍼 좌석으로 받습니다. 접수 마감·정원 도달 이후에도 등록할 수 있습니다. (POL-003)</div>
+      <div class="mfield"><label>이름 *</label><input class="tin" id="oName"><div class="errmsg"></div></div>
+      <div class="mfield"><label>휴대폰 *</label><input class="tin" id="oPhone" placeholder="010-0000-0000"><div class="errmsg"></div></div>
+      <div class="mfield"><label>지역 *</label><input class="tin" id="oRegion"><div class="errmsg"></div></div>
+      <div class="mfield"><label>참가 구분 *</label>
+        <div class="pick" id="oType" style="max-width:260px"><div class="opt">참여자</div><div class="opt">인도자</div></div>
+        <div class="errmsg"></div></div>
+      <div class="mfield"><label>숙소 사용 여부 *</label>
+        <div class="pick" id="oLodge" style="max-width:320px"><div class="opt">숙소 사용</div><div class="opt">숙소 필요 없음</div></div>
+        <div class="errmsg"></div></div>
+      <div class="sub" id="bufInfo"></div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mOnsite')">취소</button><button class="btn pri" onclick="addOnsite()">등록</button></div>
+  </div>
+</div>
+
+<!-- 이력 모달 -->
+<div class="mask" id="mHist">
+  <div class="modal wide">
+    <div class="mtop"><h3 id="hTitle">변경 이력</h3><button class="x" onclick="closeModal('mHist')">✕</button></div>
+    <div class="mbody">
+      <div class="mnote">접수·입금·환불의 변경을 담당자·사유와 함께 기록합니다. 기록은 수정·삭제할 수 없습니다. (POL-033)</div>
+      <table class="tbl"><thead><tr><th style="width:150px">일시</th><th style="width:90px">담당자</th><th style="width:110px">처리</th><th>내용 / 사유</th></tr></thead>
+        <tbody id="hBody"></tbody></table>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="closeModal('mHist')">닫기</button></div>
+  </div>
+</div>
+
+<script src="_wf.js"></script>
+<script>
+mountSideNav('registrants', '본부 팀원');
+
+const FEE = 80000, ME = '노은주';
+const BUFFER_TOTAL = 80;
+let bufferUsed = 12;
+let pol006Alt = false;      /* true = 수취인 기본값을 취소한 본인으로 */
+
+let ROWS = [
+  { id:1, regNo:'20260619-0021', name:'김복음', phone:'01099998888', type:'인도자', pay:'매칭',      status:'접수', source:'모바일', by:'본인',   appId:'A-101', depositor:'김복음' },
+  { id:2, regNo:null,            name:'이믿음', phone:'01011112222', type:'참여자', pay:'미매칭',    status:'접수', source:'모바일', by:'본인',   appId:'A-101', depositor:'김복음' },
+  { id:3, regNo:'20260619-0022', name:'박소망', phone:'01033334444', type:'참여자', pay:'부분 매칭', status:'접수', source:'현장',   by:'노은주', appId:'A-101', depositor:'김복음' },
+  { id:4, regNo:'20260619-0019', name:'최은혜', phone:'01055556666', type:'참여자', pay:'매칭',      status:'환불', source:'모바일', by:'본인',   appId:'A-102', depositor:'최은혜' },
+  { id:5, regNo:null,            name:'정소망', phone:'01077778888', type:'참여자', pay:'미매칭',    status:'접수', source:'모바일', by:'본인',   appId:'A-103', depositor:'정소망' },
+  { id:6, regNo:'20260619-0023', name:'한사랑', phone:'01022223333', type:'참여자', pay:'매칭',      status:'접수', source:'모바일', by:'본인',   appId:'A-104', depositor:'한사랑' },
+];
+let HIST = {};   /* id -> [] */
+let target = null;
+let nextId = 7, nextSeq = 24;
+
+/* POL-005 — 관리 버튼 분기 */
+function pol005Buttons(r) {
+  const btns = [`<button class="btn sm" onclick="openEdit(${r.id})">수정</button>`];
+  if (r.status === '환불') {
+    btns.push(`<button class="btn sm" onclick="openHist(${r.id})">이력</button>`);
+  } else if (r.status === '취소') {
+    btns.push(`<button class="btn sm" onclick="openHist(${r.id})">이력</button>`);
+  } else if (r.pay === '매칭') {
+    btns.push(`<button class="btn sm" onclick="openRefund(${r.id})">환불</button>`);
+  } else if (r.pay === '부분 매칭') {
+    /* 그 사람의 개인 입금 여부로 판단 — 목업에서는 박소망을 입금 완료로 본다 */
+    btns.push(`<button class="btn sm" onclick="openRefund(${r.id})">환불</button>`);
+  } else {
+    btns.push(`<button class="btn sm" onclick="openCancel(${r.id})">접수 취소</button>`);
+  }
+  return `<div class="acts">${btns.join('')}</div>`;
+}
+
+function payChip(r) {
+  if (r.status === '환불') return `<span class="chip bad">환불 완료</span>`;
+  if (r.status === '취소') return `<span class="chip neu">취소</span>`;
+  if (r.pay === '매칭') return `<span class="chip ok">확인</span>`;
+  if (r.pay === '부분 매칭') return `<span class="chip warn">부분 매칭</span>`;
+  return `<span class="chip bad">미매칭</span>`;
+}
+const fmtPhone = p => p.length === 11 ? `${p.slice(0,3)}-${p.slice(3,7)}-${p.slice(7)}` : p;
+
+function render() {
+  document.getElementById('tb').innerHTML = ROWS.map(r => `
+    <tr data-id="${r.id}" data-pay="${r.pay}" data-status="${r.status}"
+        data-search="${(r.name + ' ' + (r.regNo || '미발급') + ' ' + r.phone + ' ' + fmtPhone(r.phone)).toLowerCase()}"
+        class="${r.pay === '미매칭' && r.status === '접수' ? 'bad' : ''}">
+      <td><input type="checkbox" data-row="reg"></td>
+      <td>${r.regNo ? r.regNo : '<span class="chip neu">미발급</span>'}</td>
+      <td><b>${r.name}</b></td>
+      <td>${fmtPhone(r.phone)}</td>
+      <td>${r.type}</td>
+      <td>${payChip(r)}</td>
+      <td><span style="font-size:12px;color:#666">${r.source} · ${r.by}</span></td>
+      <td>${pol005Buttons(r)}</td>
+    </tr>`).join('');
+  apply();
+  updateSummary();
+}
+
+function updateSummary() {
+  const live = ROWS.filter(r => r.status === '접수');
+  const un = live.filter(r => r.pay === '미매칭').length;
+  document.getElementById('summary').textContent = `총 ${WF.num(live.length)}명 · 미매칭 ${un}건 · 환불 ${ROWS.filter(r=>r.status==='환불').length}건`;
+}
+
+/* [2][3] 검색·필터 */
+function apply() {
+  const q = (document.getElementById('q').value || '').trim().toLowerCase().replace(/-/g, '');
+  const tab = currentTab('reg') || 'all';
+  const shown = filterRows('#tb', tr => {
+    const r = ROWS.find(x => x.id === +tr.dataset.id);
+    if (tab === 'unmatched' && !(r.pay === '미매칭' && r.status === '접수')) return false;
+    if (tab === 'refund' && r.status !== '환불') return false;
+    if (!q) return true;
+    return (tr.dataset.search || '').replace(/-/g, '').includes(q);
+  });
+  document.getElementById('shown').textContent = `표시 ${shown}건`;
+  if (shown === 0) {
+    if (!document.getElementById('noRow')) {
+      document.getElementById('tb').insertAdjacentHTML('beforeend',
+        `<tr id="noRow"><td colspan="8"><div class="empty">검색 조건에 맞는 접수자가 없습니다.</div></td></tr>`);
+    }
+  } else { document.getElementById('noRow')?.remove(); }
+}
+onTab('reg', apply);
+onSelect('reg', sel => { document.getElementById('selInfo').textContent = `선택 ${sel.length}건`; });
+
+/* ---- 수정 ---- */
+function openEdit(id) {
+  target = ROWS.find(r => r.id === id);
+  document.getElementById('eName').value = target.name;
+  document.getElementById('ePhone').value = fmtPhone(target.phone);
+  document.getElementById('eRegion').value = '안성';
+  document.getElementById('eNote').value = target.note || '';
+  document.getElementById('eReason').value = '';
+  document.querySelectorAll('#mEdit .errmsg').forEach(e => e.classList.remove('on'));
+  openModal('mEdit');
+}
+function saveEdit() {
+  const n = document.getElementById('eName'), p = document.getElementById('ePhone');
+  const eN = WF.checkName(n.value), eP = WF.checkPhone(p.value);
+  WF.mark(n, eN); WF.mark(p, eP);
+  if (eN || eP) { toast('입력값을 확인해 주세요. (POL-042)'); return; }
+  const before = `${target.name} / ${fmtPhone(target.phone)}`;
+  target.name = n.value.trim(); target.phone = WF.normalizePhone(p.value);
+  target.note = document.getElementById('eNote').value.trim();
+  log(target.id, '정보 수정', `${before} → ${target.name} / ${fmtPhone(target.phone)}`, document.getElementById('eReason').value);
+  closeModal('mEdit'); render();
+  toast('수정했습니다. 변경 전후 값이 이력에 기록됩니다. (POL-033)');
+}
+
+/* ---- 환불 (POL-005, POL-006) ---- */
+function openRefund(id) {
+  target = ROWS.find(r => r.id === id);
+  if (target.pay === '미매칭') { toast('입금 내역이 없는 신청입니다. 접수 취소로 처리해 주세요. (POL-005)', 4200); return; }
+  const payee = pol006Alt ? target.name : target.depositor;
+  document.getElementById('rTarget').textContent = `${target.name} (신청서 ${target.appId})`;
+  document.getElementById('rAmount').textContent = `${WF.won(FEE)} (1명분)`;
+  document.getElementById('rHolder').value = payee;
+  document.getElementById('rBank').value = ''; document.getElementById('rAcct').value = ''; document.getElementById('rReason').value = '';
+  document.getElementById('rNote').innerHTML = pol006Alt
+    ? '<b>POL-006 대안</b> — 수취인 기본값을 <b>취소한 본인</b>으로 채웠습니다. (오픈 이슈 OI-3)'
+    : '<b>POL-006 현재 기준</b> — 돈은 실제 입금자에게 돌려줍니다. 인도자가 일괄 입금한 건이면 기본값은 인도자입니다. (미확정 · OI-3)';
+  document.getElementById('rPayeeHint').textContent = `기본값: ${payee}${!pol006Alt && target.depositor !== target.name ? ' (실제 입금자)' : ''}`;
+  document.querySelectorAll('#mRefund .errmsg').forEach(e => e.classList.remove('on'));
+  document.getElementById('rHolder').dataset.def = payee;
+  openModal('mRefund');
+}
+function doRefund() {
+  let bad = false;
+  [['rBank','은행'],['rAcct','계좌번호'],['rHolder','예금주'],['rReason','환불 사유']].forEach(([id]) => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { WF.mark(el, '환불 계좌, 예금주, 환불 사유를 모두 입력해 주세요.'); bad = true; }
+    else WF.mark(el, null);
+  });
+  if (bad) return;
+  const holder = document.getElementById('rHolder');
+  const changed = holder.value.trim() !== holder.dataset.def;
+  target.status = '환불';
+  log(target.id, '환불 처리', `${WF.won(FEE)} → ${holder.value.trim()} (${document.getElementById('rBank').value} ${document.getElementById('rAcct').value})`, document.getElementById('rReason').value);
+  closeModal('mRefund'); render();
+  toast(changed
+    ? `환불 처리했습니다. 입금하신 분과 다른 계좌로 환불합니다 — 계좌와 예금주를 다시 확인해 주세요. (POL-006) · 명단에서 삭제하지 않고 상태만 환불로 남깁니다.`
+    : `환불 처리했습니다. 명단에서 삭제하지 않고 상태만 「환불」로 남습니다. 대시보드 집계에 −1명 / −${WF.won(FEE)} 반영됩니다. (POL-005)`, 5200);
+}
+
+/* ---- 접수 취소 (POL-005) ---- */
+function openCancel(id) {
+  target = ROWS.find(r => r.id === id);
+  document.getElementById('cTarget').textContent = `${target.name} · ${fmtPhone(target.phone)}`;
+  document.getElementById('cReason').value = '';
+  WF.mark(document.getElementById('cReason'), null);
+  openModal('mCancel');
+}
+function doCancel() {
+  const r = document.getElementById('cReason');
+  if (!r.value.trim()) { WF.mark(r, '사유를 입력해 주세요.'); return; }
+  WF.mark(r, null);
+  target.status = '취소';
+  log(target.id, '접수 취소', '접수 → 취소', r.value.trim());
+  closeModal('mCancel'); render();
+  toast('접수를 취소했습니다. 접수 인원 집계에서 제외됩니다. (POL-005, POL-033)', 4200);
+}
+
+/* ---- 현장 접수 (POL-003) ---- */
+function openOnsite() {
+  ['oName','oPhone','oRegion'].forEach(id => { const e = document.getElementById(id); e.value = ''; WF.mark(e, null); });
+  document.querySelectorAll('#mOnsite .opt').forEach(o => o.classList.remove('sel'));
+  document.getElementById('bufInfo').innerHTML = `현장 버퍼 ${BUFFER_TOTAL}석 중 <b>${BUFFER_TOTAL - bufferUsed}석</b> 남았습니다.`;
+  openModal('mOnsite');
+}
+function addOnsite() {
+  const n = document.getElementById('oName'), p = document.getElementById('oPhone'), rg = document.getElementById('oRegion');
+  let bad = false;
+  const eN = WF.checkName(n.value); WF.mark(n, eN); bad = bad || !!eN;
+  const eP = WF.checkPhone(p.value); WF.mark(p, eP); bad = bad || !!eP;
+  const eR = rg.value.trim() ? null : '지역을 입력해 주세요.'; WF.mark(rg, eR); bad = bad || !!eR;
+  const t = pickValue('#oType'); WF.mark(document.getElementById('oType'), t ? null : '참가 구분을(를) 선택해 주세요.'); bad = bad || !t;
+  const l = pickValue('#oLodge'); WF.mark(document.getElementById('oLodge'), l ? null : '숙소 사용 여부를(을) 선택해 주세요.'); bad = bad || !l;
+  if (bad) { toast('입력값을 확인해 주세요. (POL-042)'); return; }
+
+  const row = { id: nextId++, regNo: null, name: n.value.trim(), phone: WF.normalizePhone(p.value),
+    type: t, pay: '미매칭', status: '접수', source: '현장', by: ME, appId: 'A-' + (200 + nextId), depositor: n.value.trim() };
+  ROWS.unshift(row);
+  bufferUsed++;
+  log(row.id, '현장 등록', `현장(관리자) 등록 · ${row.name} · ${l}`, '');
+  closeModal('mOnsite'); render();
+  const left = BUFFER_TOTAL - bufferUsed;
+  toast(left < 0
+    ? `등록했습니다. 다만 현장 버퍼 좌석을 ${-left}석 넘었습니다. 좌석 확보 상황을 확인해 주세요. (POL-002)`
+    : `등록했습니다. 등록 경로 = 현장(관리자), 등록자 = ${ME}로 기록됩니다. 버퍼 잔여 ${left}석 (POL-003, POL-033)`, 5000);
+}
+
+/* ---- 이력 (POL-033) ---- */
+function log(id, action, content, reason) {
+  const at = new Date().toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' });
+  (HIST[id] = HIST[id] || []).unshift({ at, who: ME, action, content, reason: reason || '—' });
+}
+function openHist(id) {
+  const r = ROWS.find(x => x.id === id);
+  document.getElementById('hTitle').textContent = `${r.name} 님 변경 이력`;
+  const rows = HIST[id] || [];
+  document.getElementById('hBody').innerHTML = rows.length
+    ? rows.map(h => `<tr><td>${h.at}</td><td>${h.who}</td><td><b>${h.action}</b></td><td>${h.content}<br><span style="color:#777;font-size:12px">사유: ${h.reason}</span></td></tr>`).join('')
+    : `<tr><td colspan="4"><div class="empty">기록된 변경이 없습니다.</div></td></tr>`;
+  openModal('mHist');
+}
+
+function togglePol006() {
+  pol006Alt = !pol006Alt;
+  document.getElementById('polBtn').textContent = pol006Alt ? 'POL-006 현재 기준으로 (수취인=입금자)' : 'POL-006 대안으로 전환 (수취인=본인)';
+  toast(pol006Alt
+    ? '대안 — 환불 계좌 기본값이 취소한 본인이 됩니다. 김복음이 일괄 입금한 이믿음·박소망 건에서 차이가 납니다. (OI-3)'
+    : '현재 기준 — 환불 계좌 기본값이 실제 입금자(인도자)가 됩니다. (POL-006)', 5000);
+}
+
+render();
+
+/* 다른 화면에서 필터를 지정해 들어온 경우 그대로 적용한다 (SCR-013 조치 목록 → 여기) */
+(function applyNavContext() {
+  const ctx = navContext();
+  if (!ctx || !ctx.filter) return;
+  if (ctx.filter.includes('환불')) {
+    document.querySelector('[data-tab="refund"]')?.click();
+    toast(`${ctx.from || '이전 화면'}에서 넘어와 "환불만" 필터를 적용했습니다.`, 3400);
+  }
+})();
+</script>
+</body>
+</html>

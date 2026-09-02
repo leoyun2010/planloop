@@ -1,0 +1,238 @@
+/* ============================================================
+   전도집회 운영 시스템 — 와이어프레임 공통 스타일
+   로파이 그레이스케일. 상태 구분에 필요한 최소한의 색만 사용한다.
+   이 파일은 04-screens/의 모든 목업이 공유한다. 개별 목업에서 수정하지 말 것.
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  background: #e8e8e8; color: #333; padding: 20px; line-height: 1.5;
+}
+
+/* ---------- 문서 정보 배너 (화면정의서 .md와 항상 동기화) ---------- */
+.wf-meta {
+  max-width: 1180px; margin: 0 auto 14px; font-size: 13px; color: #666;
+  background: #fffbe6; border: 1px solid #e6d996; padding: 10px 14px; border-radius: 4px;
+}
+.wf-meta strong { color: #333; }
+.wf-meta a { color: #555; }
+.wf-meta .tags { margin-top: 4px; font-size: 12px; color: #857a4a; }
+
+/* ---------- 주석 번호 배지 — 화면정의서의 [n]과 일치 ---------- */
+.n {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 19px; height: 19px; border-radius: 50%; background: #d33; color: #fff;
+  font-size: 11px; font-weight: bold; flex: none; margin-right: 6px;
+}
+.n.abs { position: absolute; top: -9px; left: -9px; margin: 0; box-shadow: 0 0 0 2px #fff; }
+body.nopins .n { display: none; }
+.pinbar {
+  max-width: 1180px; margin: 0 auto 10px; display: flex; gap: 8px; align-items: center;
+  font-size: 12px; color: #666;
+}
+.pinbar button {
+  font-family: inherit; font-size: 12px; border: 1px solid #999; background: #f4f4f4;
+  padding: 4px 10px; border-radius: 3px; cursor: pointer;
+}
+.pinbar button:hover { background: #e4e4e4; }
+
+/* ============================================================
+   사용자 (모바일) — 폭 360px 기준
+   ============================================================ */
+.phone {
+  width: 380px; margin: 0 auto; background: #555; border-radius: 30px; padding: 10px;
+  border: 2px solid #444;
+}
+.phone .scr {
+  background: #fff; border-radius: 22px; overflow: hidden; height: 720px;
+  display: flex; flex-direction: column; border: 1px solid #888;
+}
+.u-stat { height: 26px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #999; background: #f4f4f4; }
+.u-top { background: #6b6b6b; color: #fff; padding: 14px 18px; }
+.u-top .k { font-size: 12px; opacity: .85; }
+.u-top .t { font-size: 20px; font-weight: bold; margin-top: 2px; }
+.u-body { padding: 16px; overflow: auto; flex: 1; background: #f7f7f7; }
+.u-card { background: #fff; border: 1px solid #bbb; border-radius: 6px; padding: 14px; margin-bottom: 12px; position: relative; }
+.u-h { font-size: 14px; font-weight: bold; color: #222; margin-bottom: 8px; display: flex; align-items: center; }
+.u-body p, .u-body .txt { font-size: 15px; color: #444; }
+
+.u-primary, .u-ghost, .rowbtn, .hero-cta {
+  display: block; width: 100%; font-family: inherit; font-size: 17px; cursor: pointer;
+  border-radius: 5px; text-align: center;
+}
+.u-primary { background: #555; color: #fff; border: 1px solid #333; min-height: 54px; padding: 14px; font-weight: bold; }
+.u-primary:disabled { background: #ccc; color: #888; border-color: #bbb; cursor: not-allowed; }
+.u-ghost { background: #fff; color: #444; border: 1px solid #999; min-height: 50px; padding: 12px; margin-top: 10px; }
+.rowbtn {
+  background: #fff; border: 1px solid #bbb; min-height: 54px; padding: 14px; margin-bottom: 8px;
+  text-align: left; font-size: 16px; color: #333;
+}
+.rowbtn:hover, .u-ghost:hover { background: #eee; }
+.hero-cta { background: #555; color: #fff; border: 1px solid #333; padding: 18px; text-align: left; }
+.hero-cta .ht { font-size: 19px; font-weight: bold; }
+.hero-cta .hd { font-size: 13px; opacity: .85; margin-top: 4px; }
+
+.hseg { display: flex; gap: 6px; margin: 12px 0; }
+.hseg button {
+  flex: 1; font-family: inherit; font-size: 15px; padding: 12px 6px; cursor: pointer;
+  border: 1px solid #999; background: #fff; color: #555; border-radius: 5px; min-height: 48px;
+}
+.hseg button.hon { background: #555; color: #fff; border-color: #333; font-weight: bold; }
+
+.gbanner { background: #ededed; border: 1px solid #bbb; border-left: 4px solid #666; padding: 12px; font-size: 14px; border-radius: 4px; position: relative; }
+.hint { background: #f0f0f0; border: 1px dashed #aaa; padding: 10px; font-size: 13px; color: #555; border-radius: 4px; margin-top: 8px; }
+.step { font-size: 13px; color: #555; margin-bottom: 12px; }
+.bar2 { height: 7px; background: #ddd; border: 1px solid #bbb; border-radius: 4px; margin-top: 6px; overflow: hidden; }
+.bar2 i { display: block; height: 100%; background: #666; }
+
+.field { margin-bottom: 14px; position: relative; }
+.field label { display: block; font-size: 14px; font-weight: bold; color: #333; margin-bottom: 6px; }
+.field .req { color: #d33; }
+.inp {
+  width: 100%; border: 1px solid #999; background: #fff; padding: 13px 12px; font-size: 16px;
+  border-radius: 4px; font-family: inherit; min-height: 48px; color: #333;
+}
+.inp::placeholder { color: #aaa; }
+.inp.err { border-color: #d33; background: #fdf3f2; }
+textarea.inp { min-height: 90px; resize: vertical; }
+.errmsg { color: #c2463c; font-size: 13px; margin-top: 5px; display: none; }
+.errmsg.on { display: block; }
+
+.pick { display: flex; gap: 8px; }
+.pick .opt {
+  flex: 1; border: 1px solid #999; background: #fff; padding: 13px 6px; text-align: center;
+  font-size: 16px; border-radius: 4px; cursor: pointer; min-height: 48px;
+}
+.pick .opt.sel { background: #555; color: #fff; border-color: #333; font-weight: bold; }
+
+.ckrow { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 1px solid #bbb; background: #fff; border-radius: 4px; margin-bottom: 10px; cursor: pointer; }
+.ckrow input { width: 22px; height: 22px; margin-top: 2px; flex: none; }
+.ckrow .cktx { font-size: 15px; color: #333; }
+.ckrow .cksub { font-size: 13px; color: #666; margin-top: 3px; }
+
+.statusrow { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid #eee; font-size: 15px; }
+.statusrow:last-child { border-bottom: 0; }
+.statusrow .lbl { color: #555; }
+
+.tabbar { display: flex; border-top: 1px solid #bbb; background: #fff; }
+.tabbar .tab { flex: 1; text-align: center; padding: 10px 4px 12px; font-size: 12px; color: #888; cursor: pointer; }
+.tabbar .tab .ti { display: block; font-size: 17px; margin-bottom: 2px; }
+.tabbar .tab.on { color: #222; font-weight: bold; background: #f0f0f0; }
+
+/* ============================================================
+   관리자 (PC) — 폭 1280px 기준
+   ============================================================ */
+.browser { max-width: 1180px; margin: 0 auto; border: 2px solid #555; background: #fff; border-radius: 6px; overflow: hidden; }
+.bchrome { display: flex; align-items: center; gap: 8px; background: #ddd; border-bottom: 1px solid #999; padding: 8px 12px; }
+.bchrome .dot { width: 10px; height: 10px; border-radius: 50%; background: #aaa; }
+.bchrome .url { flex: 1; background: #fff; border: 1px solid #bbb; border-radius: 3px; padding: 4px 10px; font-size: 12px; color: #666; }
+.bchrome .who { font-size: 12px; color: #555; }
+
+.app { display: flex; min-height: 640px; }
+.side { width: 190px; background: #4a4a4a; color: #ccc; flex: none; padding: 12px 0; }
+.side .conf { padding: 0 14px 12px; border-bottom: 1px solid #5e5e5e; margin-bottom: 10px; }
+.side .conf .cl { font-size: 11px; color: #9a9a9a; }
+.side .conf .cn { font-size: 13px; color: #fff; font-weight: bold; margin-top: 2px; }
+.side .grp { font-size: 11px; color: #9a9a9a; padding: 10px 14px 4px; }
+.side .nav { padding: 9px 14px; font-size: 13px; cursor: pointer; display: flex; gap: 8px; align-items: center; }
+.side .nav:hover { background: #565656; }
+.side .nav.on { background: #fff; color: #222; font-weight: bold; }
+.side .nav .di { width: 6px; height: 6px; border-radius: 50%; background: #888; flex: none; }
+.side .nav.on .di { background: #333; }
+.side .nav.locked { opacity: .35; cursor: not-allowed; }
+
+.main { flex: 1; background: #f4f4f4; padding: 18px 20px; overflow: auto; }
+.mh { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.mh h2 { font-size: 19px; color: #222; }
+.mh .crumb { font-size: 12px; color: #777; }
+.mh .right { margin-left: auto; display: flex; gap: 8px; }
+
+.panel-box { background: #fff; border: 1px solid #bbb; border-radius: 5px; padding: 14px; margin-bottom: 14px; position: relative; }
+.panel-box > h3 { font-size: 14px; color: #222; margin-bottom: 10px; display: flex; align-items: center; }
+.panel-box .sub { font-size: 12px; color: #777; margin-top: -6px; margin-bottom: 10px; }
+
+.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.toolbar .grow { flex: 1; }
+.tin { border: 1px solid #999; background: #fff; padding: 7px 10px; font-size: 13px; border-radius: 3px; font-family: inherit; }
+.tin.w { width: 240px; }
+.tabs { display: flex; gap: 4px; }
+.tabs button {
+  font-family: inherit; font-size: 13px; padding: 7px 14px; border: 1px solid #999; background: #fff;
+  color: #555; cursor: pointer; border-radius: 3px;
+}
+.tabs button.on { background: #555; color: #fff; border-color: #333; font-weight: bold; }
+.tabs button .cnt { opacity: .7; margin-left: 4px; }
+
+.btn { font-family: inherit; font-size: 13px; padding: 7px 14px; border: 1px solid #999; background: #eee; color: #333; cursor: pointer; border-radius: 3px; }
+.btn:hover { background: #ddd; }
+.btn.pri { background: #555; color: #fff; border-color: #333; font-weight: bold; }
+.btn.pri:hover { background: #444; }
+.btn.sm { font-size: 12px; padding: 4px 9px; }
+.btn:disabled { background: #f0f0f0; color: #aaa; border-color: #ccc; cursor: not-allowed; }
+
+table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; }
+table.tbl th, table.tbl td { border: 1px solid #ddd; padding: 8px 9px; text-align: left; vertical-align: middle; }
+table.tbl th { background: #ececec; font-size: 12px; color: #444; font-weight: bold; white-space: nowrap; }
+table.tbl tr.bad { background: #fbeae8; }
+table.tbl tr.sel { background: #eef2f7; }
+table.tbl td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.tbl .acts { display: flex; gap: 4px; white-space: nowrap; }
+
+.chip { display: inline-block; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 10px; border: 1px solid; white-space: nowrap; }
+.chip.ok { background: #e6f4ec; color: #1f8a5b; border-color: #9ecfb5; }
+.chip.warn { background: #fbf1da; color: #8a5d0f; border-color: #dcc188; }
+.chip.bad { background: #fbeae8; color: #c2463c; border-color: #e0a49d; }
+.chip.neu { background: #eee; color: #555; border-color: #bbb; }
+
+.stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.stat { flex: 1; min-width: 150px; background: #fff; border: 1px solid #bbb; border-radius: 5px; padding: 12px 14px; position: relative; }
+.stat .sl { font-size: 12px; color: #777; }
+.stat .sv { font-size: 24px; font-weight: bold; color: #222; margin-top: 3px; }
+.stat .sd { font-size: 11px; color: #888; margin-top: 3px; }
+
+.kv { display: flex; gap: 10px; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #eee; }
+.kv .k { width: 130px; color: #777; flex: none; }
+.kv .v { color: #222; }
+
+.empty { text-align: center; padding: 40px 20px; color: #888; font-size: 14px; background: #fafafa; border: 1px dashed #bbb; border-radius: 5px; }
+.loading { text-align: center; padding: 40px; color: #999; font-size: 13px; }
+.skel { height: 14px; background: #e4e4e4; border-radius: 3px; margin: 8px 0; animation: sk 1.2s infinite alternate; }
+@keyframes sk { to { background: #f2f2f2; } }
+.errbox { background: #fbeae8; border: 1px solid #e0a49d; color: #a63a31; padding: 14px; border-radius: 5px; font-size: 13px; }
+
+/* ---------- 모달 ---------- */
+.mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+.mask.on { display: flex; }
+.modal { background: #fff; border: 2px solid #555; border-radius: 6px; width: 100%; max-width: 520px; max-height: 86vh; overflow: auto; }
+.modal.wide { max-width: 760px; }
+.modal .mtop { padding: 14px 16px; border-bottom: 1px solid #ccc; display: flex; align-items: center; }
+.modal .mtop h3 { font-size: 15px; color: #222; }
+.modal .mtop .x { margin-left: auto; cursor: pointer; color: #888; font-size: 18px; background: none; border: 0; font-family: inherit; }
+.modal .mbody { padding: 16px; font-size: 13px; }
+.modal .mfoot { padding: 12px 16px; border-top: 1px solid #ccc; display: flex; gap: 8px; justify-content: flex-end; background: #fafafa; }
+.mfield { margin-bottom: 12px; }
+.mfield label { display: block; font-size: 12px; font-weight: bold; color: #444; margin-bottom: 4px; }
+.mfield .tin { width: 100%; }
+.mnote { background: #f4f4f4; border-left: 3px solid #999; padding: 9px 11px; font-size: 12px; color: #555; margin-bottom: 12px; }
+
+/* ---------- 토스트 ---------- */
+#toast {
+  position: fixed; left: 50%; bottom: 34px; transform: translateX(-50%) translateY(14px);
+  background: #333; color: #fff; padding: 11px 20px; border-radius: 5px; font-size: 13px;
+  opacity: 0; pointer-events: none; transition: .18s; z-index: 90; max-width: 80vw; text-align: center;
+}
+#toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- 상태 데모 전환 바 (로딩/빈/에러 상태 확인용) ---------- */
+.statebar {
+  max-width: 1180px; margin: 0 auto 10px; background: #fff; border: 1px solid #bbb;
+  border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #555;
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+.statebar b { color: #333; }
+.statebar button {
+  font-family: inherit; font-size: 12px; border: 1px solid #999; background: #f4f4f4;
+  padding: 4px 10px; border-radius: 3px; cursor: pointer;
+}
+.statebar button.on { background: #555; color: #fff; border-color: #333; font-weight: bold; }
+.hidden { display: none !important; }
