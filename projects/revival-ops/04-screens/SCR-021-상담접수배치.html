@@ -135,7 +135,7 @@
         <select class="tin" id="asRoom" style="width:200px"></select></div>
       <div class="mfield"><label>상담사 *</label>
         <select class="tin" id="asCounselor" style="width:240px"></select>
-        <div class="sub" style="margin-top:4px">그 시간에 가능한 상담사만 선택할 수 있습니다. 불가한 상담사는 비활성으로 표시됩니다. (POL-035 · 가능 시간 입력 위치 미확정 OI-7)</div>
+        <div class="sub" style="margin-top:4px">그 시간에 가능한 상담사만 선택할 수 있습니다. 불가한 상담사는 비활성으로 표시됩니다. (POL-035 · 가능 시간 입력 위치 미확정 OI-7)<br>상담 시간은 <b>30분 단위</b>로만 설정합니다. 상담 1건의 길이는 30분입니다. (POL-050)</div>
         <div class="errmsg" id="eAssign"></div></div>
     </div>
     <div class="mfoot"><button class="btn" onclick="closeModal('mAssign')">닫기</button><button class="btn pri" onclick="confirmAssign()">확정</button></div>
@@ -146,7 +146,9 @@
 <script>
 mountSideNav('cregist', '본부 팀원');
 const ME = '노은주';
-const TIMES = ['09:00','10:00','11:00','13:00','14:00','15:00','16:00'];
+/* POL-050 — 상담 시작 시각은 30분 단위로만 고를 수 있다 (2026-09-04 회의 결정) */
+const TIMES = ['09:00','09:30','10:00','10:30','11:00','11:30',
+               '13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30'];
 const ROOMS = [
   { no:1, status:'사용' }, { no:2, status:'사용' }, { no:3, status:'사용' }, { no:4, status:'미사용' },
 ];

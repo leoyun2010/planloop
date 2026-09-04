@@ -114,13 +114,14 @@ let ROOMS = [
   { no:3, status:'상담 중', who:'이상담', min:8 },
   { no:4, status:'미사용',  who:null,     min:0 },
 ];
+/* time = 예정 시작 시각. SCR-020·SCR-021과 같은 배정 데이터라 30분 단위다 (POL-036, POL-050) */
 let SESSIONS = [
   { id:1, time:'13:00', name:'김복음', counselor:'김상담', room:1, done:true, result:null, wit:null, summary:'' },
-  { id:2, time:'13:40', name:'이믿음', counselor:'이상담', room:3, done:true, result:'해결', wit:'가능', summary:'' },
+  { id:2, time:'13:30', name:'이믿음', counselor:'이상담', room:3, done:true, result:'해결', wit:'가능', summary:'' },
   { id:3, time:'14:00', name:'박소망', counselor:'김상담', room:1, done:true, result:'재상담 필요', wit:'본인 거절', summary:'' },
-  { id:4, time:'14:20', name:'최은혜', counselor:'이상담', room:3, done:false, result:null, wit:null, summary:'' },
-  { id:5, time:'11:20', name:'오소망', counselor:'김상담', room:2, done:true, result:'해결', wit:'가능', summary:'' },
-  { id:6, time:'10:40', name:'한사랑', counselor:'이상담', room:1, done:true, result:'해결', wit:'해당 없음', summary:'' },
+  { id:4, time:'14:30', name:'최은혜', counselor:'이상담', room:3, done:false, result:null, wit:null, summary:'' },
+  { id:5, time:'11:30', name:'오소망', counselor:'김상담', room:2, done:true, result:'해결', wit:'가능', summary:'' },
+  { id:6, time:'10:30', name:'한사랑', counselor:'이상담', room:1, done:true, result:'해결', wit:'해당 없음', summary:'' },
 ];
 let target = null;
 

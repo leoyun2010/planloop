@@ -19,6 +19,7 @@
   .seat.assigned { background:#e6f4ec; border-color:#9ecfb5; color:#1f6b4a; font-weight:bold; }
   .seat.priority { background:#fbeae8; border-color:#e0a49d; color:#a63a31; font-weight:bold; }
   .seat.hold { background:#fbf1da; border-color:#dcc188; color:#8a5d0f; }
+  .seat.unusable { background:#ececec; border-color:#b6b6b6; color:#8a8a8a; text-decoration:line-through; }
   body.emptyonly .seat:not(.free) { opacity:.18; }
   body.emptyonly .seat.free { outline:2px solid #333; }
   .ulist { max-height:330px; overflow:auto; }
@@ -35,7 +36,7 @@
 
 <div class="statebar">
   <b>동작 확인</b>
-  <span>배치도 생성 → 보류 지정 → 우선 배정 → 일괄 배치 순으로 눌러 보세요.</span>
+  <span>배치도 생성 → 보류 지정 → 사용 불가 지정 → 우선 배정 → 일괄 배치 순으로 눌러 보세요.</span>
   <button onclick="breakCount()">합계 깨뜨리기 (POL-048)</button>
   <button onclick="location.reload()">초기화</button>
   <span style="margin-left:auto"></span>
@@ -105,6 +106,7 @@
               <span class="seat assigned" style="display:inline-flex;width:16px;height:16px"></span> 배정
               <span class="seat priority" style="display:inline-flex;width:16px;height:16px"></span> 우선
               <span class="seat hold" style="display:inline-flex;width:16px;height:16px"></span> 보류
+              <span class="seat unusable" style="display:inline-flex;width:16px;height:16px">✕</span> 사용 불가
             </span>
           </div>
           <div class="rooms" id="map"></div>
@@ -121,10 +123,12 @@
     <div class="mbody">
       <div id="stInfo"></div>
       <div class="mfield" style="margin-top:12px"><label>메모</label><input class="tin" id="stMemo" placeholder="예) 화장실 가까운 자리 요청"></div>
+      <div class="mfield" id="stReasonWrap" style="margin-top:8px"><label>사용 불가 사유 (필수)</label><input class="tin" id="stReason" maxlength="50" placeholder="예) 침대 프레임 파손"></div>
       <div class="toolbar" style="margin-top:12px;flex-wrap:wrap">
         <button class="btn" id="btnMove" onclick="startMove()">다른 자리로 이동</button>
         <button class="btn" id="btnUn" onclick="unassignSeat()">배정 해제</button>
         <button class="btn" id="btnHold" onclick="toggleHold()">보류 지정</button>
+        <button class="btn" id="btnUnusable" onclick="toggleUnusable()">사용 불가 지정</button>
       </div>
       <div class="mnote" style="margin-top:12px">모든 좌석 변경은 담당자와 함께 이력에 기록됩니다. (POL-033) · 불만 대응은 3클릭 이내로 끝나야 합니다. (POL-018)</div>
     </div>
@@ -148,6 +152,8 @@
           <tr><td>시점 · 예외</td><td>POL-015</td><td>게스트하우스·방갈로는 등록·입금 즉시 배정. 다 차면 「더 이상 받을 수 없습니다」</td></tr>
           <tr><td>시점 · 현장</td><td>POL-016</td><td>현장 접수자는 보류 좌석에 수동 배치</td></tr>
           <tr><td>제외</td><td>POL-017</td><td>숙소 필요 없음 선택자는 배정 대상에서 자동 제외</td></tr>
+          <tr><td><b>제외</b></td><td>POL-051</td><td>파손·구조상 못 쓰는 자리는 사유를 적어 <b>사용 불가</b>로 지정. 모든 배정에서 제외되고 총 좌석 수에는 남는다</td></tr>
+          <tr><td>번호</td><td>POL-052</td><td>좌석 번호는 <b>1층 홀수 · 2층 짝수</b>. 같은 세로 칸은 연속 번호(n, n+1). 표기는 <code>구역-방방 번호번</code></td></tr>
         </tbody>
       </table>
     </div>
@@ -191,14 +197,15 @@ function build() {
   SEATS = [];
   let id = 1;
   for (let r = 1; r <= rooms; r++) {
-    for (let i = 1; i <= lower; i++) SEATS.push({ id: id++, zone, room: r, floor: 1, no: i, status: 'free', personId: null, memo: '' });
-    for (let i = 1; i <= upper; i++) SEATS.push({ id: id++, zone, room: r, floor: 2, no: i, status: 'free', personId: null, memo: '' });
+    /* POL-052 — 1층 홀수 / 2층 짝수, 같은 세로 칸은 연속 번호 (n, n+1) */
+    for (let i = 0; i < lower; i++) SEATS.push({ id: id++, zone, room: r, floor: 1, no: i * 2 + 1, status: 'free', personId: null, memo: '', reason: '' });
+    for (let i = 0; i < upper; i++) SEATS.push({ id: id++, zone, room: r, floor: 2, no: i * 2 + 2, status: 'free', personId: null, memo: '', reason: '' });
   }
   PEOPLE.forEach(p => p.seat = null);
   fakeGhost = 0;
   log(`배치도 생성 — ${zone} ${rooms}방 (1층 ${lower} / 2층 ${upper})`);
   render();
-  toast(`${zone} ${rooms}개 방, 총 ${SEATS.length}석을 만들었습니다.`);
+  toast(`${zone} ${rooms}개 방, 총 ${SEATS.length}석을 만들었습니다. 좌석 번호는 1층 홀수 · 2층 짝수로 부여했습니다. (POL-052)`, 4600);
 }
 function resetLayout() {
   if (!SEATS.length) { toast('배치도가 없습니다.'); return; }
@@ -214,22 +221,23 @@ function reuseFixed() {
   toast('고정 도면 구역 값을 불러왔습니다. [생성]을 누르면 좌석 구조만 가져옵니다(배정 정보는 가져오지 않습니다). (POL-015)', 4600);
 }
 
-/* POL-048 — 배정+보류+빈자리 = 총 좌석 */
+/* POL-048 — 배정+보류+사용불가+빈자리 = 총 좌석 (POL-051로 사용 불가 항이 추가됨) */
 function counts() {
   const total = SEATS.length + fakeGhost;
   const assigned = SEATS.filter(s => s.status === 'assigned' || s.status === 'priority').length;
   const hold = SEATS.filter(s => s.status === 'hold').length;
+  const unusable = SEATS.filter(s => s.status === 'unusable').length;
   const free = SEATS.filter(s => s.status === 'free').length;
-  return { total, assigned, hold, free, sum: assigned + hold + free };
+  return { total, assigned, hold, unusable, free, sum: assigned + hold + unusable + free };
 }
 function renderCounter() {
   const c = counts();
   document.getElementById('counter').innerHTML =
-    `총 <b>${c.total}</b>석 · 배정 <b>${c.assigned}</b> · 보류 <b>${c.hold}</b> · 빈자리 <b>${c.free}</b>`;
+    `총 <b>${c.total}</b>석 · 배정 <b>${c.assigned}</b> · 보류 <b>${c.hold}</b> · 사용 불가 <b>${c.unusable}</b> · 빈자리 <b>${c.free}</b>`;
   const w = document.getElementById('countWarn');
   if (c.sum !== c.total) {
     w.classList.remove('hidden');
-    w.innerHTML = `<b>좌석 수가 맞지 않습니다.</b> 총 ${c.total}석인데 배정 ${c.assigned} + 보류 ${c.hold} + 빈자리 ${c.free} = ${c.sum}석입니다. 배치도를 확인해 주세요. (POL-048)`;
+    w.innerHTML = `<b>좌석 수가 맞지 않습니다.</b> 총 ${c.total}석인데 배정 ${c.assigned} + 보류 ${c.hold} + 사용 불가 ${c.unusable} + 빈자리 ${c.free} = ${c.sum}석입니다. 배치도를 확인해 주세요. (POL-048)`;
   } else w.classList.add('hidden');
   return c;
 }
@@ -247,18 +255,21 @@ function render() {
       const floor = f => rs.filter(s => s.floor === f).map(s => seatEl(s)).join('') || '<span class="sub">없음</span>';
       return `<div class="room">
         <h4>${zone} ${room}방 ${grp.length === 1 ? `<span class="tag">${grp[0]}</span>` : ''}</h4>
-        <div class="flr">1층</div><div class="seats">${floor(1)}</div>
-        <div class="flr">2층</div><div class="seats">${floor(2)}</div>
+        <div class="flr">1층 (홀수)</div><div class="seats">${floor(1)}</div>
+        <div class="flr">2층 (짝수)</div><div class="seats">${floor(2)}</div>
       </div>`;
     }).join('');
   }
   renderCounter();
   renderUnassigned();
 }
+function seatLabel(s) { return `${s.zone} ${s.room}방 ${s.no}번`; }   /* POL-052 — 번호로 층이 구분되므로 층을 넣지 않는다 */
 function seatEl(s) {
   const p = s.personId ? PEOPLE.find(x => x.id === s.personId) : null;
   const cls = s.status === 'free' ? 'free' : s.status;
-  return `<div class="seat ${cls}" onclick="openSeat(${s.id})" title="${s.zone} ${s.room}방 ${s.floor}층 ${s.no}번">${p ? p.name.slice(1) : s.no}</div>`;
+  const tip = s.status === 'unusable' ? `${seatLabel(s)} — 사용 불가: ${s.reason}` : seatLabel(s);
+  const face = s.status === 'unusable' ? '✕' : (p ? p.name.slice(1) : s.no);
+  return `<div class="seat ${cls}" onclick="openSeat(${s.id})" title="${tip}">${face}</div>`;
 }
 
 function renderUnassigned() {
@@ -295,7 +306,7 @@ function assignPriority(pid) {
   const seat = SEATS.find(s => s.floor === 1 && s.status === 'free');
   if (!seat) { toast('1층에 남은 자리가 없습니다. 보류 좌석을 해제하거나 배정된 자리를 조정해 주세요. (POL-011)', 4600); return; }
   place(p, seat, 'priority');
-  log(`우선 배정 — ${p.name} → ${seat.zone} ${seat.room}방 1층 ${seat.no}번`);
+  log(`우선 배정 — ${p.name} → ${seatLabel(seat)}`);
   render();
   toast(`${p.name} 님을 1층에 우선 배정했습니다. 필수 반영 대상입니다. (POL-011)`);
 }
@@ -385,17 +396,25 @@ function openSeat(id) {
   if (moveFrom) { doMove(s); return; }
   curSeat = s;
   const p = s.personId ? PEOPLE.find(x => x.id === s.personId) : null;
-  document.getElementById('stTitle').textContent = `${s.zone} ${s.room}방 ${s.floor}층 ${s.no}번`;
+  document.getElementById('stTitle').textContent = `${seatLabel(s)} (${s.floor}층)`;
   document.getElementById('stInfo').innerHTML = p
     ? `<div class="kv"><div class="k">배정</div><div class="v"><b>${p.name}</b> · ${p.sex} · ${p.group}</div></div>
        <div class="kv"><div class="k">상태</div><div class="v">${s.status === 'priority' ? '<span class="chip bad">우선 배정</span>' : '<span class="chip ok">일반 배정</span>'}</div></div>
        ${p.special ? `<div class="kv"><div class="k">특이사항</div><div class="v">${p.special}</div></div>` : ''}`
-    : `<div class="kv"><div class="k">상태</div><div class="v">${s.status === 'hold' ? '<span class="chip warn">보류 (현장 대응용)</span>' : '<span class="chip neu">빈 자리</span>'}</div></div>`;
+    : `<div class="kv"><div class="k">상태</div><div class="v">${
+        s.status === 'hold' ? '<span class="chip warn">보류 (현장 대응용)</span>'
+        : s.status === 'unusable' ? '<span class="chip bad">사용 불가</span>'
+        : '<span class="chip neu">빈 자리</span>'}</div></div>` +
+      (s.status === 'unusable' ? `<div class="kv"><div class="k">사유</div><div class="v">${s.reason}</div></div>` : '');
   document.getElementById('stMemo').value = s.memo || '';
+  document.getElementById('stReason').value = s.reason || '';
+  /* 사유 입력칸은 사용 불가로 지정할 수 있는 상태에서만 보인다 (POL-051) */
+  document.getElementById('stReasonWrap').style.display = (!p && s.status !== 'unusable') ? '' : 'none';
   document.getElementById('btnMove').disabled = !p;
   document.getElementById('btnUn').disabled = !p;
   document.getElementById('btnHold').textContent = s.status === 'hold' ? '보류 해제' : '보류 지정';
-  document.getElementById('btnHold').disabled = !!p;
+  document.getElementById('btnHold').disabled = !!p || s.status === 'unusable';
+  document.getElementById('btnUnusable').textContent = s.status === 'unusable' ? '사용 불가 해제' : '사용 불가 지정';
   openModal('mSeat');
 }
 function startMove() {
@@ -417,30 +436,60 @@ function doMove(to) {
     log(`좌석 교환 — ${pFrom.name} ↔ ${pTo.name}`);
     toast(`${pFrom.name} 님과 ${pTo.name} 님의 자리를 바꿨습니다. (POL-018, POL-033)`, 4200);
   } else {
+    if (to.status === 'unusable') { toast(`사용할 수 없는 자리입니다. 사유: ${to.reason} (POL-051)`, 4600); return; }
     if (to.status === 'hold') { toast('보류 좌석입니다. 현장 대응용으로 비워 둔 자리라 배정하려면 먼저 보류를 해제해 주세요. (POL-013)', 4600); return; }
     to.personId = pFrom.id; to.status = from.status; pFrom.seat = to.id;
-    from.personId = null; from.status = 'free'; from.memo = '';
-    log(`좌석 이동 — ${pFrom.name} → ${to.zone} ${to.room}방 ${to.floor}층 ${to.no}번`);
+    from.personId = null; from.status = 'free'; from.memo = ''; from.reason = '';
+    log(`좌석 이동 — ${pFrom.name} → ${seatLabel(to)}`);
     toast(`${pFrom.name} 님을 옮겼습니다. 3클릭으로 처리했습니다. (POL-018)`, 4200);
   }
   render();
 }
 function unassignSeat() {
   const p = PEOPLE.find(x => x.id === curSeat.personId);
-  p.seat = null; curSeat.personId = null; curSeat.status = 'free'; curSeat.memo = '';
+  p.seat = null; curSeat.personId = null; curSeat.status = 'free'; curSeat.memo = ''; curSeat.reason = '';
   log(`배정 해제 — ${p.name}`);
   closeModal('mSeat'); render();
   toast(`${p.name} 님의 배정을 해제했습니다. 미배정 명단으로 돌아갑니다.`);
 }
+/* POL-051 — 사용 불가 지정·해제 */
+function toggleUnusable() {
+  const s = curSeat;
+  if (s.status === 'unusable') {
+    s.status = 'free'; 
+    log(`사용 불가 해제 — ${seatLabel(s)} (사유: ${s.reason})`);
+    s.reason = '';
+    closeModal('mSeat'); render();
+    toast('사용 불가를 해제했습니다. 빈 자리로 돌아가 다시 배정 대상이 됩니다. (POL-051)', 4200);
+    return;
+  }
+  if (s.personId) {
+    const p = PEOPLE.find(x => x.id === s.personId);
+    toast(`이 자리에는 ${p.name} 님이 배정되어 있습니다. 배정을 먼저 해제한 뒤 사용 불가로 지정해 주세요. (POL-051)`, 5000);
+    return;
+  }
+  const reason = document.getElementById('stReason').value.trim();
+  if (!reason) { toast('사용 불가 사유를 입력해 주세요. (POL-051)', 4200); return; }
+  s.status = 'unusable'; s.reason = reason; s.memo = '';
+  log(`사용 불가 지정 — ${seatLabel(s)}: ${reason}`);
+  closeModal('mSeat'); render();
+  const room = SEATS.filter(x => x.zone === s.zone && x.room === s.room);
+  if (room.every(x => x.status === 'unusable')) {
+    toast(`${s.zone} ${s.room}방 전체가 사용 불가입니다. 배정 가능한 자리가 없습니다. (POL-051)`, 5200);
+  } else {
+    toast(`사용 불가로 지정했습니다. 일괄 배치·우선 배정·그룹 배정에서 모두 제외됩니다. (POL-051)`, 4600);
+  }
+}
+
 function toggleHold() {
   curSeat.status = curSeat.status === 'hold' ? 'free' : 'hold';
-  log(`${curSeat.status === 'hold' ? '보류 지정' : '보류 해제'} — ${curSeat.zone} ${curSeat.room}방 ${curSeat.floor}층 ${curSeat.no}번`);
+  log(`${curSeat.status === 'hold' ? '보류 지정' : '보류 해제'} — ${seatLabel(curSeat)}`);
   closeModal('mSeat'); render();
   toast(curSeat.status === 'hold' ? '보류 좌석으로 지정했습니다. 일괄 배치에서 제외됩니다. (POL-013)' : '보류를 해제했습니다.');
 }
 function saveSeat() {
   curSeat.memo = document.getElementById('stMemo').value.trim();
-  if (curSeat.memo) log(`메모 — ${curSeat.zone} ${curSeat.room}방 ${curSeat.floor}층 ${curSeat.no}번: ${curSeat.memo}`);
+  if (curSeat.memo) log(`메모 — ${seatLabel(curSeat)}: ${curSeat.memo}`);
   closeModal('mSeat'); render();
   toast('저장했습니다. 변경 이력에 기록됩니다. (POL-033)');
 }

@@ -9,6 +9,9 @@
   .tlwrap { display:flex; gap:0; border:1px solid #bbb; background:#fff; border-radius:5px; overflow:hidden; }
   .axis { width:56px; flex:none; border-right:1px solid #ddd; background:#f6f6f6; }
   .axis .hr, .col .hr { height:52px; border-bottom:1px solid #eee; font-size:11px; color:#888; padding:2px 5px; }
+  /* POL-050 — 30분 격자. 정시 경계는 진하게, 30분 경계는 점선으로 구분한다 */
+  .axis .hr.half, .col .hr.half { height:26px; }
+  .axis .hr.mid, .col .hr.mid { border-bottom:1px dashed #f0f0f0; }
   .cols { display:flex; flex:1; overflow-x:auto; }
   .col { flex:1; min-width:150px; border-right:1px solid #eee; position:relative; }
   .colhd { height:34px; border-bottom:1px solid #ddd; background:#f0f0f0; font-size:12px; font-weight:bold;
@@ -154,10 +157,10 @@
   <div class="modal" style="max-width:420px">
     <div class="mtop"><h3>운영 시간대 설정</h3><button class="x" onclick="closeModal('mHours')">✕</button></div>
     <div class="mbody">
-      <div class="mnote"><b>POL-022 미확정</b> — 새벽 상담 운영 여부에 따라 범위를 확정합니다. 현재는 09:00~24:00을 가정합니다. (오픈 이슈 OI-13)</div>
+      <div class="mnote"><b>POL-022 미확정</b> — 새벽 상담 운영 여부에 따라 범위를 확정합니다. 현재는 09:00~24:00을 가정합니다. (오픈 이슈 OI-13)<br><b>POL-050</b> — 시작·종료는 <b>30분 단위</b>로만 입력합니다. (2026-09-04 회의 결정)</div>
       <div class="toolbar">
-        <label style="font-size:12px">시작</label><input class="tin" id="hFrom" type="number" min="0" max="23" style="width:80px">
-        <label style="font-size:12px">종료</label><input class="tin" id="hTo" type="number" min="1" max="24" style="width:80px">
+        <label style="font-size:12px">시작</label><input class="tin" id="hFrom" type="number" min="0" max="23.5" step="0.5" style="width:80px">
+        <label style="font-size:12px">종료</label><input class="tin" id="hTo" type="number" min="0.5" max="24" step="0.5" style="width:80px">
       </div>
       <div class="errmsg" id="eHours"></div>
     </div>
@@ -169,6 +172,8 @@
 <script>
 mountSideNav('schedule', '본부 팀원');
 const ME = '노은주', PX = 52;   /* 1시간 = 52px */
+const UNIT = 0.5;               /* POL-050 — 상담 예정 시간은 30분 단위로만 설정한다 */
+const isSlot = t => Math.abs(t / UNIT - Math.round(t / UNIT)) < 1e-9;
 let HOURS = { from: 9, to: 18 };
 let day = '6/19', sel = null, assignSlot = null;
 
@@ -178,11 +183,12 @@ let COUNSELORS = [
   { id:3, name:'박상담', avail: { '6/19':[9,15], '6/20':[13,18], '6/21':[9,18] } },
 ];
 let BLOCKS = [
-  { id:1, day:'6/19', cid:1, name:'김복음', room:1, planFrom:10,   planTo:10.67, actFrom:10,    actTo:10.67, status:'대기',      res:null, wit:null, memo:'' },
-  { id:2, day:'6/19', cid:1, name:'이믿음', room:1, planFrom:11,   planTo:11.67, actFrom:11.08, actTo:12.1,  status:'진행 중',   res:null, wit:null, memo:'' },
-  { id:3, day:'6/19', cid:3, name:'최은혜', room:3, planFrom:9.5,  planTo:10.17, actFrom:9.5,   actTo:10.0,  status:'상담 종료', res:'해결', wit:'가능', memo:'' },
-  { id:4, day:'6/19', cid:2, name:'박소망', room:2, planFrom:14,   planTo:14.67, actFrom:14,    actTo:14.67, status:'대기',      res:null, wit:null, memo:'' },
-  { id:5, day:'6/20', cid:2, name:'한사랑', room:2, planFrom:10,   planTo:10.67, actFrom:10,    actTo:10.67, status:'대기',      res:null, wit:null, memo:'' },
+  /* 예정 시간(planFrom/planTo)은 30분 단위 (POL-050). 실제 진행(actFrom/actTo)은 분 단위 그대로 기록한다 (POL-050 예외) */
+  { id:1, day:'6/19', cid:1, name:'김복음', room:1, planFrom:10,   planTo:10.5,  actFrom:10,    actTo:10.5,  status:'대기',      res:null, wit:null, memo:'' },
+  { id:2, day:'6/19', cid:1, name:'이믿음', room:1, planFrom:11,   planTo:11.5,  actFrom:11.08, actTo:12.1,  status:'진행 중',   res:null, wit:null, memo:'' },
+  { id:3, day:'6/19', cid:3, name:'최은혜', room:3, planFrom:9.5,  planTo:10,    actFrom:9.5,   actTo:9.85,  status:'상담 종료', res:'해결', wit:'가능', memo:'' },
+  { id:4, day:'6/19', cid:2, name:'박소망', room:2, planFrom:14,   planTo:14.5,  actFrom:14,    actTo:14.5,  status:'대기',      res:null, wit:null, memo:'' },
+  { id:5, day:'6/20', cid:2, name:'한사랑', room:2, planFrom:10,   planTo:10.5,  actFrom:10,    actTo:10.5,  status:'대기',      res:null, wit:null, memo:'' },
 ];
 let WAITING = [
   { id:101, name:'정소망', reason:'구원 확신 문의' },
@@ -196,9 +202,12 @@ const fmt = h => `${String(Math.floor(h)).padStart(2,'0')}:${String(Math.round((
 function render() {
   /* 시간축 */
   let ax = '';
-  for (let h = HOURS.from; h < HOURS.to; h++) ax += `<div class="hr">${String(h).padStart(2,'0')}:00</div>`;
+  /* POL-050 — 격자를 30분으로 쪼갠다. 정시에만 라벨을 적어 눈이 어지럽지 않게 한다 */
+  for (let t = HOURS.from; t < HOURS.to; t += UNIT) {
+    ax += `<div class="hr half${t % 1 ? ' mid' : ''}">${t % 1 ? '' : fmt(t)}</div>`;
+  }
   document.getElementById('axis').innerHTML = `<div class="colhd" style="background:#e8e8e8">시간</div>${ax}`;
-  document.getElementById('hourInfo').textContent = `운영 시간 ${String(HOURS.from).padStart(2,'0')}:00 ~ ${String(HOURS.to).padStart(2,'0')}:00 (POL-022 미확정)`;
+  document.getElementById('hourInfo').textContent = `운영 시간 ${fmt(HOURS.from)} ~ ${fmt(HOURS.to)} · 30분 단위 (POL-050) · 범위는 POL-022 미확정`;
 
   const hrs = HOURS.to - HOURS.from;
   const list = COUNSELORS;
@@ -213,8 +222,10 @@ function render() {
     let shades = '';
     if (av[0] > HOURS.from) shades += `<div class="shade" style="top:0;height:${(av[0]-HOURS.from)*PX}px"></div>`;
     if (av[1] < HOURS.to)   shades += `<div class="shade" style="top:${(av[1]-HOURS.from)*PX}px;height:${(HOURS.to-av[1])*PX}px"></div>`;
-    const cells = Array.from({ length: hrs }, (_, i) =>
-      `<div class="hr" onclick="clickEmpty(${c.id}, ${HOURS.from + i})"></div>`).join('');
+    const cells = Array.from({ length: Math.round(hrs / UNIT) }, (_, i) => {
+      const t = HOURS.from + i * UNIT;
+      return `<div class="hr half${t % 1 ? ' mid' : ''}" onclick="clickEmpty(${c.id}, ${t})"></div>`;
+    }).join('');
     const bl = blocks.map(b => {
       const cls = b.status === '대기' ? 'wait' : b.status === '진행 중' ? 'prog' : 'done';
       const top = (b.actFrom - HOURS.from) * PX;
@@ -264,7 +275,7 @@ function setStatus(to) {
   if (ti - fi > 1 && !confirm('진행 중 단계를 거치지 않았습니다.\n그대로 종료하시겠습니까?')) return;
   sel.status = to;
   if (to === '진행 중') sel.actFrom = Math.max(sel.planFrom, sel.actFrom);
-  if (to === '상담 종료' && sel.actTo <= sel.actFrom) sel.actTo = sel.actFrom + 0.67;
+  if (to === '상담 종료' && sel.actTo <= sel.actFrom) sel.actTo = sel.actFrom + UNIT;   /* 실제 진행 시간은 분 단위 기록 (POL-050 예외) */
   render(); openDrawer(sel.id);
   toast(`«${to}»로 바꿨습니다. 왼쪽 블록 색과 문구가 즉시 바뀝니다. (POL-035)`);
 }
@@ -287,11 +298,14 @@ function saveDrawer() {
 function clickEmpty(cid, hour) {
   const c = COUNSELORS.find(x => x.id === cid);
   const av = c.avail[day] || [HOURS.from, HOURS.to];
-  if (hour < av[0] || hour >= av[1]) { toast(`${c.name} 상담사의 가능 시간(${av[0]}시~${av[1]}시) 밖입니다. (POL-035)`, 4200); return; }
-  const dup = BLOCKS.find(b => b.day === day && b.cid === cid && hour >= Math.floor(b.planFrom) && hour < Math.ceil(b.planTo));
+  if (!isSlot(hour)) { toast('상담 시간은 30분 단위로만 설정할 수 있습니다. (예: 10:00, 10:30) (POL-050)', 4600); return; }
+  if (hour < av[0] || hour + UNIT > av[1]) { toast(`${c.name} 상담사의 가능 시간(${fmt(av[0])}~${fmt(av[1])}) 밖입니다. (POL-035)`, 4200); return; }
+  if (hour + UNIT > HOURS.to) { toast(`운영 시간대(${fmt(HOURS.from)}~${fmt(HOURS.to)}) 안에서만 배정할 수 있습니다. (POL-022)`, 4600); return; }
+  /* 30분 슬롯이 기존 예정 구간과 겹치는지 본다 (POL-036 중복 배치 금지) */
+  const dup = BLOCKS.find(b => b.day === day && b.cid === cid && hour < b.planTo && hour + UNIT > b.planFrom);
   if (dup) { toast('이 시간에 이미 배정된 상담이 있습니다. (POL-036 중복 배치 금지)', 4200); return; }
   assignSlot = { cid, hour };
-  document.getElementById('aWhere').textContent = `${c.name} · ${day} ${String(hour).padStart(2,'0')}:00`;
+  document.getElementById('aWhere').textContent = `${c.name} · ${day} ${fmt(hour)}~${fmt(hour + UNIT)} (30분)`;
   document.getElementById('aList').innerHTML = WAITING.length ? WAITING.map(w => `
     <label class="ckrow" style="padding:9px 11px;margin-bottom:6px">
       <input type="radio" name="wt" style="width:16px;height:16px" value="${w.id}">
@@ -305,11 +319,11 @@ function doAssign() {
   if (!sel2) { const e = document.getElementById('eAssign'); e.classList.add('on'); e.textContent = '배치할 대기자를 선택해 주세요.'; return; }
   const w = WAITING.find(x => x.id === +sel2.value);
   BLOCKS.push({ id: nextBlock++, day, cid: assignSlot.cid, name: w.name, room: 1,
-    planFrom: assignSlot.hour, planTo: assignSlot.hour + 0.67,
-    actFrom: assignSlot.hour, actTo: assignSlot.hour + 0.67, status: '대기', res: null, wit: null, memo: '' });
+    planFrom: assignSlot.hour, planTo: assignSlot.hour + UNIT,        /* POL-050 — 최소 길이 30분 */
+    actFrom: assignSlot.hour, actTo: assignSlot.hour + UNIT, status: '대기', res: null, wit: null, memo: '' });
   WAITING = WAITING.filter(x => x.id !== w.id);
   closeModal('mAssign'); render();
-  toast(`${w.name} 님을 현장 배정했습니다. SCR-021 배치 대기 목록에서 제거됩니다. (POL-036)`, 4600);
+  toast(`${w.name} 님을 ${fmt(assignSlot.hour)}~${fmt(assignSlot.hour + UNIT)}(30분)에 현장 배정했습니다. SCR-021 배치 대기 목록에서 제거됩니다. (POL-036, POL-050)`, 5200);
 }
 
 /* 운영 시간 설정 — POL-022 */
@@ -323,6 +337,7 @@ function saveHours() {
   const f = +document.getElementById('hFrom').value, t = +document.getElementById('hTo').value;
   const e = document.getElementById('eHours');
   if (!(t > f)) { e.classList.add('on'); e.textContent = '종료 시각은 시작 시각보다 커야 합니다.'; return; }
+  if (!isSlot(f) || !isSlot(t)) { e.classList.add('on'); e.textContent = '운영 시간은 30분 단위로만 설정할 수 있습니다. (예: 09:00, 09:30) (POL-050)'; return; }
   const outside = BLOCKS.filter(b => b.day === day && (b.planFrom < f || b.planTo > t));
   if (outside.length) {
     e.classList.add('on');
