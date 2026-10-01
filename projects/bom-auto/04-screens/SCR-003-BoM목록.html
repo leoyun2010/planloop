@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-003 BoM 목록 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-003 BoM 목록</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-003-BoM목록.md">SCR-003-BoM목록.md</a>
+  <div class="tags">REQ-014, REQ-003, REQ-015 · POL-006, POL-008, POL-009 · /boms</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본(영업)</button>
+  <button data-s="loading" onclick="setState('loading')">로딩</button>
+  <button data-s="empty" onclick="setState('empty')">빈: 전체 0건</button>
+  <button data-s="nores" onclick="setState('nores')">빈: 검색 0건</button>
+  <button data-s="error" onclick="setState('error')">에러</button>
+  <button data-s="invalid" onclick="setState('invalid')">입력 오류</button>
+  <button data-s="engineer" onclick="setState('engineer')">역할: 엔지니어</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a class="on">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><span class="spacer"></span>
+    <span class="me" data-state="default loading empty nores error invalid">김영업 (영업)</span><span class="me" data-state="engineer">박엔지 (엔지니어)</span>
+    <span class="wf-btn sm" data-go="SCR-001-로그인.html">로그아웃</span></div>
+  <div class="main">
+    <div class="pagehead"><span class="n">2</span><h1>BoM 목록</h1><span class="spacer"></span>
+      <span class="wf-btn primary" data-state="default loading empty nores error invalid" data-go="SCR-004-새BoM.html">새 BoM</span></div>
+
+    <div class="filterbar"><span class="n abs">3</span>
+      고객사명·건명 <span class="wf-input" style="min-width:170px">대웅</span>
+      SKU <span class="wf-input" data-state="default loading empty nores error engineer" style="min-width:120px">C9300X</span><span class="wf-input err val" data-state="invalid" style="min-width:120px">C9</span>
+      벤더 <span class="wf-input wf-sel" style="min-width:70px">전체</span>
+      작성자 <span class="wf-input wf-sel" style="min-width:80px">전체</span>
+      상태 <span class="wf-input wf-sel" style="min-width:70px">전체</span>
+      최종 수정일 <span class="wf-input" style="min-width:95px" data-state="default loading empty nores error engineer">2026-10-01</span><span class="wf-input err val" style="min-width:95px" data-state="invalid">2026-10-09</span> ~ <span class="wf-input" style="min-width:95px">2026-10-08</span>
+      <span class="wf-btn primary">검색</span><span class="wf-btn">초기화</span>
+      <div data-state="invalid" style="width:100%"><span class="wf-text err">SKU는 3자 이상 입력해 주세요.</span> · <span class="wf-text err">시작일이 종료일보다 늦습니다.</span> <span class="wf-text sm">(검색을 실행하지 않는다)</span></div>
+    </div>
+
+    <div class="row" style="margin-bottom:8px">
+      <span data-state="default loading empty nores error invalid"><span class="n">4</span>내 BoM만 보기 <span class="toggle"></span></span>
+      <span class="spacer grow"></span>
+      <span class="n">5</span><span class="wf-text sm" data-state="default invalid engineer">총 42건 · 최종 수정일 최신순</span><span class="wf-text sm" data-state="loading">조회 중</span><span class="wf-text sm" data-state="empty nores">총 0건</span>
+    </div>
+
+    <div class="wf-box none" style="position:relative"><span class="n abs">6</span>
+      <table class="wf" data-state="default invalid engineer">
+        <tr><th>고객사명</th><th>건명</th><th>벤더</th><th>작성자</th><th>최신 버전·상태</th><th>최종 수정일시 ▼</th></tr>
+        <tr data-go="SCR-005-BoM상세.html"><td>대웅제약</td><td>마곡 C&amp;D 센터 구축</td><td>Cisco</td><td>김영업</td><td>v2 작성중</td><td>2026-10-06 14:20</td></tr>
+        <tr data-go="SCR-005-BoM상세.html#confirmed"><td>국방부</td><td>해군 지능데이터센터</td><td>Dell</td><td>이영업</td><td>v1 확정</td><td>2026-10-05 17:02</td></tr>
+        <tr data-go="SCR-005-BoM상세.html"><td>무디스</td><td>스위치 교체 사업</td><td>Cisco</td><td>김영업</td><td>v3 확정</td><td>2026-10-05 11:40</td></tr>
+        <tr data-go="SCR-005-BoM상세.html"><td>한양대병원</td><td>스토리지 증설</td><td>Cisco, Dell</td><td>최영업</td><td>v1 작성중</td><td>2026-10-02 09:15</td></tr>
+        <tr data-go="SCR-005-BoM상세.html#empty"><td>인터터치</td><td>은평힐튼 무선</td><td>-</td><td>김영업</td><td>v1 작성중</td><td>2026-10-01 16:48</td></tr>
+      </table>
+      <div data-state="loading"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+      <div data-state="empty" class="center"><div class="ic"></div>등록된 BoM이 없습니다.<br><br><span class="wf-btn primary" data-go="SCR-004-새BoM.html">새 BoM</span></div>
+      <div data-state="nores" class="center"><div class="ic"></div>조건에 맞는 BoM이 없습니다.<br><br><span class="wf-btn">초기화</span></div>
+      <div data-state="error" class="center"><div class="ic"></div>데이터를 불러오지 못했습니다. 다시 시도해 주세요.<br><br><span class="wf-btn">다시 시도</span></div>
+    </div>
+    <div class="pager" data-state="default invalid engineer"><span class="n">7</span>&lt; <b>1</b> 2 3 &gt; · 페이지당 20건</div>
+  </div>
+</div>
+</body>
+</html>

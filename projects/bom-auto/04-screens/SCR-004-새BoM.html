@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-004 새 BoM 만들기 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-004 새 BoM 만들기 (모달)</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-004-새BoM.md">SCR-004-새BoM.md</a>
+  <div class="tags">REQ-003 · POL-003, POL-004, POL-008 · /boms?new=1</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본</button>
+  <button data-s="filled" onclick="setState('filled')">입력 완료</button>
+  <button data-s="loading" onclick="setState('loading')">로딩(만드는 중)</button>
+  <button data-s="empty" onclick="setState('empty')">빈 상태(해당 없음)</button>
+  <button data-s="invalid" onclick="setState('invalid')">에러: 입력 오류</button>
+  <button data-s="error" onclick="setState('error')">에러: 저장 실패</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="logo">BoM 자동화</span><a class="on">BoM 목록</a><a>EOS 검색</a><span class="spacer"></span><span class="me">김영업 (영업)</span><span class="wf-btn sm">로그아웃</span></div>
+  <div class="main"><div class="pagehead"><h1>BoM 목록</h1></div><div class="sk"></div><div class="sk"></div><div class="sk w80"></div></div>
+  <div class="dim-bg"></div>
+  <div class="modal">
+    <div class="row"><span class="n">1</span><h2 style="margin:0">새 BoM</h2><span class="grow"></span><span data-go="SCR-003-BoM목록.html">✕</span></div>
+    <div class="line"></div>
+    <div class="fld"><span class="n abs">2</span><label>고객사명 * <span class="cnt" data-state="default empty">0/50</span><span class="cnt" data-state="filled loading error">4/50</span><span class="cnt" data-state="invalid">0/50</span></label>
+      <span class="wf-input full" data-state="default empty">예) 대웅제약</span>
+      <span class="wf-input full val" data-state="filled loading error">대웅제약</span>
+      <span class="wf-input full err" data-state="invalid"> </span>
+      <div class="wf-text err" data-state="invalid">고객사명을 입력해 주세요.</div>
+    </div>
+    <div class="fld"><span class="n abs">3</span><label>건명 * <span class="cnt" data-state="default empty">0/100</span><span class="cnt" data-state="filled loading error">11/100</span><span class="cnt" data-state="invalid">14/100</span></label>
+      <span class="wf-input full" data-state="default empty">예) 마곡 C&amp;D 센터 구축</span>
+      <span class="wf-input full val" data-state="filled loading error">마곡 C&amp;D 센터 구축</span>
+      <span class="wf-input full val err" data-state="invalid">마곡 ⏎ C&amp;D 센터 구축</span>
+      <div class="wf-text err" data-state="invalid">줄바꿈과 제어 문자는 입력할 수 없습니다.</div>
+    </div>
+    <div class="wf-box none" style="position:relative"><span class="n">4</span><span class="wf-text sm">같은 고객사명·건명으로도 만들 수 있습니다. 건마다 ID로 구분합니다.</span></div>
+    <div class="wf-text sm" data-state="empty">빈 상태: 해당 없음 — 입력 폼이며, 빈 입력은 기본 상태와 같다.</div>
+    <div class="banner" data-state="error">요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.</div>
+    <div class="foot"><span class="n">5</span><span class="wf-btn" data-go="SCR-003-BoM목록.html">취소</span>
+      <span class="wf-btn primary" data-state="default filled empty invalid error" data-go="SCR-006-파일업로드.html#empty">만들기</span>
+      <span class="wf-btn dis" data-state="loading">⟳ 만들기</span></div>
+  </div>
+</div>
+</body>
+</html>

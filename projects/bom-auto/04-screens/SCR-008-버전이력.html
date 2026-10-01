@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-008 버전 이력·비교 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-008 버전 이력·비교</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-008-버전이력.md">SCR-008-버전이력.md</a>
+  <div class="tags">REQ-012, REQ-013 · POL-004, POL-007, POL-008, POL-009, POL-039 · /boms/{bomId}/versions</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본</button>
+  <button data-s="compare" onclick="setState('compare')">비교 결과</button>
+  <button data-s="cancreate" onclick="setState('cancreate')">새 버전 가능</button>
+  <button data-s="viewer" onclick="setState('viewer')">비작성자</button>
+  <button data-s="loading" onclick="setState('loading')">로딩</button>
+  <button data-s="empty" onclick="setState('empty')">빈 상태(v1만)</button>
+  <button data-s="error" onclick="setState('error')">에러</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a class="on" data-go="SCR-003-BoM목록.html">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><span class="spacer"></span>
+    <span class="me" data-state="default compare cancreate loading empty error">김영업 (영업)</span><span class="me" data-state="viewer">박엔지 (엔지니어)</span><span class="wf-btn sm">로그아웃</span></div>
+  <div class="main">
+    <div class="bomhead"><span class="n abs">2</span><span class="ttl">대웅제약 · 마곡 C&amp;D 센터 구축</span><span class="kv">작성자 김영업</span>
+      <span class="wf-input wf-sel" data-state="default compare viewer loading error">v2 작성중</span><span class="wf-input wf-sel" data-state="cancreate">v2 확정</span><span class="wf-input wf-sel" data-state="empty">v1 작성중</span></div>
+    <div class="btabs"><span class="n abs">3</span><div data-go="SCR-005-BoM상세.html">표준 BoM</div><div data-go="SCR-007-검증결과.html">검증 결과</div><div class="on">버전 이력</div>
+      <div data-state="default compare cancreate loading empty error" data-go="SCR-009-견적편집.html">견적</div></div>
+
+    <div class="row" style="margin-bottom:10px;position:relative" data-state="default compare cancreate loading empty error"><span class="n">4</span>
+      <span data-state="default compare loading error"><span class="wf-btn dis">새 버전 만들기</span><span class="tip">작성 중인 버전(v2)이 이미 있습니다.</span></span>
+      <span data-state="empty"><span class="wf-btn dis">새 버전 만들기</span><span class="tip">작성 중인 버전(v1)이 이미 있습니다.</span></span>
+      <span data-state="cancreate"><span class="wf-btn primary" data-go="SCR-005-BoM상세.html">새 버전 만들기</span> <span class="wf-text sm">→ v3(작성중·미검증) 생성 후 SCR-005</span></span>
+    </div>
+
+    <div class="wf-box none" style="position:relative;margin-bottom:10px"><span class="n abs">5</span>
+      <div data-state="loading"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+      <div data-state="error" class="center"><div class="ic"></div>데이터를 불러오지 못했습니다. 다시 시도해 주세요.<br><br><span class="wf-btn">다시 시도</span></div>
+      <table class="wf" data-state="default compare cancreate viewer empty">
+        <tr><th>비교</th><th>버전</th><th>상태</th><th>확정 일시</th><th>확정자</th><th>오류</th><th>경고</th><th>검토 권고</th><th></th><th></th></tr>
+        <tr data-state="cancreate"><td><span class="check"></span></td><td>v2</td><td>확정</td><td>2026-10-06 15:20</td><td>김영업</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td><span class="wf-btn sm" data-go="SCR-005-BoM상세.html#confirmed">열기</span></td><td><span class="wf-btn sm">BoM 다운로드</span></td></tr>
+        <tr data-state="default compare viewer"><td><span class="check on"></span></td><td>v2</td><td>작성중</td><td>-</td><td>-</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td><span class="wf-btn sm" data-go="SCR-005-BoM상세.html">열기</span></td><td><span class="wf-btn sm">BoM 다운로드</span></td></tr>
+        <tr data-state="default compare cancreate viewer"><td><span class="check on"></span></td><td>v1</td><td>확정</td><td>2026-10-02 16:40</td><td>김영업</td><td class="num">0</td><td class="num">2</td><td class="num">3</td><td><span class="wf-btn sm" data-go="SCR-005-BoM상세.html#confirmed">열기</span></td><td><span class="wf-btn sm">BoM 다운로드</span></td></tr>
+        <tr data-state="empty"><td><span class="check dis"></span></td><td>v1</td><td>작성중</td><td>-</td><td>-</td><td class="num">-</td><td class="num">-</td><td class="num">-</td><td><span class="wf-btn sm" data-go="SCR-005-BoM상세.html">열기</span></td><td><span class="wf-btn sm">BoM 다운로드</span></td></tr>
+      </table>
+    </div>
+
+    <div class="row" style="margin-bottom:10px;position:relative" data-state="default compare cancreate viewer empty"><span class="n">6</span>
+      <span class="wf-btn primary" data-state="default compare viewer" data-go="#compare">선택한 두 버전 비교</span>
+      <span data-state="cancreate empty"><span class="wf-btn dis">선택한 두 버전 비교</span> <span class="wf-text sm">비교할 버전 2개를 선택하세요.</span></span>
+    </div>
+
+    <div class="wf-box" style="position:relative" data-state="default compare cancreate viewer empty"><span class="n abs">7</span>
+      <div data-state="default cancreate" class="wf-text sm">비교할 버전 2개를 선택하세요.</div>
+      <div data-state="empty" class="wf-text sm">비교할 다른 버전이 없습니다.</div>
+      <div data-state="compare viewer">
+        <div style="font-weight:bold;font-size:13px;margin-bottom:6px">v1 → v2 : 추가 1행 · 삭제 0행 · 변경 <span data-state="compare">3</span><span data-state="viewer">2</span>행</div>
+        <table class="wf">
+          <tr><th>구분</th><th>행 (v1→v2)</th><th>원본 라인</th><th>SKU</th><th>필드</th><th>v1 값</th><th>v2 값</th></tr>
+          <tr class="chg"><td>변경</td><td>18 → 18</td><td>2.0</td><td>C9200L-48P-4X-E</td><td>수량</td><td>6</td><td>8</td></tr>
+          <tr class="chg"><td>변경</td><td>19 → 19</td><td>2.0.1</td><td>CON-SNT-C9200L4X</td><td>수량</td><td>6</td><td>8</td></tr>
+          <tr class="chg" data-state="compare"><td>변경</td><td>1 → 1</td><td>1.0</td><td>C9300X-24HX-E</td><td>List 단가 (작성자만)</td><td>(빈 값)</td><td>12,500,000</td></tr>
+          <tr class="add"><td>추가</td><td>- → 37</td><td>(직접 입력)</td><td>CAB-AC-C15-KOR</td><td>-</td><td>-</td><td>(새 행)</td></tr>
+        </table>
+        <div class="wf-text sm" data-state="viewer" style="margin-top:4px">비작성자: 가격 필드 변경은 목록과 건수에서 빠진다 (POL-009).</div>
+        <div class="wf-text sm" style="margin-top:4px">행은 계보 ID로 맞춘다 (POL-004). 차이가 없으면 「두 버전의 내용이 같습니다.」</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

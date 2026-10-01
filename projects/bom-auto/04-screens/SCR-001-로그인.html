@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-001 로그인·인증 오류 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-001 로그인·인증 오류</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-001-로그인.md">SCR-001-로그인.md</a>
+  <div class="tags">REQ-001 · POL-001, POL-002, POL-013 · /login</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본(로그아웃 후)</button>
+  <button data-s="loading" onclick="setState('loading')">로딩(콜백 처리)</button>
+  <button data-s="empty" onclick="setState('empty')">빈 상태(해당 없음)</button>
+  <button data-s="err-sso" onclick="setState('err-sso')">에러: 인증 실패</button>
+  <button data-s="err-expired" onclick="setState('err-expired')">에러: 세션 만료</button>
+  <button data-s="err-profile" onclick="setState('err-profile')">에러: 계정 정보 없음</button>
+</div>
+
+<div class="pc" style="background:#f4f4f4">
+  <div style="width:440px;margin:110px auto;background:#fff;border:2px solid #555;padding:28px 30px;position:relative">
+    <div class="wf-box none" style="margin-bottom:18px">
+      <span class="n">1</span><b style="font-size:18px">BoM 자동 작성·검증 서비스</b>
+      <div class="wf-text sm" style="margin-left:25px">인성정보 사내 서비스</div>
+    </div>
+
+    <div class="wf-box" style="min-height:64px">
+      <span class="n abs">2</span>
+      <div class="wf-text" data-state="default">로그아웃되었습니다.</div>
+      <div class="wf-text" data-state="loading">⟳ 로그인 처리 중입니다…</div>
+      <div class="wf-text sm" data-state="empty">해당 없음 — 조회할 데이터가 없는 화면이다. 기본 상태와 같다.</div>
+      <div class="wf-text err" data-state="err-sso">Naver Works 인증에 실패했습니다. 다시 시도하거나 관리자에게 문의해 주세요.</div>
+      <div class="wf-text err" data-state="err-expired">로그인 시간이 만료되었습니다. 다시 로그인해 주세요.</div>
+      <div class="wf-text err" data-state="err-profile">Naver Works 계정 정보를 받지 못했습니다. 관리자에게 문의해 주세요.</div>
+    </div>
+
+    <div class="wf-box none" style="margin:16px 0">
+      <span class="n">3</span>
+      <span class="wf-btn primary" style="width:340px" data-state="default empty" data-go="SCR-003-BoM목록.html">Naver Works로 로그인</span>
+      <span class="wf-btn dis" style="width:340px" data-state="loading">⟳ Naver Works로 로그인</span>
+      <span class="wf-btn primary" style="width:340px" data-state="err-sso err-expired err-profile" data-go="#loading">다시 로그인</span>
+      <div class="wf-text sm" style="margin:6px 0 0 25px">성공 → returnTo 또는 SCR-003 · 역할 미지정 → <a href="SCR-002-역할대기.html">SCR-002</a></div>
+    </div>
+
+    <div class="wf-box none"><span class="n">4</span><span class="wf-text sm">PC Chrome·Edge, 화면 폭 1280px 이상에서 사용하세요.</span></div>
+  </div>
+</div>
+</body>
+</html>

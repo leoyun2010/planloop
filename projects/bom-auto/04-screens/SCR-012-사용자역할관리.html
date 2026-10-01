@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-012 사용자 역할 관리 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-012 사용자 역할 관리</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-012-사용자역할관리.md">SCR-012-사용자역할관리.md</a>
+  <div class="tags">REQ-020 · POL-002, POL-008, POL-010, POL-011, POL-013 · /admin/users · 관리자만</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본</button>
+  <button data-s="selferr" onclick="setState('selferr')">자기 해제 오류</button>
+  <button data-s="done" onclick="setState('done')">성공</button>
+  <button data-s="loading" onclick="setState('loading')">로딩</button>
+  <button data-s="empty" onclick="setState('empty')">빈 상태</button>
+  <button data-s="error" onclick="setState('error')">에러</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a data-go="SCR-003-BoM목록.html">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><a class="on">사용자 관리</a><span class="spacer"></span><span class="me">정관리 (관리자)</span><span class="wf-btn sm" data-go="SCR-001-로그인.html">로그아웃</span></div>
+  <div class="main">
+    <div class="pagehead"><span class="n">2</span><h1>사용자 역할 관리</h1></div>
+    <div class="filterbar"><span class="n abs">3</span>역할 <span class="wf-input wf-sel val" style="min-width:110px" data-state="default done loading empty error">역할 미지정</span><span class="wf-input wf-sel val" style="min-width:110px" data-state="selferr">전체</span>
+      이름·계정 <span class="wf-input" style="min-width:200px" data-state="default selferr done loading error"> </span><span class="wf-input val" style="min-width:200px" data-state="empty">kim.none</span>
+      <span class="wf-btn primary">검색</span><span class="grow"></span>
+      <span data-state="default selferr done">총 23명</span><span data-state="empty">총 0명</span></div>
+
+    <div class="wf-box solid" style="font-size:12px"><span class="n abs">4</span>
+      <div class="row">
+        <span data-state="default selferr loading">선택 3명 · 역할 <span class="wf-input wf-sel val">엔지니어</span></span>
+        <span data-state="default selferr"><span class="wf-btn primary" data-go="#done">역할 지정</span></span><span data-state="loading"><span class="wf-btn dis">⟳ 역할 지정</span></span>
+        <span data-state="done empty error">선택 0명 · 역할 <span class="wf-input wf-sel">선택</span> <span class="wf-btn dis">역할 지정</span></span>
+      </div>
+      <div class="wf-text err" data-state="selferr" style="margin-top:4px">자신의 관리자 역할은 해제할 수 없습니다. 선택 목록에서 본인을 빼 주세요.</div>
+    </div>
+
+    <div class="wf-box none" style="position:relative"><span class="n abs">5</span>
+      <div data-state="loading"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+      <div data-state="empty" class="center"><div class="ic"></div>조건에 맞는 사용자가 없습니다.</div>
+      <div data-state="error" class="center"><div class="ic"></div>데이터를 불러오지 못했습니다. 다시 시도해 주세요.<br><br><span class="wf-btn">다시 시도</span></div>
+      <table class="wf" data-state="default selferr done">
+        <tr><th><span class="check"></span></th><th>이름</th><th>Naver Works 계정</th><th>부서</th><th>역할</th><th>최초 로그인 ▼</th><th>최근 로그인</th></tr>
+        <tr data-state="selferr" class="sel"><td><span class="check on"></span></td><td>정관리 (본인)</td><td>admin.jung@insunginfo.co.kr</td><td>CSD</td><td>관리자</td><td>2026-10-01 09:00</td><td>2026-10-06 10:30</td></tr>
+        <tr class="sel" data-state="default selferr"><td><span class="check on"></span></td><td>박엔지</td><td>eng.park@insunginfo.co.kr</td><td>기술지원팀</td><td>역할 미지정</td><td>2026-10-06 09:00</td><td>2026-10-06 09:00</td></tr>
+        <tr class="sel" data-state="default selferr"><td><span class="check on"></span></td><td>최엔지</td><td>eng.choi@insunginfo.co.kr</td><td>기술지원팀</td><td>역할 미지정</td><td>2026-10-06 08:52</td><td>2026-10-06 08:52</td></tr>
+        <tr class="sel" data-state="default"><td><span class="check on"></span></td><td>한엔지</td><td>eng.han@insunginfo.co.kr</td><td>-</td><td>역할 미지정</td><td>2026-10-05 17:40</td><td>2026-10-05 17:40</td></tr>
+        <tr data-state="default done"><td><span class="check"></span></td><td>윤영업</td><td>sales.yoon@insunginfo.co.kr</td><td>기업사업부</td><td>역할 미지정</td><td>2026-10-05 15:10</td><td>2026-10-05 15:10</td></tr>
+        <tr data-state="done"><td><span class="check"></span></td><td>오영업</td><td>sales.oh@insunginfo.co.kr</td><td>DC사업부</td><td>역할 미지정</td><td>2026-10-05 14:02</td><td>2026-10-05 14:02</td></tr>
+      </table>
+      <div class="wf-text sm" data-state="selferr" style="margin-top:4px">예시: 역할 「전체」 필터에서 본인까지 골라 엔지니어로 지정하려 한 경우 — 요청 전체를 거부한다.</div>
+    </div>
+    <div class="pager" data-state="default selferr done"><span class="n">6</span>&lt; <b>1</b> &gt; · 페이지당 50명</div>
+  </div>
+  <div class="toast" data-state="done">3명의 역할을 변경했습니다: 엔지니어</div>
+</div>
+</body>
+</html>

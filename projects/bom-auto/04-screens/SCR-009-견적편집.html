@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-009 견적 편집 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-009 견적 편집</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-009-견적편집.md">SCR-009-견적편집.md</a>
+  <div class="tags">REQ-009, 015, 016, 017, 028 · POL-005, 007, 009, 033 ~ 038 · /boms/{bomId}/v/{n}/quotes/{quoteId} · 작성자(영업)만</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본</button>
+  <button data-s="blocked" onclick="setState('blocked')">저장 차단(구성형 CCW)</button>
+  <button data-s="dirty" onclick="setState('dirty')">저장 전 변경</button>
+  <button data-s="loading" onclick="setState('loading')">로딩</button>
+  <button data-s="empty" onclick="setState('empty')">빈: 견적 없음</button>
+  <button data-s="draft" onclick="setState('draft')">빈: 작성중 버전</button>
+  <button data-s="error" onclick="setState('error')">에러: 조회</button>
+  <button data-s="conflict" onclick="setState('conflict')">에러: 충돌</button>
+  <button data-s="dlg" onclick="setState('dlg')">[13] DC율 덮어쓰기</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a class="on" data-go="SCR-003-BoM목록.html">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><span class="spacer"></span><span class="me">김영업 (영업)</span><span class="wf-btn sm">로그아웃</span></div>
+  <div class="main">
+    <div class="bomhead"><span class="n abs">2</span>
+      <span data-state="default dirty loading empty error conflict dlg draft"><span class="ttl">EY한영 · 스위치 교체</span></span><span data-state="blocked"><span class="ttl">대웅제약 · 마곡 C&amp;D 센터 구축</span></span>
+      <span class="kv">작성자 김영업</span>
+      <span class="wf-input wf-sel" data-state="default blocked dirty loading empty error conflict dlg">v1 확정</span><span class="wf-input wf-sel" data-state="draft">v2 작성중</span>
+      <span data-state="default blocked dirty loading empty error conflict dlg"><span class="chip dark">확정</span></span><span data-state="draft"><span class="chip">작성중</span></span></div>
+    <div class="btabs"><span class="n abs">3</span><div data-go="SCR-005-BoM상세.html">표준 BoM</div><div data-go="SCR-007-검증결과.html">검증 결과</div><div data-go="SCR-008-버전이력.html">버전 이력</div><div class="on">견적</div></div>
+
+    <div data-state="loading"><div class="sk w40"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk w80"></div></div>
+    <div data-state="error" class="center"><div class="ic"></div>데이터를 불러오지 못했습니다. 다시 시도해 주세요.<br><br><span class="wf-btn">다시 시도</span></div>
+    <div data-state="empty" class="center"><span class="n">4</span><div class="ic"></div>아직 만든 견적이 없습니다.<br><br><span class="wf-btn primary" data-go="#default">새 견적</span></div>
+    <div data-state="draft" class="center"><div class="ic"></div>확정된 버전으로만 견적을 만들 수 있습니다.</div>
+
+    <div data-state="default blocked dirty conflict dlg">
+      <!-- [4] -->
+      <div class="row" style="margin-bottom:8px;position:relative"><span class="n">4</span>견적 <span class="wf-input wf-sel val">견적 1 — 2026-10-06 16:02</span><span class="wf-btn">새 견적</span><span class="grow"></span><span class="wf-text sm">기준: v1 (확정 2026-10-06 15:20)</span></div>
+      <!-- [5] -->
+      <div class="banner" data-state="blocked"><span class="n abs">5</span><b>단가가 없는 행이 36개 있습니다</b> — 행 1 C9300X-24HX-E · 행 2 CON-SNT-C9300X2E · 행 3 C9300-DNA-E-24 … <span class="wf-text sm">(상위 품목 5행 — 1·18·30·31·35 — 에 단가를 넣으면, 가격이 빈 구성품 31행은 번들 포함(0원)이 되어 목록에서 빠진다)</span> · <b>기본 마진율을 입력해 주세요.</b></div>
+      <div class="banner" data-state="conflict">다른 창에서 먼저 저장된 내용이 있습니다. 새로고침한 뒤 다시 수정해 주세요. <span class="wf-btn sm">새로고침</span></div>
+      <!-- [6][7][8] -->
+      <div class="wf-box" style="font-size:12px">
+        <div class="row" style="position:relative;margin-bottom:6px"><span class="n">6</span><b style="min-width:70px">환율</b><span class="wf-text sm">모든 행이 KRW입니다. 환율을 입력하지 않아도 됩니다.</span><span class="wf-text sm" style="margin-left:14px">(KRW 외 통화가 있으면 예: USD <span class="wf-input xs val">1,385.50</span>)</span></div>
+        <div class="row" style="position:relative;margin-bottom:6px"><span class="n">7</span><b style="min-width:70px">DC율 일괄</b>
+          PRODUCT <span class="wf-input xs val">70.00</span>% <span class="wf-btn sm" data-go="#dlg">적용</span>
+          SERVICE <span class="wf-input xs" style="background:#f2f2f2">—</span>% <span class="wf-btn sm dis">적용</span>
+          SOFTWARE <span class="wf-input xs" style="background:#f2f2f2">—</span>% <span class="wf-btn sm dis">적용</span>
+          <span class="wf-text sm">(BoM에 없는 구분은 비활성)</span></div>
+        <div class="row" style="position:relative"><span class="n">8</span><b style="min-width:70px">기본 마진율</b>
+          <span data-state="default dirty conflict dlg"><span class="wf-input xs val">20.0</span>%</span>
+          <span data-state="blocked"><span class="wf-input xs err"> </span>% <span class="wf-text err">기본 마진율을 입력해 주세요.</span></span></div>
+      </div>
+
+      <!-- [9] -->
+      <div class="wf-box none" style="position:relative;margin-bottom:8px"><span class="n abs">9</span>
+        <table class="wf" data-state="default dirty conflict dlg">
+          <tr><th>제외</th><th>행</th><th>구분</th><th>SKU</th><th>품명</th><th class="num">수량</th><th>통화</th><th class="num">List 단가</th><th class="num">List 금액</th><th class="num">DC율(%)</th><th class="num">원가(원화)</th><th class="num">마진율(%)</th><th class="num">견적 단가</th><th class="num">견적가</th></tr>
+          <tr class="top"><td><span class="check"></span></td><td>1</td><td>PRODUCT</td><td>C9300-48T-M</td><td>Catalyst 9300 48-port…</td><td class="num">2</td><td>KRW</td><td class="num">20,051,583</td><td class="num">40,103,166</td><td class="num">70.00</td><td class="num">12,030,949</td><td class="num" style="color:#999">(20.0)</td><td class="num">7,218,569</td><td class="num">14,437,138</td></tr>
+          <tr class="excl"><td><span class="check on"></span></td><td>2</td><td>PRODUCT</td><td>MA-PWR-CORD-EU-FR</td><td>Power cord EU…</td><td class="num">4</td><td>KRW</td><td class="num">0</td><td class="num">0</td><td class="num">70.00</td><td class="num">0</td><td class="num">(20.0)</td><td class="num">0</td><td class="num">0</td></tr>
+          <tr><td><span class="check"></span></td><td>3</td><td>PRODUCT</td><td>C9300-NM-8X-M-O</td><td>Network Module…</td><td class="num">2</td><td>KRW</td><td class="num">5,043,760</td><td class="num">10,087,520</td><td class="num">70.00</td><td class="num">3,026,256</td><td class="num">(20.0)</td><td class="num">1,815,753</td><td class="num">3,631,507</td></tr>
+          <tr><td colspan="14" class="wf-text sm">… 행 4 ~ 10 생략 …</td></tr>
+          <tr class="top"><td><span class="check"></span></td><td>11</td><td>PRODUCT</td><td>MA-SFP-10GB-SR</td><td>Meraki 10G SR…</td><td class="num">2</td><td>KRW</td><td class="num">1,968,070</td><td class="num">3,936,140</td><td class="num" data-state="default conflict dlg">80.00</td><td class="num" data-state="dirty"><span class="mod">75.00</span></td><td class="num" data-state="default conflict dlg">787,228</td><td class="num" data-state="dirty">984,035</td><td class="num">(20.0)</td><td class="num" data-state="default conflict dlg">472,336</td><td class="num" data-state="dirty">590,421</td><td class="num" data-state="default conflict dlg">944,673</td><td class="num" data-state="dirty">1,180,842</td></tr>
+          <tr class="top"><td><span class="check"></span></td><td>12</td><td>PRODUCT</td><td>CAB-C15-CBN-KOR=</td><td>Cabinet Jumper Power Cord…</td><td class="num">4</td><td>KRW</td><td class="num">98,899</td><td class="num">395,596</td><td class="num">70.00</td><td class="num">118,678</td><td class="num"><span class="wf-input xs val">30.0</span></td><td class="num">38,570</td><td class="num">154,281</td></tr>
+          <tr class="top"><td><span class="check"></span></td><td>13</td><td>PRODUCT</td><td>CAB-C15-CBN-KOR=</td><td>Cabinet Jumper Power Cord…</td><td class="num">2</td><td>KRW</td><td class="num">98,899</td><td class="num">197,798</td><td class="num">70.00</td><td class="num">59,339</td><td class="num">(20.0)</td><td class="num">35,603</td><td class="num">71,206</td></tr>
+        </table>
+        <table class="wf" data-state="blocked">
+          <tr><th>제외</th><th>행</th><th>구분</th><th>SKU</th><th class="num">수량</th><th>통화</th><th class="num">List 단가</th><th class="num">List 금액</th><th class="num">DC율(%)</th><th class="num">원가(원화)</th><th class="num">마진율(%)</th><th class="num">견적가</th></tr>
+          <tr class="top hl"><td><span class="check"></span></td><td>1</td><td>PRODUCT</td><td>C9300X-24HX-E</td><td class="num">2</td><td>KRW</td><td class="num"><span class="wf-input xs err" style="width:100px">단가 입력</span></td><td class="num">—</td><td class="num">0.00</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr class="hl"><td><span class="check"></span></td><td>2</td><td>SERVICE</td><td>CON-SNT-C9300X2E</td><td class="num">2</td><td>KRW</td><td class="num"><span class="wf-input xs err" style="width:100px">단가 입력</span></td><td class="num">—</td><td class="num">0.00</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td colspan="12" class="wf-text sm">행 1에 단가를 넣은 뒤: 행 2는 List 단가 칸에 「번들 포함」, 원가 0 · 직접 단가를 넣어도 된다</td></tr>
+          <tr><td colspan="12" class="wf-text sm">… 번들 포함 판정: Cisco 구성품이면서 자기 List 금액은 비고 상위 품목 List 금액은 있을 때 (POL-033). 단가 입력칸 규칙: 0 이상, 소수 둘째 자리까지 — 「단가는 0 이상 숫자여야 합니다. (소수점 둘째 자리까지)」</td></tr>
+        </table>
+        <div class="wf-text sm" style="margin-top:4px">Dell 상위 품목·하위 제품(구성품 있음) 행은 회색, 금액 칸 「—」(합산 제외). 제외 행은 취소선 — 원가분석표에는 들어간다.</div>
+      </div>
+
+      <!-- [10] -->
+      <div class="row" style="margin-bottom:8px;position:relative"><span class="n">10</span><span class="wf-btn">AI 권고 불필요 항목 일괄 제외</span><span class="wf-text sm">제외 2행</span>
+        <span class="wf-text sm">제외 행에 금액이 있으면 경고: 「견적서에서 제외한 행 중 금액이 있는 행이 {n}개 있습니다. 이 금액은 견적서 합계에서 빠집니다.」</span></div>
+      <!-- [11] -->
+      <div class="wf-box solid" style="font-size:13px" data-state="default conflict dlg"><span class="n abs">11</span>합계 원가 <b>22,462,206</b> · 합계 견적가 <b>26,966,510</b> · 견적서 합계(제외 반영) <b>26,966,510</b></div>
+      <div class="wf-box solid" style="font-size:13px" data-state="dirty"><span class="n abs">11</span>합계 원가 <b>22,659,013</b> · 합계 견적가 <b>27,202,679</b> · 견적서 합계(제외 반영) <b>27,202,679</b> <span class="wf-text sm">(저장 전)</span></div>
+      <div class="wf-box solid" style="font-size:13px" data-state="blocked"><span class="n abs">11</span>합계 원가 — · 합계 견적가 — · 견적서 합계 — <span class="wf-text sm">(단가를 모두 넣으면 계산)</span></div>
+      <!-- [12] -->
+      <div class="row" style="position:relative"><span class="n">12</span>
+        <span class="wf-btn dis" data-state="default conflict dlg">저장</span><span class="wf-btn primary" data-state="dirty blocked">저장</span>
+        <span class="wf-btn primary" data-state="default dlg" data-go="SCR-010-견적서다운로드.html">견적서 다운로드</span><span class="wf-btn dis" data-state="blocked dirty conflict">견적서 다운로드</span>
+        <span class="wf-btn" data-state="default dlg">원가분석표 다운로드</span><span class="wf-btn dis" data-state="blocked dirty conflict">원가분석표 다운로드</span></div>
+    </div>
+  </div>
+
+  <div class="dim-bg" data-state="dlg"></div>
+  <div class="modal" data-state="dlg"><span class="n abs">13</span><h2>DC율 일괄 적용</h2><div class="wf-text">PRODUCT 행 13개의 DC율을 70.00%로 바꿉니다. 행별로 입력한 값도 바뀝니다.</div>
+    <div class="foot"><span class="wf-btn" data-go="#default">취소</span><span class="wf-btn primary" data-go="#dirty">바꾸기</span></div></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-006 파일 업로드·형식 판별 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-006 파일 업로드·형식 판별 (패널)</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-006-파일업로드.md">SCR-006-파일업로드.md</a>
+  <div class="tags">REQ-004, REQ-005 · POL-005, POL-014, POL-015, POL-016, POL-019 · /boms/{bomId}/v/{n}?upload=1</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본(변환 성공)</button>
+  <button data-s="loading" onclick="setState('loading')">로딩</button>
+  <button data-s="empty" onclick="setState('empty')">빈 상태</button>
+  <button data-s="rejected" onclick="setState('rejected')">에러: 거부</button>
+  <button data-s="aborted" onclick="setState('aborted')">에러: 변환 중단</button>
+  <button data-s="manual" onclick="setState('manual')">에러: 판별 실패</button>
+  <button data-s="conflict" onclick="setState('conflict')">에러: 충돌</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="logo">BoM 자동화</span><a class="on">BoM 목록</a><a>EOS 검색</a><span class="spacer"></span><span class="me">김영업 (영업)</span><span class="wf-btn sm">로그아웃</span></div>
+  <div class="main"><div class="bomhead"><span class="ttl">대웅제약 · 마곡 C&amp;D 센터 구축</span><span class="chip">v1 작성중</span><span class="chip dash">미검증</span></div>
+    <div class="btabs"><div class="on">표준 BoM</div><div>검증 결과</div><div>버전 이력</div><div>견적</div></div>
+    <div class="sk"></div><div class="sk"></div><div class="sk w80"></div><div class="sk"></div><div class="sk w60"></div></div>
+  <div class="dim-bg"></div>
+  <div class="drawer">
+    <div class="row"><span class="n">1</span><h2 style="margin:0">벤더 BoM 파일 올리기</h2><span class="grow"></span>
+      <span data-state="default empty rejected aborted manual conflict" data-go="SCR-005-BoM상세.html">✕</span><span data-state="loading" style="color:#ccc">✕</span></div>
+    <div class="line"></div>
+
+    <div class="wf-box none" style="position:relative;margin-bottom:12px"><span class="n abs">2</span>
+      <div class="drop">파일을 끌어다 놓거나 클릭해 선택하세요<br><span class="wf-text sm">.xls, .xlsx, .csv · 파일당 10MB · 데이터 3,000행 이하</span></div></div>
+
+    <div class="wf-box none" style="position:relative"><span class="n abs">3</span>
+      <div style="font-weight:bold;font-size:12px;margin-bottom:6px">처리 목록</div>
+      <div data-state="empty" class="wf-text sm">올린 파일이 없습니다.</div>
+
+      <div class="fcard" data-state="default">
+        <div class="row"><b>(대웅제약 마곡C&amp;D 센터 구축)Quote_4793379459_BOM.xls</b><span class="grow"></span>1.1MB <span class="chip dark">완료</span></div>
+        <div class="wf-text">Cisco CCW(구성형)로 인식했습니다. 단가가 없어 견적은 단가 입력 후 만들 수 있습니다. 가격형으로 다시 내보내면 단가가 자동으로 들어갑니다.</div>
+        <div style="margin-top:4px;position:relative"><span class="n">5</span><b>총 36행 변환(상위 품목 5, 구성품 31), 미분류 0행</b></div>
+      </div>
+      <div class="fcard" data-state="default">
+        <div class="row"><b>CASE1_Storage_BoM.xlsx</b><span class="grow"></span>0.1MB <span class="chip dark">완료</span></div>
+        <div class="wf-text">Dell Solutions Configurator 파일로 인식했습니다.</div>
+        <div style="margin-top:4px"><b>총 26행 변환(상위 품목 1, 하위 제품 4, 구성품 21), 미분류 0행</b></div>
+      </div>
+
+      <div class="fcard" data-state="loading">
+        <div class="row"><b>(대웅제약 마곡C&amp;D 센터 구축)Quote_4793379459_BOM.xls</b><span class="grow"></span>1.1MB <span class="chip">변환 중</span></div>
+        <div class="bar" style="height:8px;background:#eee;border:1px solid #bbb;margin-top:6px"><i style="display:block;width:60%;height:100%;background:#888"></i></div>
+      </div>
+      <div class="fcard" data-state="loading"><div class="row"><b>CASE1_Storage_BoM.xlsx</b><span class="grow"></span>0.1MB <span class="chip dash">대기</span></div></div>
+
+      <div data-state="rejected">
+        <div class="fcard"><div class="row"><b>대웅_견적.pdf</b><span class="grow"></span>0.4MB <span class="chip">거부</span></div><div class="wf-text err">.xls, .xlsx, .csv 파일만 올릴 수 있습니다.</div></div>
+        <div class="fcard"><div class="row"><b>전사_BoM_취합.xlsx</b><span class="grow"></span>12.3MB <span class="chip">거부</span></div><div class="wf-text err">파일 크기는 10MB 이하여야 합니다. (현재 12.3MB)</div></div>
+        <div class="fcard"><div class="row"><b>보안_BoM.xlsx</b><span class="grow"></span>0.2MB <span class="chip">거부</span></div><div class="wf-text err">암호가 걸린 파일은 읽을 수 없습니다. 암호를 해제한 뒤 다시 올려 주세요.</div></div>
+        <div class="fcard"><div class="row"><b>export.csv</b><span class="grow"></span>0.1MB <span class="chip">거부</span></div><div class="wf-text err">CSV 파일의 문자 인코딩을 읽을 수 없습니다. UTF-8 또는 CP949로 저장해 주세요.</div></div>
+        <div class="fcard"><div class="row"><b>빈파일.xlsx</b><span class="grow"></span>0.0MB <span class="chip">거부</span></div><div class="wf-text err">빈 파일입니다. 내용이 있는 파일을 올려 주세요.</div></div>
+        <div class="fcard"><div class="row"><b>대량_BoM.xlsx</b><span class="grow"></span>2.4MB <span class="chip">거부</span></div><div class="wf-text err">데이터 행은 3,000행 이하여야 합니다. (현재 3,512행)</div></div>
+        <div class="wf-text sm">그 밖의 사유: 「파일을 열 수 없습니다. 파일이 손상되었는지 확인해 주세요.」 · 거부된 파일은 저장하지 않는다.</div>
+      </div>
+
+      <div data-state="aborted">
+        <div class="fcard"><div class="row"><b>Quote_resaved.xls</b><span class="grow"></span>0.9MB <span class="chip">중단</span></div><div class="wf-text err"># 열이 숫자로 바뀌어 라인 번호를 읽을 수 없습니다. CCW에서 다시 내보낸 원본 파일을 올려 주세요.</div></div>
+        <div class="fcard"><div class="row"><b>Dell_USD.xlsx</b><span class="grow"></span>0.1MB <span class="chip">중단</span></div><div class="wf-text err">Dell 파일의 통화가 원화(₩)가 아닙니다. 지원하지 않는 통화입니다.</div></div>
+        <div class="wf-text sm">그 밖의 사유: 「필수 컬럼이 없어 변환할 수 없습니다: {컬럼 목록}」 · 「품목 행을 찾지 못했습니다.」</div>
+      </div>
+
+      <div class="fcard" data-state="manual">
+        <div class="row"><b>bom_export.xlsx</b><span class="grow"></span>0.2MB <span class="chip">판별 실패</span></div>
+        <div style="position:relative;margin-top:6px;padding:8px;border:1px dashed #999;background:#fafafa"><span class="n abs">4</span>
+          <div class="wf-text">파일 형식을 판별하지 못했습니다. 형식을 직접 선택해 주세요.</div>
+          <div style="margin:6px 0"><span class="radio"></span>Cisco CCW 구성형<br><span class="radio on"></span>Cisco CCW 가격형<br><span class="radio"></span>Dell Solutions Configurator</div>
+          <span class="wf-btn primary sm">이 형식으로 변환</span> <span class="wf-btn sm">취소</span>
+          <div class="wf-text err" style="margin-top:6px">선택한 형식의 필수 컬럼이 없습니다: Unit List Price, Discount %</div>
+          <div class="wf-text sm">머리글 행이 없으면: 「품목 표의 머리글 행을 찾지 못했습니다. 벤더 도구에서 내보낸 원본 파일인지 확인해 주세요.」</div>
+        </div>
+      </div>
+
+      <div class="fcard" data-state="conflict"><div class="row"><b>(대웅제약 마곡C&amp;D 센터 구축)Quote_4744902766_BOM.xls</b><span class="grow"></span>1.2MB <span class="chip">실패</span></div>
+        <div class="wf-text err">다른 창에서 먼저 저장된 내용이 있습니다. 새로고침한 뒤 다시 수정해 주세요.</div></div>
+    </div>
+
+    <div class="foot"><span class="n">6</span><span class="wf-btn primary" data-state="default empty rejected aborted manual conflict" data-go="SCR-005-BoM상세.html">닫기</span><span class="wf-btn dis" data-state="loading">닫기</span></div>
+  </div>
+</div>
+</body>
+</html>

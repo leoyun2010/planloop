@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-013 권한 없음 안내 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-013 권한 없음 안내</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-013-권한없음.md">SCR-013-권한없음.md</a>
+  <div class="tags">REQ-002, REQ-015 · POL-008, POL-009 · /403, /404</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본(403)</button>
+  <button data-s="notfound" onclick="setState('notfound')">404</button>
+  <button data-s="na" onclick="setState('na')">로딩·빈·에러(해당 없음)</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a data-go="SCR-003-BoM목록.html">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><span class="spacer"></span><span class="me">박엔지 (엔지니어)</span><span class="wf-btn sm" data-go="SCR-001-로그인.html">로그아웃</span></div>
+  <div class="main">
+    <div class="center" style="padding:100px 12px;position:relative">
+      <div style="position:relative;display:inline-block"><span class="n abs">2</span><div class="ic">!</div></div>
+      <div class="wf-text" style="font-size:15px" data-state="default">이 기능을 사용할 권한이 없습니다.</div>
+      <div class="wf-text" style="font-size:15px" data-state="notfound">요청한 페이지를 찾을 수 없습니다.</div>
+      <div class="wf-text sm" data-state="na">로딩·빈 상태·에러: 해당 없음 — 서버 판정 결과를 바로 보여주는 정적 오류 화면이다.</div>
+      <div class="wf-text sm" data-state="default" style="margin-top:6px">예: 엔지니어가 견적 URL을 직접 열었을 때. 다른 영업의 견적은 없는 주소여도 403으로 보여준다 (POL-009).</div>
+      <br><span class="n">3</span><span class="wf-btn primary" data-go="SCR-003-BoM목록.html">BoM 목록으로</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

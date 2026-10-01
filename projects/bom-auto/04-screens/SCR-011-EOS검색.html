@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-011 EOS 검색 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-011 EOS 검색</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-011-EOS검색.md">SCR-011-EOS검색.md</a>
+  <div class="tags">REQ-019 · POL-008, POL-012, POL-024, POL-029 · /eos</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본(Cisco EoS 예정 · AI)</button>
+  <button data-s="cisco-onsale" onclick="setState('cisco-onsale')">Cisco 판매중 · AI</button>
+  <button data-s="dell-onsale" onclick="setState('dell-onsale')">Dell 판매중</button>
+  <button data-s="dell-eos" onclick="setState('dell-eos')">Dell 판매 종료</button>
+  <button data-s="dell-nf" onclick="setState('dell-nf')">Dell 찾지 못함</button>
+  <button data-s="loading" onclick="setState('loading')">로딩</button>
+  <button data-s="empty" onclick="setState('empty')">빈 상태</button>
+  <button data-s="error" onclick="setState('error')">에러: 조회 실패</button>
+  <button data-s="invalid" onclick="setState('invalid')">에러: 입력 오류</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a data-go="SCR-003-BoM목록.html">BoM 목록</a><a class="on">EOS 검색</a><span class="spacer"></span><span class="me">박엔지 (엔지니어)</span><span class="wf-btn sm" data-go="SCR-001-로그인.html">로그아웃</span></div>
+  <div class="main" style="max-width:900px">
+    <div class="pagehead"><span class="n">2</span><h1>EOS 검색</h1></div>
+    <div class="filterbar" style="font-size:13px"><span class="n abs">3</span>
+      벤더 <span data-state="default cisco-onsale loading error"><span class="radio on"></span>Cisco <span class="radio"></span>Dell</span>
+      <span data-state="dell-onsale dell-eos dell-nf"><span class="radio"></span>Cisco <span class="radio on"></span>Dell</span>
+      <span data-state="empty invalid"><span class="radio"></span>Cisco <span class="radio"></span>Dell</span>
+      &nbsp; SKU
+      <span class="wf-input val" style="min-width:240px" data-state="default loading error">C9200L-48P-4X-E</span>
+      <span class="wf-input val" style="min-width:240px" data-state="cisco-onsale">C9K-ACC-RBFT</span>
+      <span class="wf-input val" style="min-width:240px" data-state="dell-onsale dell-eos dell-nf">210-BPMK</span>
+      <span class="wf-input" style="min-width:240px" data-state="empty">예) C9300X-24HX-E, 210-BPMK</span>
+      <span class="wf-input err val" style="min-width:240px" data-state="invalid">338-CTBB, 379-BDCO</span>
+      <span class="wf-btn primary" data-state="default cisco-onsale dell-onsale dell-eos dell-nf empty error invalid" data-go="#loading">조회</span><span class="wf-btn dis" data-state="loading">⟳ 조회</span>
+      <div data-state="invalid" style="width:100%"><span class="wf-text err">벤더를 선택해 주세요.</span> · <span class="wf-text err">SKU를 하나만 입력해 주세요.</span>
+        <span class="wf-text sm">(형식이 틀리면 「{벤더} SKU 형식이 아닙니다.」)</span></div>
+    </div>
+
+    <div class="wf-box solid" style="padding:14px"><span class="n abs">4</span>
+      <div data-state="default">
+        <div class="row"><b>C9200L-48P-4X-E · Cisco</b><span class="grow"></span><span class="note" style="margin:0">AI 검색 결과 — 틀릴 수 있습니다</span><span class="g warn">EoS 예정</span></div>
+        <div class="wf-text">EoS 예정 — End-of-Sale 2026-12-31, LDoS 2031-12-31 (출처: <u>https://www.cisco.com/…/eos-c9200l</u>) · 대체 제품: C9200CX-48P-4X-E</div>
+        <div class="kv"><b>EoS 공지일</b>2025-12-15 &nbsp; <b>End-of-Sale</b>2026-12-31 &nbsp; <b>LDoS</b>2031-12-31</div>
+      </div>
+      <div data-state="cisco-onsale">
+        <div class="row"><b>C9K-ACC-RBFT · Cisco</b><span class="grow"></span><span class="note" style="margin:0">AI 검색 결과 — 틀릴 수 있습니다</span><span class="chip">판매중</span></div>
+        <div class="wf-text">판매중 (AI 검색 결과 — 틀릴 수 있습니다, 출처: <u>https://www.cisco.com/…</u>)</div>
+        <div class="wf-text sm">MVP는 Cisco도 AI 검색(D-38). EoX API 조회는 P1(REQ-029)</div>
+      </div>
+      <div data-state="dell-onsale">
+        <div class="row"><b>210-BPMK · Dell</b><span class="grow"></span><span class="note" style="margin:0">AI 검색 결과 — 틀릴 수 있습니다</span><span class="chip">판매중</span></div>
+        <div class="wf-text">판매중 (AI 검색 결과 — 틀릴 수 있습니다, 출처: <u>https://www.dell.com/…/poweredge-xe7740</u>)</div>
+      </div>
+      <div data-state="dell-eos">
+        <div class="row"><b>210-BPMK · Dell</b><span class="grow"></span><span class="note" style="margin:0">AI 검색 결과 — 틀릴 수 있습니다</span><span class="g warn">판매 종료</span></div>
+        <div class="wf-text">판매 종료로 보입니다 (AI 검색 결과 — 틀릴 수 있습니다) — End-of-Sale 2026-09-01 (출처: <u>https://www.dell.com/…</u>)</div>
+        <div class="kv"><b>End-of-Sale</b>2026-09-01</div>
+      </div>
+      <div data-state="dell-nf">
+        <div class="row"><b>210-BPMK · Dell</b><span class="grow"></span><span class="note" style="margin:0">AI 검색 결과 — 틀릴 수 있습니다</span></div>
+        <div class="wf-text">Dell 자료에서 찾을 수 없는 SKU입니다 (AI 검색 결과 — 틀릴 수 있습니다)</div>
+      </div>
+      <div data-state="loading" class="center" style="padding:20px">⟳ EOS 정보를 조회하고 있습니다…</div>
+      <div data-state="empty invalid" class="center" style="padding:20px">벤더와 SKU를 입력해 조회하세요.</div>
+      <div data-state="error" class="center" style="padding:20px">EOS 정보를 가져오지 못했습니다<br><br><span class="wf-btn" data-go="#loading">다시 시도</span></div>
+
+      <div class="row" style="margin-top:10px;border-top:1px solid #ddd;padding-top:8px;position:relative" data-state="default cisco-onsale dell-onsale dell-eos dell-nf"><span class="n">5</span>
+        <span class="wf-text sm" data-state="default">조회 2026-10-06 10:02 · 캐시된 결과</span><span class="wf-text sm" data-state="cisco-onsale dell-onsale dell-eos dell-nf">조회 2026-10-06 10:15</span>
+        <span class="grow"></span><span class="wf-btn sm" data-go="#loading">다시 조회</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

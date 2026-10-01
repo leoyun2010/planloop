@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-007 검증 결과·확정 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-007 검증 결과·확정</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-007-검증결과.md">SCR-007-검증결과.md</a>
+  <div class="tags">REQ-007 ~ REQ-011 · POL-007, 009, 021 ~ 032, 039 · /boms/{bomId}/v/{n}/validation</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본(미확인 있음)</button>
+  <button data-s="ready" onclick="setState('ready')">확정 가능</button>
+  <button data-s="errors" onclick="setState('errors')">오류 있음</button>
+  <button data-s="stale" onclick="setState('stale')">재검증 필요</button>
+  <button data-s="aifail" onclick="setState('aifail')">AI 실패</button>
+  <button data-s="confirmed" onclick="setState('confirmed')">확정됨</button>
+  <button data-s="viewer" onclick="setState('viewer')">비작성자</button>
+  <button data-s="running" onclick="setState('running')">로딩: 실행 중</button>
+  <button data-s="loading" onclick="setState('loading')">로딩: 조회</button>
+  <button data-s="empty" onclick="setState('empty')">빈: 미검증</button>
+  <button data-s="zero" onclick="setState('zero')">빈: 판정 0건</button>
+  <button data-s="error" onclick="setState('error')">에러</button>
+  <button data-s="dlg" onclick="setState('dlg')">[12] 확정 확인</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a class="on" data-go="SCR-003-BoM목록.html">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><span class="spacer"></span>
+    <span class="me" data-state="default ready errors stale aifail confirmed running loading empty zero error dlg">김영업 (영업)</span><span class="me" data-state="viewer">박엔지 (엔지니어)</span><span class="wf-btn sm">로그아웃</span></div>
+  <div class="main">
+    <div class="bomhead"><span class="n abs">2</span><span class="ttl">대웅제약 · 마곡 C&amp;D 센터 구축</span><span class="kv">작성자 김영업</span>
+      <span class="wf-input wf-sel" data-state="default ready errors stale aifail viewer running loading empty zero error dlg">v2 작성중</span><span class="wf-input wf-sel" data-state="confirmed">v2 확정</span>
+      <span data-state="default ready errors aifail viewer zero dlg confirmed"><span class="chip">검증 완료</span></span><span data-state="stale"><span class="chip">재검증 필요</span></span><span data-state="empty running"><span class="chip dash">미검증</span></span></div>
+    <div class="btabs"><span class="n abs">3</span><div data-go="SCR-005-BoM상세.html">표준 BoM</div><div class="on">검증 결과</div><div data-go="SCR-008-버전이력.html">버전 이력</div>
+      <div data-state="default ready errors stale aifail confirmed running loading empty zero error dlg" data-go="SCR-009-견적편집.html">견적</div></div>
+
+    <!-- [4] 실행 바 -->
+    <div class="row" style="margin-bottom:8px;position:relative"><span class="n">4</span>
+      <span class="wf-text" data-state="default ready errors stale aifail confirmed viewer zero dlg">최근 검증 2026-10-06 14:32 · v2 · 수정 번호 7</span>
+      <span class="wf-text" data-state="running">검증 시작 2026-10-06 15:01 · v2 · 수정 번호 8</span>
+      <span class="wf-text" data-state="empty">검증 기록 없음</span>
+      <span class="grow"></span>
+      <span class="wf-btn primary" data-state="default ready errors stale aifail empty zero dlg" data-go="#running">검증</span><span class="wf-btn dis" data-state="running">⟳ 검증</span>
+      <span class="wf-btn" data-state="default ready errors stale aifail confirmed viewer zero dlg">리포트 다운로드</span><span class="wf-btn dis" data-state="empty running">리포트 다운로드</span>
+    </div>
+
+    <!-- [5] 진행 -->
+    <div class="steps" data-state="running"><span class="n abs">5</span><div class="done">✓ 고정 규칙 검사</div><div class="now">EOS 조회 중 (41/54)</div><div>AI 검토 대기</div></div>
+    <!-- [6] 배너 -->
+    <div class="banner" data-state="stale"><span class="n abs">6</span>BoM이 수정되어 이 결과는 최신이 아닙니다</div>
+
+    <div data-state="loading"><div class="sk w40"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk w80"></div></div>
+    <div data-state="error" class="center"><div class="ic"></div>데이터를 불러오지 못했습니다. 다시 시도해 주세요.<br><br><span class="wf-btn">다시 시도</span></div>
+    <div data-state="empty" class="center"><div class="ic"></div>검증 결과가 없습니다.<br><br><span class="wf-btn primary" data-go="#running">검증</span>
+      <div class="wf-text sm" style="margin-top:8px">품목 0행에서 실행하면: 「검증할 품목이 없습니다. 벤더 BoM 파일을 올리거나 행을 추가해 주세요.」</div></div>
+    <div data-state="running" class="wf-text sm" style="margin-bottom:8px">실행 중에는 직전 결과를 흐리게 보여준다. 다시 실행하면 토스트 「검증이 이미 진행 중입니다.」</div>
+
+    <div data-state="default ready errors stale aifail confirmed viewer zero dlg running">
+      <!-- [7] 요약 -->
+      <div class="row" style="margin-bottom:6px;position:relative"><span class="n">7</span>
+        <span data-state="default stale aifail confirmed viewer dlg running"><span class="g err">오류</span> 0건 · <span class="g warn">경고</span> 2건 · <span class="g rec">검토 권고</span> 3건 ·
+          <span data-state="default stale viewer running">확인 1/5</span><span data-state="aifail">확인 2/2 (AI 권고 없음)</span><span data-state="confirmed dlg">확인 5/5</span></span>
+        <span data-state="ready"><span class="g err">오류</span> 0건 · <span class="g warn">경고</span> 2건 · <span class="g rec">검토 권고</span> 3건 · 확인 5/5</span>
+        <span data-state="errors"><span class="g err">오류</span> 2건 · <span class="g warn">경고</span> 2건 · <span class="g rec">검토 권고</span> 3건 · 확인 1/5</span>
+        <span data-state="zero"><span class="g err">오류</span> 0건 · <span class="g warn">경고</span> 0건 · <span class="g rec">검토 권고</span> 0건</span>
+      </div>
+      <!-- [8] 필터 -->
+      <div class="filterbar"><span class="n abs">8</span>등급 <span class="wf-input wf-sel" style="min-width:80px">전체</span> 규칙 <span class="wf-input wf-sel" style="min-width:70px">전체</span> AI 분류 <span class="wf-input wf-sel" style="min-width:120px">전체</span></div>
+
+      <!-- [9] 판정 목록 -->
+      <div class="wf-box none" style="position:relative;margin-bottom:12px"><span class="n abs">9</span>
+        <div style="font-weight:bold;font-size:13px;margin-bottom:4px">고정 규칙·EOS 판정</div>
+        <div data-state="zero" class="wf-text sm">판정 결과가 없습니다.</div>
+        <table class="wf" data-state="default ready errors stale aifail confirmed viewer dlg running">
+          <tr><th>등급</th><th>규칙</th><th>행</th><th>SKU</th><th>대상 필드</th><th>안내 문구</th><th>확인함</th></tr>
+          <tr data-state="errors" data-go="SCR-005-BoM상세.html"><td><span class="g err">오류</span></td><td>R1</td><td>37</td><td>(빈 값)</td><td>품명</td><td>품명 값이 비어 있습니다.</td><td>—</td></tr>
+          <tr data-state="errors" data-go="SCR-005-BoM상세.html"><td><span class="g err">오류</span></td><td>R2</td><td>18</td><td>C9200L-48P-4X-E</td><td>수량</td><td>수량은 1 이상의 정수여야 합니다. (현재 값: 7.5)</td><td>—</td></tr>
+          <tr data-go="SCR-005-BoM상세.html"><td><span class="g warn">경고</span></td><td>R8</td><td>18</td><td>C9200L-48P-4X-E</td><td>EOS 상태</td><td>EoS 예정 — End-of-Sale 2026-12-31, LDoS 2031-12-31 (출처: <u>https://www.cisco.com/…</u>) · 대체 제품: C9200CX-48P-4X-E</td>
+            <td><span data-state="default stale errors viewer running"><span class="check"></span></span><span data-state="ready aifail confirmed dlg"><span class="check on"></span>김영업 10-06 14:40</span></td></tr>
+          <tr data-go="SCR-005-BoM상세.html"><td><span class="g warn">경고</span></td><td>R6</td><td>19</td><td>CON-SNT-C9200L4X</td><td>서비스·구독 기간</td><td>서비스·구독 기간이 다른 행과 다릅니다: 12개월 (기준 36개월)</td>
+            <td><span class="check on"></span>김영업 10-06 14:35 <span class="wf-text sm" data-state="stale">(재검증 필요 — 체크 비활성)</span></td></tr>
+        </table>
+        <div class="wf-text sm" data-state="default ready errors stale aifail dlg">작성자에게만 R4·R9 행에 「차이: {차이}원 (합계 {합계} / 기준 {기준})」 상세가 펼쳐진다. 행 클릭 → SCR-005 해당 행.</div>
+        <div class="wf-text sm" data-state="viewer">비작성자: 체크박스 읽기 전용, 금액 상세 없음.</div>
+      </div>
+
+      <!-- [10] AI -->
+      <div class="wf-box none" style="position:relative;margin-bottom:12px"><span class="n abs">10</span>
+        <div class="row" style="margin-bottom:4px"><b style="font-size:13px">AI 검토 권고</b><span class="note" style="margin:0">AI가 생성한 권고이며 틀릴 수 있습니다</span></div>
+        <div data-state="aifail" class="banner">AI 검토를 완료하지 못했습니다 <span class="wf-btn sm">다시 시도</span></div>
+        <div data-state="zero" class="wf-text sm">검토 권고가 없습니다.</div>
+        <table class="wf" data-state="default ready errors stale confirmed viewer dlg running">
+          <tr><th>등급</th><th>분류</th><th>대상 행</th><th>지적 내용</th><th>근거</th><th>확인함</th></tr>
+          <tr data-go="SCR-005-BoM상세.html"><td><span class="g rec">검토 권고</span></td><td>호환성</td><td>23</td><td>행 23 CAB-TA-EU는 유럽형 전원 케이블입니다. 같은 BoM의 9는 한국형(CAB-AC-C15-KOR)입니다</td><td>CAB-TA-EU 품명 「Europe AC Type A Power Cable」</td>
+            <td><span data-state="default stale errors viewer running"><span class="check"></span></span><span data-state="ready confirmed dlg"><span class="check on"></span>김영업 10-06 14:41</span></td></tr>
+          <tr><td><span class="g rec">검토 권고</span></td><td>고객에게 불필요한 항목</td><td>10, 11, 12</td><td>「선택 안 함」 자리표시 품목입니다(C9300-SSD-NONE 등)</td><td>품명 「No SSD Card Selected」</td>
+            <td><span data-state="default stale errors viewer running"><span class="check"></span></span><span data-state="ready confirmed dlg"><span class="check on"></span>김영업 10-06 14:41</span></td></tr>
+          <tr><td><span class="g rec">검토 권고</span></td><td>필수 액세서리 누락</td><td>BoM 전체</td><td>CW9179F(행 30)에 전원 공급 품목이 없습니다</td><td>…</td>
+            <td><span data-state="default stale errors viewer running"><span class="check"></span></span><span data-state="ready confirmed dlg"><span class="check on"></span>김영업 10-06 14:42</span></td></tr>
+        </table>
+      </div>
+
+      <!-- [11] 확정 바 -->
+      <div class="wf-box solid" style="position:relative" data-state="default ready errors stale aifail running zero dlg"><span class="n abs">11</span>
+        <div class="row">
+          <span data-state="aifail"><span class="check"></span>AI 검토 없이 확정합니다</span>
+          <span class="grow"></span>
+          <span data-state="ready zero dlg"><span class="wf-btn primary" data-go="#dlg">확정</span></span>
+          <span data-state="default"><span class="wf-btn dis">확정</span><span class="tip">확인하지 않은 경고·검토 권고가 4건 있습니다.</span></span>
+          <span data-state="errors"><span class="wf-btn dis">확정</span><span class="tip">오류 2건을 해결해야 확정할 수 있습니다.</span></span>
+          <span data-state="stale"><span class="wf-btn dis">확정</span><span class="tip">BoM이 수정되었습니다. 다시 검증해 주세요.</span></span>
+          <span data-state="aifail"><span class="wf-btn dis">확정</span><span class="tip">AI 검토가 완료되지 않았습니다. 다시 시도하거나 'AI 검토 없이 확정합니다'를 선택해 주세요.</span></span>
+          <span data-state="running"><span class="wf-btn dis">확정</span><span class="tip">검증이 진행 중입니다.</span></span>
+        </div>
+      </div>
+      <div class="wf-box solid" data-state="confirmed"><span class="n abs">11</span>확정 2026-10-06 15:20 · 김영업</div>
+    </div>
+    <div class="wf-box solid" data-state="empty"><span class="n abs">11</span><div class="row"><span class="grow"></span><span class="wf-btn dis">확정</span><span class="tip">검증을 실행해야 확정할 수 있습니다.</span></div></div>
+  </div>
+
+  <div class="dim-bg" data-state="dlg"></div>
+  <div class="modal" data-state="dlg"><span class="n abs">12</span><h2>확정</h2><div class="wf-text">v2을 확정합니다. 확정한 버전은 수정할 수 없습니다. 확정하시겠습니까?</div>
+    <div class="foot"><span class="wf-btn" data-go="#ready">취소</span><span class="wf-btn primary" data-go="SCR-005-BoM상세.html#confirmed">확정</span></div></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-005 BoM 상세 — 표준 BoM — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-005 BoM 상세 — 표준 BoM</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-005-BoM상세.md">SCR-005-BoM상세.md</a>
+  <div class="tags">REQ-005, 006, 008, 012, 013, 015 · POL-004, 005, 007, 008, 009, 016~020, 029, 039 · /boms/{bomId}/v/{n}</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본(작성자·작성중)</button>
+  <button data-s="confirmed" onclick="setState('confirmed')">작성자·확정</button>
+  <button data-s="viewer" onclick="setState('viewer')">비작성자</button>
+  <button data-s="dell" onclick="setState('dell')">Dell 하위 제품</button>
+  <button data-s="loading" onclick="setState('loading')">로딩</button>
+  <button data-s="empty" onclick="setState('empty')">빈 상태</button>
+  <button data-s="error" onclick="setState('error')">에러</button>
+  <span class="lbl">대화상자:</span>
+  <button data-s="dlg-del" onclick="setState('dlg-del')">[8] 행 삭제</button>
+  <button data-s="dlg-leave" onclick="setState('dlg-leave')">[9] 이탈</button>
+  <button data-s="dlg-conflict" onclick="setState('dlg-conflict')">[10] 충돌</button>
+  <button data-s="dlg-delbom" onclick="setState('dlg-delbom')">[11] BoM 건 삭제</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a class="on" data-go="SCR-003-BoM목록.html">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><span class="spacer"></span>
+    <span class="me" data-state="default confirmed dell loading empty error dlg-del dlg-leave dlg-conflict dlg-delbom">김영업 (영업)</span><span class="me" data-state="viewer">박엔지 (엔지니어)</span><span class="wf-btn sm">로그아웃</span></div>
+  <div class="main">
+    <!-- [2] 헤더 -->
+    <div class="bomhead"><span class="n abs">2</span>
+      <div data-state="loading" style="width:100%"><div class="sk w60"></div></div>
+      <span data-state="default confirmed viewer empty error dlg-del dlg-leave dlg-conflict dlg-delbom"><span class="ttl">대웅제약 · 마곡 C&amp;D 센터 구축</span></span>
+      <span data-state="dell"><span class="ttl">해군 · 배치함 스토리지</span></span>
+      <span class="kv" data-state="default confirmed viewer empty error dell dlg-del dlg-leave dlg-conflict dlg-delbom">작성자 김영업 · 생성 2026-10-01</span>
+      <span class="wf-input wf-sel" data-state="default viewer dlg-del dlg-leave dlg-conflict">v2 작성중</span><span class="wf-input wf-sel" data-state="confirmed">v1 확정</span><span class="wf-input wf-sel" data-state="empty dell error dlg-delbom">v1 작성중</span>
+      <span data-state="default viewer dell empty dlg-del dlg-leave dlg-conflict dlg-delbom"><span class="chip">작성중</span></span><span data-state="confirmed"><span class="chip dark">확정</span> <span class="kv">확정 2026-10-02 16:40 · 김영업</span></span>
+      <span data-state="default viewer dlg-del dlg-leave dlg-conflict"><span class="chip">재검증 필요</span></span><span data-state="confirmed"><span class="chip">검증 완료</span></span><span data-state="empty dell dlg-delbom"><span class="chip dash">미검증</span></span>
+    </div>
+    <!-- [3] 탭 -->
+    <div class="btabs"><span class="n abs">3</span><div class="on">표준 BoM</div><div data-go="SCR-007-검증결과.html">검증 결과</div><div data-go="SCR-008-버전이력.html">버전 이력</div>
+      <div data-state="default confirmed dell loading empty error dlg-del dlg-leave dlg-conflict dlg-delbom" data-go="SCR-009-견적편집.html">견적</div></div>
+
+    <!-- [4] 도구 모음 -->
+    <div class="row" style="margin-bottom:8px;position:relative"><span class="n">4</span>
+      <span data-state="default dell empty dlg-del dlg-leave dlg-conflict dlg-delbom">
+        <span class="wf-btn" data-go="SCR-006-파일업로드.html">파일 올리기</span> <span class="wf-btn">행 추가</span>
+        <span class="wf-btn" data-state="default dell dlg-del dlg-leave dlg-conflict" data-go="#dlg-del">선택 행 삭제</span><span class="wf-btn dis" data-state="empty dlg-delbom">선택 행 삭제</span>
+        <span class="wf-btn primary" data-state="default dlg-del dlg-leave dlg-conflict" data-go="#dlg-conflict">저장</span><span class="wf-btn dis" data-state="dell empty dlg-delbom">저장</span>
+        <span class="wf-btn primary" data-state="default dell dlg-del dlg-leave dlg-conflict" data-go="SCR-007-검증결과.html#running">검증</span><span class="wf-btn dis" data-state="empty dlg-delbom">검증</span>
+      </span>
+      <span data-state="confirmed"><span class="wf-btn primary" data-go="#default">새 버전 만들기</span></span>
+      <span class="grow"></span>
+      <span class="wf-btn" data-state="default confirmed viewer dell empty dlg-del dlg-leave dlg-conflict dlg-delbom">BoM 다운로드</span>
+      <span class="wf-btn wf-sel" data-state="default confirmed dell empty dlg-del dlg-leave dlg-conflict dlg-delbom">원본 파일</span>
+      <span class="wf-btn danger" data-state="empty dell dlg-delbom" data-go="#dlg-delbom">BoM 건 삭제</span>
+    </div>
+
+    <!-- [5] 변환 요약 -->
+    <div class="wf-box" style="font-size:12px" data-state="default confirmed viewer dell dlg-del dlg-leave dlg-conflict dlg-delbom"><span class="n abs">5</span>
+      <span data-state="default confirmed viewer dlg-del dlg-leave dlg-conflict"><b>총 36행 변환(상위 품목 5, 구성품 31), 미분류 0행</b> · (대웅제약 마곡C&amp;D 센터 구축)Quote_4793379459_BOM.xls · CCW 구성형 · 2026-10-01 10:12 · 김영업</span>
+      <span data-state="dell dlg-delbom"><b>총 26행 변환(상위 품목 1, 하위 제품 4, 구성품 21), 미분류 0행</b> · CASE1_Storage_BoM.xlsx · Dell Solutions Configurator · 2026-10-06 09:30 · 김영업</span>
+    </div>
+
+    <!-- [6] 표 -->
+    <div class="wf-box none" style="position:relative;overflow-x:auto"><span class="n abs">6</span>
+      <!-- Cisco 예시 -->
+      <table class="wf" data-state="default confirmed viewer dlg-del dlg-leave dlg-conflict">
+        <tr><th data-state="default dlg-del dlg-leave dlg-conflict">□</th><th>행</th><th>벤더</th><th>원본 라인</th><th>상위</th><th>유형</th><th>구분</th><th>모듈명</th><th>SKU</th><th>품명</th><th>수량</th><th>기간</th><th>구독 정보</th><th>EOS 상태</th><th>원본 파일 / 행</th><th>비고</th>
+          <th class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">통화</th><th class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">List 단가</th><th class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">List 금액</th><th class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">할인율</th></tr>
+        <tr class="top"><td data-state="default dlg-del dlg-leave dlg-conflict"><span class="check on"></span></td><td>1</td><td>Cisco</td><td>1.0</td><td></td><td>상위 품목</td><td>PRODUCT</td><td></td><td>C9300X-24HX-E</td><td>Catalyst 9300 24-port mGig UPoE+…</td><td class="num">2</td><td></td><td></td><td>판매중</td><td>…4793379459_BOM.xls / 32</td><td></td>
+          <td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">KRW</td><td class="price num" data-state="default dlg-del dlg-leave dlg-conflict"><span class="mod">12,500,000</span></td><td class="price num" data-state="confirmed"></td><td class="price num" data-state="default confirmed dlg-del dlg-leave dlg-conflict">25,000,000</td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td></tr>
+        <tr><td data-state="default dlg-del dlg-leave dlg-conflict"><span class="check"></span></td><td>2</td><td>Cisco</td><td>1.0.1</td><td>1</td><td>구성품</td><td>SERVICE</td><td></td><td><span class="i1">CON-SNT-C9300X2E</span></td><td><span class="i1">SNTC-8X5XNBD Catalyst 9300…</span></td><td class="num">2</td><td class="num">36</td><td></td><td>판매중</td><td>… / 33</td><td></td>
+          <td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">KRW</td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td></tr>
+        <tr><td data-state="default dlg-del dlg-leave dlg-conflict"><span class="check"></span></td><td>9</td><td>Cisco</td><td>1.6</td><td>1</td><td>구성품</td><td>PRODUCT</td><td></td><td><span class="i1">CAB-AC-C15-KOR</span></td><td><span class="i1">AC Power Cord, Korea, C15</span></td><td class="num">4</td><td></td><td></td><td>판매중</td><td>… / 40</td><td></td>
+          <td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">KRW</td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td></tr>
+        <tr class="top"><td data-state="default dlg-del dlg-leave dlg-conflict"><span class="check"></span></td><td>18</td><td>Cisco</td><td>2.0</td><td></td><td>상위 품목</td><td>PRODUCT</td><td></td><td>C9200L-48P-4X-E</td><td>Catalyst 9200L 48-port PoE+…</td><td class="num" data-state="default dlg-del dlg-leave dlg-conflict viewer"><span class="mod">8</span></td><td class="num" data-state="confirmed">6</td><td></td><td></td><td>EoS 예정</td><td>… / 49</td><td></td>
+          <td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">KRW</td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td></tr>
+        <tr><td data-state="default dlg-del dlg-leave dlg-conflict"><span class="check"></span></td><td>19</td><td>Cisco</td><td>2.0.1</td><td>18</td><td>구성품</td><td>SERVICE</td><td></td><td><span class="i1">CON-SNT-C9200L4X</span></td><td><span class="i1">SNTC-8X5XNBD Catalyst 9200L…</span></td><td class="num" data-state="default dlg-del dlg-leave dlg-conflict viewer"><span class="mod">8</span></td><td class="num" data-state="confirmed">6</td><td class="num">12</td><td></td><td>판매중</td><td>… / 50</td><td></td>
+          <td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">KRW</td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td></tr>
+        <tr class="top"><td data-state="default dlg-del dlg-leave dlg-conflict"><span class="check"></span></td><td>31</td><td>Cisco</td><td>4.0</td><td></td><td>상위 품목</td><td>SOFTWARE</td><td></td><td>CISCO-NETWORK-SUB</td><td>Cisco Networking Subscription</td><td class="num">1</td><td class="num">36</td><td>Requested Start Date : 06-May-2026| Requested For : 36.00 Months…</td><td>판매중</td><td>… / 62</td><td></td>
+          <td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">KRW</td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td></tr>
+        <tr class="add"><td data-state="default dlg-del dlg-leave dlg-conflict"><span class="check"></span></td><td>37</td><td>Cisco ▾</td><td></td><td>35</td><td>구성품</td><td>PRODUCT ▾</td><td></td><td><span class="i1 wf-input xs val" style="width:130px">CAB-AC-C15-KOR</span></td><td><span class="i1">AC Power Cord, Korea</span></td><td class="num">1</td><td></td><td></td><td></td><td>직접 입력 / </td><td>EU 케이블 교체</td>
+          <td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict">KRW</td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td><td class="price" data-state="default confirmed dlg-del dlg-leave dlg-conflict"></td></tr>
+      </table>
+      <div class="wf-text sm" data-state="default dlg-del dlg-leave dlg-conflict" style="margin-top:4px">「수정됨」 셀에 마우스를 올리면 <span class="tip">원본 값: 6</span> · 가로 스크롤, 행~SKU 열 고정 · 가격 정보 열(회색)은 작성자에게만 보인다 · 초록 행 = 직접 추가(저장 전)</div>
+      <div class="wf-text sm" data-state="viewer" style="margin-top:4px">비작성자: 가격 정보 열이 없고(응답에 필드 자체가 없음 — POL-009) 모든 셀이 읽기 전용이다.</div>
+      <div class="wf-text sm" data-state="confirmed" style="margin-top:4px">확정 버전: 모든 셀 읽기 전용 (POL-004).</div>
+
+      <!-- Dell 하위 제품 예시 -->
+      <table class="wf" data-state="dell dlg-delbom">
+        <tr><th>□</th><th>행</th><th>원본 라인</th><th>상위</th><th>유형</th><th>구분</th><th>모듈명</th><th>SKU</th><th>옵션 ID</th><th>품명</th><th>수량</th><th>기간</th><th>EOS</th><th class="price">List 단가</th><th class="price">List 금액</th></tr>
+        <tr class="top"><td><span class="check"></span></td><td>1</td><td>5625400.4.1-1</td><td></td><td>상위 품목</td><td>PRODUCT</td><td></td><td></td><td></td><td>Unity XT Hybrid New Solution - APJC…</td><td class="num">1</td><td></td><td></td><td class="price num">156,890,693</td><td class="price num">156,890,693</td></tr>
+        <tr class="sub"><td><span class="check"></span></td><td>2</td><td>5625400.4.1-1.S1</td><td>1</td><td>하위 제품</td><td>PRODUCT</td><td></td><td></td><td></td><td><span class="i1">Unity 380 Hybrid DPE - APJ</span></td><td class="num">1</td><td></td><td></td><td class="price num">156,890,691</td><td class="price num">156,890,691</td></tr>
+        <tr><td><span class="check"></span></td><td>3</td><td>5625400.4.1-1.1</td><td>2</td><td>구성품</td><td>PRODUCT</td><td>Unity XT 380</td><td>210-ASKK, 389-FNYG</td><td>…</td><td><span class="i2">Unity XT 380 DPE 25x2.5 고객 지원 랙…</span></td><td class="num">1</td><td></td><td></td><td class="price num">75,126,841</td><td class="price num">75,126,841</td></tr>
+        <tr><td><span class="check"></span></td><td>6</td><td>5625400.4.1-1.4</td><td>2</td><td>구성품</td><td>PRODUCT</td><td>추가 드라이브</td><td>400-BFXS</td><td>…</td><td><span class="i2">Unity 600GB 10K SAS 25X2.5 드라이브</span></td><td class="num">21</td><td></td><td></td><td class="price num">2,181,706</td><td class="price num">45,815,826</td></tr>
+        <tr><td><span class="check"></span></td><td>12</td><td>5625400.4.1-1.10</td><td>2</td><td>구성품</td><td>SERVICE</td><td>Dell 서비스: 연장 서비스</td><td>199-BJOS</td><td>…</td><td><span class="i2">파트너 지원-L3 지원 익일… 36 개월</span></td><td class="num">1</td><td class="num">36</td><td></td><td class="price num">19,875,499</td><td class="price num">19,875,499</td></tr>
+        <tr class="sub"><td><span class="check"></span></td><td>14</td><td>5625400.4.1-1.S2</td><td>1</td><td>하위 제품</td><td>PRODUCT</td><td></td><td></td><td></td><td><span class="i1">Dell Unity XT Software HFA - APJ</span></td><td class="num">1</td><td></td><td></td><td class="price num">0</td><td class="price num">0</td></tr>
+      </table>
+      <div class="wf-text sm" data-state="dell dlg-delbom" style="margin-top:4px">하위 제품 행(회색) = 구분선·소계. SKU 없음, 원가 합계 제외 (D-26, POL-016). 하위 제품 아래 구성품은 2단 들여쓰기.</div>
+
+      <div data-state="loading"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+      <div data-state="empty" class="center"><div class="ic"></div>아직 올린 파일이 없습니다. 벤더 BoM 파일을 올리거나 행을 추가해 주세요.<br><br>
+        <span class="wf-btn primary" data-go="SCR-006-파일업로드.html#empty">파일 올리기</span> <span class="wf-btn">행 추가</span>
+        <div class="wf-text sm" style="margin-top:8px">비작성자에게는 「아직 품목이 없습니다.」만 표시</div></div>
+      <div data-state="error" class="center"><div class="ic"></div>데이터를 불러오지 못했습니다. 다시 시도해 주세요.<br><br><span class="wf-btn">다시 시도</span>
+        <div class="wf-text sm" style="margin-top:8px">없는 BoM·버전이면 <a href="SCR-013-권한없음.html#notfound">SCR-013(404)</a></div></div>
+    </div>
+
+    <!-- [7] 저장 상태 -->
+    <div class="wf-text sm" style="position:relative" data-state="default dell dlg-del dlg-leave dlg-conflict dlg-delbom"><span class="n">7</span>
+      <span data-state="default dlg-del dlg-leave dlg-conflict">저장하지 않은 변경 3건</span><span data-state="dell dlg-delbom">마지막 저장 2026-10-06 09:30</span></div>
+  </div>
+
+  <!-- 대화상자 -->
+  <div class="dim-bg" data-state="dlg-del dlg-leave dlg-conflict dlg-delbom"></div>
+  <div class="modal" data-state="dlg-del"><span class="n abs">8</span><h2>행 삭제</h2><div class="wf-text">이 상위 품목과 구성품 16개가 함께 삭제됩니다. 삭제하시겠습니까?</div>
+    <div class="foot"><span class="wf-btn" data-go="#default">취소</span><span class="wf-btn danger" data-go="#default">삭제</span></div></div>
+  <div class="modal" data-state="dlg-leave"><span class="n abs">9</span><h2>화면 이동</h2><div class="wf-text">저장하지 않은 변경 사항이 있습니다. 이 화면을 떠나시겠습니까?</div>
+    <div class="foot"><span class="wf-btn" data-go="#default">머무르기</span><span class="wf-btn primary" data-go="SCR-003-BoM목록.html">떠나기</span></div></div>
+  <div class="modal" data-state="dlg-conflict"><span class="n abs">10</span><h2>저장하지 못했습니다</h2><div class="wf-text">다른 창에서 먼저 저장된 내용이 있습니다. 새로고침한 뒤 다시 수정해 주세요.</div>
+    <div class="wf-text sm" style="margin-top:6px">표의 입력값은 남아 있어 복사할 수 있다.</div>
+    <div class="foot"><span class="wf-btn" data-go="#default">닫기</span><span class="wf-btn primary" data-go="#default">새로고침</span></div></div>
+  <div class="modal" data-state="dlg-delbom"><span class="n abs">11</span><h2>BoM 건 삭제</h2><div class="wf-text">이 BoM 건과 올린 파일, 검증 결과가 모두 삭제됩니다. 삭제하시겠습니까?</div>
+    <div class="foot"><span class="wf-btn" data-go="#dell">취소</span><span class="wf-btn danger" data-go="SCR-003-BoM목록.html">삭제</span></div></div>
+</div>
+</body>
+</html>
