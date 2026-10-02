@@ -2,10 +2,10 @@
 
 | 항목 | 내용 |
 |---|---|
-| 문서 버전 | v1.0 |
+| 문서 버전 | v1.2 |
 | 상태 | 승인 |
 | 작성일 | 2026-09-30 |
-| 최종 수정일 | 2026-10-01 |
+| 최종 수정일 | 2026-10-02 |
 | 근거 회의록 | [2026-09-30 기획 인터뷰 결정사항](minutes/2026-09-30-기획인터뷰-결정사항.md) — D-01 ~ D-41 (D-26 ~ D-41은 이 문서 작성·검토 중 결정) |
 | 근거 자료 | 샘플 폴더 `C:\Users\user\Downloads\BoM 자동화 프로그램\` 벤더 BoM 11개 (Cisco CCW 5, Dell Configurator 6) — 전수 분석 |
 | 관련 문서 | [01-prd.md](01-prd.md), [00-brief.md](00-brief.md), [03-ia.md](03-ia.md), [04-screens/](04-screens/), [05-qa-tc.md](05-qa-tc.md) |
@@ -21,7 +21,7 @@
   - `확정` — 근거가 있다. 결정(D-xx), PRD에 명시된 값, 샘플 전수 분석 결과 중 하나다.
   - `검토중` — 이 문서가 처음 제안한 값(「제안값」)이 들어 있다. v0.5에서 제안값 10건을 모두 확정해 현재 0건이다(D-35).
   - `미확정` — 외부 조건이 정해져야 확정할 수 있다(보안 부서 확인, 보관 기간 등).
-- **관련 TC는 [05-qa-tc.md](05-qa-tc.md) v1.0 기준으로 채웠다.** 정책마다 그 정책을 참조하는 모든 TC를 적었고, 위반 케이스 TC(유형 예외·경계)는 05-qa-tc.md 커버리지 표 2에 따로 모았다. 관련 화면(SCR)은 [03-ia.md](03-ia.md) v0.1 기준으로 채웠다.
+- **관련 TC는 [05-qa-tc.md](05-qa-tc.md) v1.0 기준으로 채웠다(v1.2에서 CR-002·003·004 반영분 TC-164 ~ TC-187을 더했다).** 정책마다 그 정책을 참조하는 모든 TC를 적었고, 위반 케이스 TC(유형 예외·경계)는 05-qa-tc.md 커버리지 표 2에 따로 모았다. 관련 화면(SCR)은 [03-ia.md](03-ia.md) v0.1 기준으로 채웠다.
 - **문구**: 「」 안이 사용자에게 보이는 문구 원문이다. `{변수}`는 값으로 바뀐다. 문구는 이 문서가 기준이며, 화면·API·xlsx에서 같은 문구를 쓴다.
 - **의사코드 공통 약속** (JS)
   - `ok()` 통과 · `block(code, vars)` 차단(저장·실행 거부) · `warn(code, vars)` 경고 · `finding(rule, grade, row, field, code, vars)` 검증 판정 1건
@@ -46,27 +46,28 @@
 
 | 구분 | 건수 | 정책 |
 |---|---|---|
-| 전체 | 39건 | POL-001 ~ POL-039 |
-| 확정 | 37건 | 아래 목록에서 상태가 「확정」인 것. 제안값 10건은 2026-10-01에 그대로 확정(D-35) |
+| 전체 | 50건 | POL-001 ~ POL-050 |
+| 확정 | 47건 | 아래 목록에서 상태가 「확정」인 것. 제안값 10건은 2026-10-01에 그대로 확정(D-35). POL-040 ~ POL-050은 CR-002·CR-004로 추가 |
 | 검토중 | 0건 | — |
 | 미확정 | 2건 | POL-011, POL-013 — 보관 기간 미정(OI-12). MVP는 삭제 없이 보관(D-36) |
+| 폐지 | 1건 | POL-038 원가분석표 — CR-003, DEC-58. 번호는 비워 두지 않고 내용을 남긴다 |
 
 ## 정책 목록
 
 | ID | 분류 | 정책명 | 관련 REQ | 관련 TC | 상태 |
 |---|---|---|---|---|---|
 | POL-001 | 회원/인증 | Naver Works SSO 로그인·세션 | REQ-001, NFR-004 | TC-001, TC-002, TC-003, TC-004, TC-005, TC-006, TC-147 | 확정 |
-| POL-002 | 회원/인증 | 최초 로그인 등록·역할 대기 | REQ-001, REQ-002, REQ-020 | TC-007, TC-008, TC-009, TC-021, TC-148 | 확정 |
+| POL-002 | 회원/인증 | 최초 로그인 등록·역할 대기 | REQ-001, REQ-002, REQ-020, REQ-037 | TC-007, TC-008, TC-009, TC-021, TC-148, TC-180 | 확정 |
 | POL-003 | 콘텐츠/데이터 | BoM 건 입력값 | REQ-003 | TC-023, TC-024, TC-025, TC-026, TC-027, TC-150 | 확정 |
 | POL-004 | 콘텐츠/데이터 | 버전 상태 전이·삭제 | REQ-011, REQ-012 | TC-023, TC-066, TC-076, TC-108, TC-109, TC-110, TC-111, TC-112, TC-154 | 확정 |
 | POL-005 | 콘텐츠/데이터 | 동시 편집 충돌 방지 | REQ-006 | TC-066, TC-067, TC-074, TC-075, TC-131, TC-155 | 확정 |
 | POL-006 | 콘텐츠/데이터 | BoM 목록·검색 | REQ-014 | TC-028, TC-029, TC-030, TC-031, TC-032, TC-033, TC-034, TC-035, TC-046, TC-108, TC-149 | 확정 |
-| POL-007 | 콘텐츠/데이터 | 다운로드 파일명 | REQ-013, REQ-018, REQ-028 | TC-016, TC-048, TC-093, TC-113, TC-115, TC-134, TC-135, TC-140 | 확정 |
-| POL-008 | 권한/등급 | 역할별 기능 권한 | REQ-002, NFR-005 | TC-011, TC-012, TC-013, TC-014, TC-016, TC-048, TC-076, TC-107, TC-112, TC-151, TC-159 | 확정 |
-| POL-009 | 권한/등급 | 작성자 전용 정보(가격·견적) | REQ-015, NFR-005 | TC-013, TC-015, TC-016, TC-017, TC-028, TC-084, TC-087, TC-111, TC-116, TC-159 | 확정 |
-| POL-010 | 권한/등급 | 역할 변경 | REQ-020 | TC-014, TC-019, TC-020, TC-021, TC-022, TC-158 | 확정 |
-| POL-011 | 운영 | 감사 로그 | NFR-008 | TC-003, TC-006, TC-019, TC-023, TC-036, TC-048, TC-093, TC-104, TC-106, TC-107, TC-108, TC-112, TC-113, TC-116, TC-118, TC-134, TC-140, TC-156 | 미확정 |
-| POL-012 | 법/개인정보 | LLM 전송 범위·기록 | REQ-009, REQ-008, NFR-007 | TC-094, TC-095, TC-098, TC-102, TC-103, TC-143 | 확정 |
+| POL-007 | 콘텐츠/데이터 | 다운로드 파일명 | REQ-013, REQ-018 | TC-016, TC-048, TC-093, TC-113, TC-115, TC-134, TC-135 | 확정 |
+| POL-008 | 권한/등급 | 역할별 기능 권한 | REQ-002, NFR-005, REQ-030, REQ-034, REQ-035 | TC-011, TC-012, TC-013, TC-014, TC-016, TC-048, TC-076, TC-107, TC-112, TC-151, TC-159, TC-164, TC-176, TC-177, TC-181, TC-182 | 확정 |
+| POL-009 | 권한/등급 | 작성자 전용 정보(가격·견적) | REQ-015, NFR-005 | TC-013, TC-015, TC-016, TC-017, TC-028, TC-084, TC-087, TC-111, TC-116, TC-159, TC-181, TC-182 | 확정 |
+| POL-010 | 권한/등급 | 역할 변경 | REQ-020 | TC-014, TC-019, TC-020, TC-021, TC-022, TC-158, TC-180 | 확정 |
+| POL-011 | 운영 | 감사 로그 | NFR-008, REQ-034 | TC-003, TC-006, TC-019, TC-023, TC-036, TC-048, TC-093, TC-104, TC-106, TC-107, TC-108, TC-112, TC-113, TC-116, TC-118, TC-134, TC-156, TC-163, TC-165, TC-166, TC-168, TC-174, TC-175, TC-176, TC-180, TC-182, TC-184 | 미확정 |
+| POL-012 | 법/개인정보 | LLM 전송 범위·기록 | REQ-009, REQ-008, NFR-007, REQ-031 | TC-094, TC-095, TC-098, TC-102, TC-103, TC-143, TC-168, TC-171 | 확정 |
 | POL-013 | 법/개인정보 | 사용자 정보 수집·보관 | REQ-001, REQ-020 | TC-007, TC-010, TC-018, TC-147 | 미확정 |
 | POL-014 | 업로드·변환 | 업로드 파일 허용 조건 | REQ-004, NFR-002, NFR-011 | TC-047, TC-049, TC-050, TC-051, TC-052, TC-053, TC-054, TC-152 | 확정 |
 | POL-015 | 업로드·변환 | 벤더 형식 판별 | REQ-004 | TC-036, TC-037, TC-038, TC-039, TC-055, TC-056, TC-057, TC-058 | 확정 |
@@ -83,17 +84,28 @@
 | POL-026 | 검증 | R5 중복 SKU | REQ-007 | TC-079, TC-091 | 확정 |
 | POL-027 | 검증 | R6 서비스·구독 기간 불일치 | REQ-007 | TC-078, TC-085, TC-091 | 확정 |
 | POL-028 | 검증 | R7 미분류 | REQ-007 | TC-086 | 확정 |
-| POL-029 | 검증 | R8 EOS 조회·판정 | REQ-008, REQ-019 | TC-094, TC-095, TC-096, TC-097, TC-142, TC-143, TC-144, TC-145, TC-146, TC-157 | 확정 |
+| POL-029 | 검증 | R8 EOS 조회·판정 | REQ-008, REQ-019, REQ-033 | TC-094, TC-095, TC-096, TC-097, TC-142, TC-143, TC-144, TC-145, TC-146, TC-157, TC-167, TC-174, TC-175, TC-184 | 확정 |
 | POL-030 | 검증 | R9 벤더 파일 합계 불일치 | REQ-007 | TC-017, TC-087 | 확정 |
-| POL-031 | 검증 | AI 검토 권고 | REQ-009 | TC-090, TC-098, TC-099, TC-100, TC-101, TC-132 | 확정 |
-| POL-032 | 검증 | BoM 확정 조건 | REQ-011 | TC-080, TC-088, TC-098, TC-104, TC-105, TC-106, TC-107, TC-153 | 확정 |
-| POL-033 | 견적·출력 | 견적 생성·저장 조건 | REQ-016 | TC-108, TC-117, TC-118, TC-120, TC-122, TC-123, TC-124, TC-129, TC-130, TC-139, TC-155 | 확정 |
-| POL-034 | 견적·출력 | 원가 계산 | REQ-016, NFR-012 | TC-118, TC-119, TC-120, TC-121, TC-122, TC-130 | 확정 |
-| POL-035 | 견적·출력 | 환율·DC율 입력 | REQ-016 | TC-120, TC-125, TC-126, TC-127, TC-128 | 확정 |
-| POL-036 | 견적·출력 | 견적가·마진율 | REQ-017 | TC-118, TC-119, TC-129, TC-130, TC-134 | 확정 |
-| POL-037 | 견적·출력 | 고객 견적서 | REQ-018, REQ-009 | TC-132, TC-133, TC-134, TC-135, TC-136, TC-137, TC-138, TC-139, TC-156 | 확정 |
-| POL-038 | 견적·출력 | 원가분석표 | REQ-028 | TC-139, TC-140, TC-141 | 확정 |
+| POL-031 | 검증 | AI 검토 권고 | REQ-009 | TC-090, TC-098, TC-099, TC-100, TC-101, TC-132, TC-167 | 확정 |
+| POL-032 | 검증 | BoM 확정 조건 | REQ-011 | TC-080, TC-088, TC-098, TC-104, TC-105, TC-106, TC-107, TC-153, TC-163 | 확정 |
+| POL-033 | 견적·출력 | 견적 생성·저장 조건 | REQ-016 | TC-108, TC-117, TC-118, TC-120, TC-122, TC-123, TC-124, TC-129, TC-130, TC-139, TC-155, TC-166, TC-183 | 확정 |
+| POL-034 | 견적·출력 | 소비자가·원가 계산 | REQ-016, NFR-012 | TC-118, TC-119, TC-120, TC-121, TC-122, TC-130 | 확정 |
+| POL-035 | 견적·출력 | 환율·할인율·GP율 입력 | REQ-016 | TC-120, TC-125, TC-126, TC-128 | 확정 |
+| POL-036 | 견적·출력 | 공급단가·GP | REQ-017 | TC-118, TC-119, TC-129, TC-130, TC-134 | 확정 |
+| POL-037 | 견적·출력 | 고객 견적서 | REQ-018, REQ-009, REQ-030, REQ-032 | TC-132, TC-133, TC-134, TC-135, TC-136, TC-137, TC-138, TC-139, TC-156, TC-165, TC-166, TC-173, TC-185 | 확정 |
+| POL-038 | 견적·출력 | 원가분석표 — **폐지(CR-003, DEC-58)** | REQ-028(폐지) | TC-139, TC-140(삭제), TC-141 | 폐지 |
 | POL-039 | 견적·출력 | 표준 BoM·검증 리포트 xlsx | REQ-013, REQ-010 | TC-093, TC-113, TC-114 | 확정 |
+| POL-040 | 운영 | 환경설정 (관리자) | REQ-030, REQ-018, REQ-008, REQ-009, REQ-019 | TC-164, TC-165, TC-166, TC-167, TC-168, TC-169, TC-170 | 확정 |
+| POL-041 | 운영 | AI 사용량 집계·월 예산 | REQ-031, REQ-008, REQ-009 | TC-171, TC-172 | 확정 |
+| POL-042 | 견적·출력 | 내 견적서 기본값 | REQ-032, REQ-018 | TC-173 | 확정 |
+| POL-043 | 검증 | EOS 관리자 등록·캐시 관리 | REQ-033, REQ-008, REQ-019 | TC-174, TC-175 | 확정 |
+| POL-044 | 운영 | 감사 로그 조회·내보내기 | REQ-034, NFR-008 | TC-176, TC-186 | 확정 |
+| POL-045 | 운영 | 운영 통계·AI 권고 품질 지표 | REQ-035 | TC-177, TC-178, TC-187 | 확정 |
+| POL-046 | 운영 | 공지·점검 배너 | REQ-036 | TC-179 | 확정 |
+| POL-047 | 권한/등급 | 사용자 비활성화 | REQ-037, REQ-020 | TC-180 | 확정 |
+| POL-048 | 콘텐츠/데이터 | BoM 건 복제 | REQ-038 | TC-182 | 확정 |
+| POL-049 | 견적·출력 | 이전 버전 견적 가져오기 | REQ-039 | TC-183 | 확정 |
+| POL-050 | 검증 | EOS 여러 SKU 검색 | REQ-040, REQ-019 | TC-184 | 확정 |
 
 **정책을 두지 않은 REQ**: REQ-021 ~ REQ-027(P1·P2)은 PRD에서 규칙을 「2차 기획에서 정한다」로 남겨 두었다. 2차 기획 때 정책을 추가한다.
 
@@ -140,12 +152,14 @@
 - **위반/실패 시 처리**
   - 역할 미지정 사용자는 역할 대기 화면만 볼 수 있다(차단). 문구: 「역할이 지정되지 않았습니다. 관리자(CSD)가 역할을 지정하면 서비스를 이용할 수 있습니다.」 [로그아웃]
   - 역할 미지정 사용자가 API를 호출하면 HTTP 403과 `{"code":"ROLE_PENDING","message":"역할이 지정되지 않았습니다."}`를 반환한다.
-- **예외**: 배포 설정 `BOOTSTRAP_ADMIN_ACCOUNTS`에 적힌 Naver Works 계정은 처음 로그인할 때 「관리자」로 등록한다. 관리자가 한 명도 없으면 아무도 역할을 지정할 수 없기 때문이다. 이름·부서는 로그인할 때마다 Naver Works 값으로 갱신하되, 역할은 바꾸지 않는다.
+  - 비활성화된 사용자(POL-047)는 역할과 상관없이 로그인할 수 없다. 세션을 만들지 않고 로그인 화면에 「사용이 중지된 계정입니다. 관리자(CSD)에게 문의해 주세요.」를 표시하며, 로그인 실패로 기록한다(POL-011, CR-004).
+- **예외**: 배포 설정 `BOOTSTRAP_ADMIN_ACCOUNTS`에 적힌 Naver Works 계정은 처음 로그인할 때 「관리자」로 등록한다. 관리자가 한 명도 없으면 아무도 역할을 지정할 수 없기 때문이다. 이름·부서는 로그인할 때마다 Naver Works 값으로 갱신하되, 역할은 바꾸지 않는다. 역할 미지정 사용자도 공지·점검 배너(`GET /api/notice`, POL-046)는 본다.
 - **검증 의사코드**:
 
   ```js
   function onSsoCallback(nw, config) {
     let u = users.findByNwId(nw.id);
+    if (u?.disabledAt) return loginFail("disabled");           // POL-047 — ACCOUNT_DISABLED
     if (!u) {
       const role = config.BOOTSTRAP_ADMIN_ACCOUNTS.includes(nw.email) ? "관리자" : "역할 미지정";
       u = users.create({nwId: nw.id, name: nw.name, email: nw.email, dept: nw.dept ?? "", role, firstLoginAt: now()});
@@ -156,14 +170,14 @@
   }
   function checkPol002(user, req) {
     if (user.role !== "역할 미지정") return ok();
-    if (req.isApi && req.path !== "/auth/logout") return block("ROLE_PENDING", {status: 403});
+    if (req.isApi && !["/auth/logout", "/api/notice"].includes(req.path)) return block("ROLE_PENDING", {status: 403});
     return req.isApi ? ok() : showScreen("역할 대기");
   }
   ```
 
-- **관련 요구사항**: REQ-001, REQ-002, REQ-020
+- **관련 요구사항**: REQ-001, REQ-002, REQ-020, REQ-037
 - **관련 화면**: SCR-001, SCR-002, SCR-012
-- **관련 테스트**: TC-007, TC-008, TC-009, TC-021, TC-148
+- **관련 테스트**: TC-007, TC-008, TC-009, TC-021, TC-148, TC-180
 
 ## 2. 콘텐츠/데이터 정책
 
@@ -280,7 +294,7 @@
   - SKU를 1~2자로 입력하면 검색을 실행하지 않는다. 문구: 「SKU는 3자 이상 입력해 주세요.」
   - 시작일이 종료일보다 늦으면 검색을 실행하지 않는다. 문구: 「시작일이 종료일보다 늦습니다.」
   - 검색 조건이 있는데 결과가 0건이면: 「조건에 맞는 BoM이 없습니다.」
-  - 검색 조건 없이 목록이 0건이면: 「등록된 BoM이 없습니다.」 영업에게는 [새 BoM] 버튼을 함께 표시한다.
+  - 검색 조건 없이 목록이 0건이면: 「등록된 BoM이 없습니다.」 BoM 건을 만들 수 있는 역할(영업·관리자, POL-008)에게는 [새 BoM] 버튼을 함께 표시한다.
 - **예외**: 가격 필드는 검색 대상이 아니다(REQ-015). 정렬 기준이 같으면 BoM 건 ID 내림차순으로 정렬한다.
 - **검증 의사코드**:
 
@@ -313,11 +327,11 @@
 
 ### POL-007 다운로드 파일명
 
-- **규칙** (한 문장): 시스템이 만드는 파일의 이름은 `{고객사명}_{건명}_{종류}_v{버전}.{확장자}`다. 종류는 `BoM` / `검증리포트` / `견적서` / `원가분석표` 중 하나다.
+- **규칙** (한 문장): 시스템이 만드는 파일의 이름은 `{고객사명}_{건명}_{종류}_v{버전}.{확장자}`다. 종류는 `BoM` / `검증리포트` / `견적서` 중 하나다(`원가분석표`는 폐지 — CR-003, DEC-58).
 - **정제 규칙**: ① `\ / : * ? " < > |`와 제어 문자는 `_`로 바꾼다. ② 연속 공백은 한 칸으로 줄인다. ③ 고객사명·건명은 각각 앞뒤 공백과 끝의 마침표를 뺀 뒤 **최대 40자**로 자른다.
-- **적용 시점**: 표준 BoM·검증 리포트·고객 견적서·원가분석표 다운로드 응답의 `Content-Disposition` 헤더. 한글이 깨지지 않도록 `filename*=UTF-8''…` 형식으로 보낸다.
+- **적용 시점**: 표준 BoM·검증 리포트·고객 견적서 다운로드 응답의 `Content-Disposition` 헤더. 한글이 깨지지 않도록 `filename*=UTF-8''…` 형식으로 보낸다.
 - **위반/실패 시 처리**: 차단하지 않는다. 쓸 수 없는 문자는 규칙대로 바꾸며, 문구는 없다. 예: 고객사명 「A/S 센터」, 건명 「1:1 교체」, v2 → `A_S 센터_1_1 교체_BoM_v2.xlsx`
-- **예외**: 원본 벤더 파일은 업로드할 때의 파일명 그대로 내려준다. 한 버전에 견적이 여러 개여도 견적서 파일명은 같다(구분은 감사 로그의 견적 ID로 한다).
+- **예외**: 원본 벤더 파일은 업로드할 때의 파일명 그대로 내려준다. 한 버전에 견적이 여러 개여도 견적서 파일명은 같다(구분은 감사 로그의 견적 ID로 한다). Summary형 견적서도 종류는 `견적서`다. BoM 건에 속하지 않는 파일 — 감사 로그 CSV `감사로그_{YYYY-MM-DD}.csv`(POL-044), EOS 여러 SKU 검색 결과 `EOS검색_{벤더}_{YYYY-MM-DD}.xlsx`(POL-050) — 은 이 형식을 따르지 않는다(날짜는 KST 오늘).
 - **검증 의사코드**:
 
   ```js
@@ -331,13 +345,13 @@
   }
   ```
 
-- **관련 요구사항**: REQ-013, REQ-018, REQ-028
+- **관련 요구사항**: REQ-013, REQ-018
 - **관련 화면**: SCR-005, SCR-007, SCR-008, SCR-009, SCR-010
-- **관련 테스트**: TC-016, TC-048, TC-093, TC-113, TC-115, TC-134, TC-135, TC-140
+- **관련 테스트**: TC-016, TC-048, TC-093, TC-113, TC-115, TC-134, TC-135
 
 ## 3. 결제/과금 정책
 
-해당 없음 — 이 서비스에는 결제·과금 기능이 없다. 원가·견적가 계산은 [10장](#10-견적출력-정책)에서 정한다.
+해당 없음 — 이 서비스에는 결제·과금 기능이 없다. 원가·공급단가 계산은 [10장](#10-견적출력-정책)에서 정한다.
 
 ## 4. 알림 정책
 
@@ -348,9 +362,9 @@
 | 역할 | 설명 | 주요 권한 |
 |---|---|---|
 | 역할 미지정 | 처음 로그인한 사용자. 관리자가 역할을 지정하기 전 | 역할 대기 화면, 로그아웃 |
-| 영업 | BoM 건의 작성자 (40명) | 본인 BoM 건 생성·업로드·편집·검증·확정·새 버전, 본인 건의 가격·견적·견적서·원가분석표. 전사 BoM 조회, EOS 검색 |
+| 영업 | BoM 건의 작성자 (40명) | 본인 BoM 건 생성·복제·업로드·편집·검증·확정·새 버전, 본인 건의 가격·견적·견적서. 전사 BoM 조회, EOS 검색 |
 | 엔지니어 | 공유된 BoM의 조회자 (150명) | 전사 BoM 조회(가격 제외), 검증 리포트 조회·다운로드, 표준 BoM 다운로드, EOS 검색 |
-| 관리자 | CSD 담당자 | 엔지니어 권한 + 사용자 역할 관리. 가격·견적은 볼 수 없다 |
+| 관리자 | CSD 담당자 | 엔지니어 권한 + 사용자 역할 관리·비활성화, 환경설정, 감사 로그, 통계. 자기가 만든 BoM 건은 영업 작성자와 같은 권한이다(DEC-62, CR-004). 남의 BoM 건의 가격·견적은 볼 수 없다 |
 
 ### POL-008 역할별 기능 권한
 
@@ -361,58 +375,63 @@
 | BoM 목록·상세·버전 비교 조회 (가격 제외) | `GET /api/boms`, `GET /api/boms/{id}` | ○ | ○ | ○ |
 | 검증 리포트 조회·xlsx 다운로드 | `GET /api/validations/{id}` | ○ | ○ | ○ |
 | 표준 BoM xlsx 다운로드 | `GET /api/versions/{id}/bom.xlsx` | ○ | ○ | ○ |
-| SKU EOS 단건 검색 | `GET /api/eos?vendor=&sku=` | ○ | ○ | ○ |
-| BoM 건 생성 | `POST /api/boms` | ○ | × | × |
-| 업로드·편집·검증 실행·확인함·확정·새 버전·BoM 건 삭제 | `POST/PUT/DELETE /api/boms/{id}/…` | 작성자만 | × | × |
-| 원본 벤더 파일 다운로드 | `GET /api/files/{id}` | 작성자만 | × | × |
-| 가격 정보·견적·견적서·원가분석표 | `/api/quotes/…` | 작성자만 | × | × |
-| 사용자 역할 관리 | `/api/users/…` | × | × | ○ |
+| SKU EOS 단건·여러 SKU 검색 (POL-050) | `GET /api/eos?vendor=&sku=`, `POST /api/eos/bulk.xlsx` | ○ | ○ | ○ |
+| 공지·점검 배너 조회 (POL-046) | `GET /api/notice` | ○ | ○ | ○ |
+| BoM 건 생성·복제 (POL-048) | `POST /api/boms`, `POST /api/boms/{id}/clone` | ○ | × | ○ |
+| 업로드·편집·검증 실행·확인함·확정·새 버전·BoM 건 삭제 | `POST/PUT/DELETE /api/boms/{id}/…` | 작성자만 | × | 작성자만 |
+| 원본 벤더 파일 다운로드 | `GET /api/files/{id}` | 작성자만 | × | 작성자만 |
+| 가격 정보·견적·견적서 | `/api/quotes/…`, `/api/versions/{id}/quotes` | 작성자만 | × | 작성자만 |
+| 사용자 역할 관리·비활성화 (POL-010, POL-047) | `/api/users/…` | × | × | ○ |
+| 환경설정 — 견적서 회사 정보·CI, 견적 기본값·문구, AI·EOS, AI 사용량·월 예산, EOS 관리, 공지·점검 (POL-040 ~ 043, 046) | `/api/settings/…` | × | × | ○ |
+| 감사 로그 조회·CSV (POL-044) | `GET /api/audit`, `GET /api/audit.csv` | × | × | ○ |
+| 통계 (POL-045) | `GET /api/stats` | × | × | ○ |
 
-- 「작성자만」은 **역할이 영업이고** BoM 건의 작성자일 때다. 작성자의 역할이 엔지니어로 바뀌면 그 사용자는 자기 건의 가격·견적도 볼 수 없다.
+- 「작성자만」은 **작성자 역할(영업·관리자)이고** BoM 건의 작성자일 때다(DEC-62, CR-004). 작성자의 역할이 엔지니어·역할 미지정으로 바뀌면 그 사용자는 자기 건의 가격·견적도 볼 수 없다.
 - **적용 시점**: 모든 API 요청(서버 미들웨어), 화면 렌더링(메뉴·버튼 표시 여부)
 - **위반/실패 시 처리**
   - 권한이 없는 기능의 메뉴·버튼은 화면에 표시하지 않는다.
   - 권한 없이 API를 호출하면 차단한다. HTTP 403 `{"code":"FORBIDDEN","message":"이 기능을 사용할 권한이 없습니다."}`
   - 권한 없는 화면 URL로 직접 들어오면 「이 기능을 사용할 권한이 없습니다.」와 [BoM 목록으로]를 표시한다.
-- **예외**: 없다. 관리자도 BoM 편집과 가격 조회는 할 수 없다. 역할 미지정 사용자는 POL-002를 따른다.
+- **예외**: 없다. 관리자도 남이 만든 BoM 건은 편집할 수 없고 가격·견적을 볼 수 없다. 환경설정·감사 로그·통계 화면은 가격·견적 값을 보여주지 않는다. 역할 미지정 사용자는 POL-002를, 비활성화된 사용자는 POL-047을 따른다.
 - **검증 의사코드**:
 
   ```js
+  const AUTHOR_ROLES = ["영업", "관리자"];          // DEC-62 — 관리자도 자기가 만든 BoM 은 작성자
   const MATRIX = {
     READ_BOM: ["영업", "엔지니어", "관리자"], READ_VALIDATION: ["영업", "엔지니어", "관리자"],
     DOWNLOAD_BOM: ["영업", "엔지니어", "관리자"], EOS_SEARCH: ["영업", "엔지니어", "관리자"],
-    CREATE_BOM: ["영업"], EDIT_BOM: ["영업*"], DOWNLOAD_ORIGINAL: ["영업*"], QUOTE: ["영업*"],
-    MANAGE_USERS: ["관리자"],
-  }; // "영업*" = 영업이면서 작성자
+    CREATE_BOM: AUTHOR_ROLES, EDIT_BOM: ["작성자"], DOWNLOAD_ORIGINAL: ["작성자"], QUOTE: ["작성자"],
+    MANAGE_USERS: ["관리자"], MANAGE_SETTINGS: ["관리자"], VIEW_AUDIT: ["관리자"], VIEW_STATS: ["관리자"],
+  }; // "작성자" = 작성자 역할(영업·관리자)이면서 그 BoM 건의 작성자
   function authorize(user, action, bom) {
     const role = users.get(user.id).role;             // 매 요청 DB 조회 (POL-010)
     const allowed = MATRIX[action];
     if (allowed.includes(role)) return ok();
-    if (allowed.includes("영업*") && role === "영업" && bom?.authorId === user.id) return ok();
+    if (allowed.includes("작성자") && AUTHOR_ROLES.includes(role) && bom?.authorId === user.id) return ok();
     return block("FORBIDDEN", {status: 403});
   }
   ```
 
-- **관련 요구사항**: REQ-002, NFR-005
-- **관련 화면**: SCR-003, SCR-005, SCR-007, SCR-009, SCR-012, SCR-013 (메뉴·버튼 표시는 전 화면 GNB)
-- **관련 테스트**: TC-011, TC-012, TC-013, TC-014, TC-016, TC-048, TC-076, TC-107, TC-112, TC-151, TC-159
+- **관련 요구사항**: REQ-002, NFR-005, REQ-030, REQ-034, REQ-035
+- **관련 화면**: SCR-003, SCR-005, SCR-007, SCR-009, SCR-012, SCR-013, SCR-014, SCR-015, SCR-016 (메뉴·버튼 표시는 전 화면 GNB)
+- **관련 테스트**: TC-011, TC-012, TC-013, TC-014, TC-016, TC-048, TC-076, TC-107, TC-112, TC-151, TC-159, TC-164, TC-176, TC-177, TC-181, TC-182
 
 ### POL-009 작성자 전용 정보(가격·견적)
 
-- **규칙** (한 문장): 가격 정보(통화·List 단가·List 금액·할인율·벤더 Net 금액)와 견적 정보(환율·DC율·마진율·원가·견적가·견적서·원가분석표)는 BoM 건 작성자(역할 영업)에게만 보낸다. 그 밖의 사용자에게는 가려진 값이 아니라 **필드 자체를 빼고** 응답한다.
+- **규칙** (한 문장): 가격 정보(통화·List 단가·List 금액·할인율·벤더 Net 금액)와 견적 정보(환율·할인율·매입 DC율·목표 GP율·판매단가·매입단가·소비자가·원가·공급단가·GP·견적서)는 BoM 건 작성자(작성자 역할 영업·관리자, POL-008)에게만 보낸다. 그 밖의 사용자에게는 가려진 값이 아니라 **필드 자체를 빼고** 응답한다.
 - **적용 시점**: BoM 상세·행 목록·버전 비교·검증 결과 조회 API의 응답 직렬화, 견적 API, 원본 벤더 파일 다운로드(가격형 CCW·Dell 원본에는 가격이 들어 있다)
 - **위반/실패 시 처리**
   - 작성자가 아니면 가격 필드를 응답에서 제거한다. 값이 `null`인 키로도 보내지 않는다. 화면에는 가격 열과 견적 탭이 없다.
-  - 견적·견적서·원가분석표·원본 파일 API는 차단한다. HTTP 403 「이 기능을 사용할 권한이 없습니다.」
+  - 견적·견적서·원본 파일 API는 차단한다. HTTP 403 「이 기능을 사용할 권한이 없습니다.」
   - R4·R9 판정의 금액 상세(POL-025, POL-030)도 작성자에게만 보낸다.
-- **예외**: 없다(관리자 포함). 표준 BoM xlsx와 검증 리포트 xlsx에는 작성자가 받더라도 가격이 들어가지 않는다(POL-039). 감사 로그에도 금액을 쓰지 않는다(POL-011).
+- **예외**: 없다(남의 BoM 건이면 관리자 포함). 표준 BoM xlsx와 검증 리포트 xlsx에는 작성자가 받더라도 가격이 들어가지 않는다(POL-039). 감사 로그에도 금액을 쓰지 않는다(POL-011). BoM 건 복제는 원본 작성자가 아니면 가격 정보·원본 파일을 복사하지 않는다(POL-048).
 - **검증 의사코드**:
 
   ```js
   const PRICE_FIELDS = ["currency", "listUnitPrice", "listAmount", "discountRate", "vendorNetAmount"];
   function serializeRow(row, viewer, bom) {
     const out = {...row};
-    if (!(viewer.role === "영업" && bom.authorId === viewer.id)) for (const f of PRICE_FIELDS) delete out[f];
+    if (!(AUTHOR_ROLES.includes(viewer.role) && bom.authorId === viewer.id)) for (const f of PRICE_FIELDS) delete out[f]; // POL-008
     return out;
   }
   // 테스트 기준: 비작성자 응답 JSON에서 PRICE_FIELDS 중 어떤 키도 존재하지 않아야 한다 (!("listAmount" in row))
@@ -420,7 +439,7 @@
 
 - **관련 요구사항**: REQ-015, NFR-005
 - **관련 화면**: SCR-005, SCR-007, SCR-008, SCR-009, SCR-013
-- **관련 테스트**: TC-013, TC-015, TC-016, TC-017, TC-028, TC-084, TC-087, TC-111, TC-116, TC-159
+- **관련 테스트**: TC-013, TC-015, TC-016, TC-017, TC-028, TC-084, TC-087, TC-111, TC-116, TC-159, TC-181, TC-182
 
 ### POL-010 역할 변경
 
@@ -429,9 +448,9 @@
 - **위반/실패 시 처리**
   - 선택한 사용자가 0명이면 [역할 지정] 버튼이 비활성이다.
   - 선택에 자기 자신이 들어 있고 새 역할이 관리자가 아니면, 요청 전체를 차단한다(일부만 반영하지 않음). 문구: 「자신의 관리자 역할은 해제할 수 없습니다. 선택 목록에서 본인을 빼 주세요.」
-  - 성공하면: 「{n}명의 역할을 변경했습니다: {역할}」
+  - 성공하면: 「{n}명의 역할을 변경했습니다: {role}」
   - 역할이 바뀐 사용자마다 변경자·일시·이전 역할·새 역할을 기록한다(POL-011).
-- **예외**: 이전 역할과 새 역할이 같은 사용자는 기록하지 않고 {n}에서도 뺀다. 역할은 세션에 캐시하지 않고 요청마다 DB에서 읽는다. 역할이 바뀌어도 그 사용자가 작성한 BoM 건은 그대로 남는다(OI-10).
+- **예외**: 이전 역할과 새 역할이 같은 사용자는 기록하지 않고 {n}에서도 뺀다. 역할은 세션에 캐시하지 않고 요청마다 DB에서 읽는다. 역할이 바뀌어도 그 사용자가 작성한 BoM 건은 그대로 남는다(OI-10). 비활성화(POL-047)는 역할 변경과 별개다 — 비활성화해도 역할은 그대로이고, 다시 활성화하면 그 역할로 쓴다.
 - **검증 의사코드**:
 
   ```js
@@ -451,7 +470,7 @@
 
 - **관련 요구사항**: REQ-020
 - **관련 화면**: SCR-012
-- **관련 테스트**: TC-014, TC-019, TC-020, TC-021, TC-022, TC-158
+- **관련 테스트**: TC-014, TC-019, TC-020, TC-021, TC-022, TC-158, TC-180
 
 ## 6. 운영/어뷰징 정책
 
@@ -463,16 +482,20 @@
 
 | 사건 | 대상 ID |
 |---|---|
-| 로그인 성공·실패, 로그아웃 | 사용자 |
+| 로그인 성공·실패(실패 사유 포함 — 비활성 계정 등), 로그아웃 | 사용자 |
 | 역할 변경 (이전·새 역할 포함) | 사용자 |
-| BoM 건 생성·삭제, 파일 업로드 | BoM 건, 파일 |
+| 사용자 비활성화·다시 활성화 (POL-047) | 사용자 |
+| BoM 건 생성·삭제, 파일 업로드. 복제로 만든 건(POL-048)은 생성 기록에 원본 BoM 건·버전·가격 복사 여부를 함께 남긴다 | BoM 건, 파일 |
 | 새 버전 생성, 확정, 「확인함」 체크·해제, 「AI 검토 없이 확정」 | 버전, 검증 결과 |
-| 견적 생성·저장 | 견적 |
-| 모든 다운로드 — 표준 BoM, 검증 리포트, 고객 견적서(양식·형식 포함), 원가분석표, 원본 벤더 파일 | 버전·검증 결과·견적·파일 |
+| 견적 생성·저장. 이전 버전 견적에서 만든 견적(POL-049)은 원본 견적 ID·옮긴 행 수·못 옮긴 행 수를 함께 남긴다 | 견적 |
+| 모든 다운로드 — 표준 BoM, 검증 리포트, 고객 견적서(양식·형식 포함), 원본 벤더 파일, 감사 로그 CSV(거른 조건·건수, POL-044), EOS 여러 SKU 검색 결과 xlsx(벤더·건수, POL-050). 원가분석표는 폐지(CR-003) | 버전·검증 결과·견적·파일 |
+| 환경설정 변경(바뀐 항목 이름만, 값은 남기지 않음) — 견적서 회사 정보, CI 올리기·되돌리기, 견적 기본값·문구, AI·EOS, AI 월 예산, 공지·점검, EOS 캐시 비우기(범위·지운 건수), EOS 관리자 등록·수정·삭제(벤더·키) (POL-040 ~ 043, 046) | 설정 키 |
+
+- 「확인함」 일괄 체크·해제(POL-032)는 **상태가 바뀐 항목마다** 낱건 체크와 같은 형식으로 한 줄씩 남기고, 일괄 여부(`bulk`)를 함께 기록한다. 거부된 일괄 요청은 실패 1줄(대상 건수 포함)을 남긴다(CR-001).
 
 - **적용 시점**: 표의 사건을 처리하는 API가 끝나는 시점(성공과 실패 모두)
 - **위반/실패 시 처리**: 다운로드 요청에서 감사 로그를 쓰지 못하면 다운로드도 차단한다. HTTP 500과 문구 「요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.」 나머지 사건은 처리를 끝내고 기록 실패를 서버 오류 로그에 남긴다.
-- **예외**: 목록·상세 조회는 기록하지 않는다. 로그에는 금액·가격 값을 쓰지 않는다(POL-009). **보관 기간은 미정이다(OI-12)** — MVP는 삭제 기능 없이 모두 보관하고, 2차 착수 전에 정한다(D-36). MVP에는 감사 로그 조회 화면이 없다.
+- **예외**: 목록·상세 조회는 기록하지 않는다(감사 로그·AI 사용량·통계 조회 포함). 로그에는 금액·가격 값을 쓰지 않는다(POL-009). **보관 기간은 미정이다(OI-12)** — MVP는 삭제 기능 없이 모두 보관하고, 2차 착수 전에 정한다(D-36). 관리자는 감사 로그 화면(SCR-015)에서 조회하고 CSV로 내보낼 수 있다(POL-044, CR-004).
 - **검증 의사코드**:
 
   ```js
@@ -492,9 +515,9 @@
   // 다운로드 핸들러는 mandatory: true
   ```
 
-- **관련 요구사항**: NFR-008
-- **관련 화면**: 해당 없음
-- **관련 테스트**: TC-003, TC-006, TC-019, TC-023, TC-036, TC-048, TC-093, TC-104, TC-106, TC-107, TC-108, TC-112, TC-113, TC-116, TC-118, TC-134, TC-140, TC-156
+- **관련 요구사항**: NFR-008, REQ-034
+- **관련 화면**: SCR-015
+- **관련 테스트**: TC-003, TC-006, TC-019, TC-023, TC-036, TC-048, TC-093, TC-104, TC-106, TC-107, TC-108, TC-112, TC-113, TC-116, TC-118, TC-134, TC-156, TC-163, TC-165, TC-166, TC-168, TC-174, TC-175, TC-176, TC-180, TC-182, TC-184
 
 ## 7. 법적/개인정보 정책
 
@@ -503,12 +526,12 @@
 - **규칙** (한 문장): LLM은 사내 승인 클라우드 LLM(기업 계약, 학습 미사용)만 호출한다. LLM 입력에는 **구성 필드만** 넣는다. 가격 정보·견적 정보·고객사명·건명·사용자 개인정보는 넣지 않는다.
 - **전송 필드**
   - AI 검토 권고(REQ-009): 행 번호, 벤더, 행 유형, 상위 행 번호, 구분, 모듈명, SKU, 품명, 수량, 서비스·구독 기간, 구독 정보
-  - EOS AI 검색(REQ-008·019, Cisco·Dell 공통 — D-38): SKU, 품명, 모듈명. 단건 검색(REQ-019)은 입력한 SKU만
+  - EOS AI 검색(REQ-008·019, Cisco·Dell 공통 — D-38): SKU, 품명, 모듈명. 검증의 Dell 조회는 제품 품명만(DEC-56, POL-029). 단건·여러 SKU 검색(REQ-019·040)은 입력한 SKU만
 - **근거**: D-11은 전송 범위를 제한하지 않는다. 다만 호환성·누락·불필요 항목 판단에 가격과 고객사명은 필요 없다. 그래서 이 범위로 좁혔고(D-34), 구성 정보 전송은 허용으로 확정했다(D-37, OI-13 해결).
 - **적용 시점**: LLM API를 호출하기 직전(서버의 LLM 클라이언트 한 곳에서 검사)
 - **위반/실패 시 처리**: 입력에 허용 목록 밖의 필드가 있으면 호출하지 않고 차단한다. 서버 오류 로그에 기록하고, 해당 단계는 실패로 처리한다. 사용자에게는 AI 검토 실패 문구(POL-031) 또는 EOS 「확인 불가」(POL-029)가 표시된다.
-- **기록**: LLM 요청·응답 원문을 검증 결과 ID와 함께 저장한다. 보관 기간은 해당 검증 결과와 같다(BoM 건을 삭제하면 함께 삭제). 화면에서는 조회할 수 없고, 사후 추적용으로 DB에만 남긴다.
-- **예외**: 사내 보안 정책이 바뀌어 전송 범위가 달라지면 이 정책의 전송 필드만 고친다.
+- **기록**: LLM 요청·응답 원문을 검증 결과 ID와 함께 저장한다. 보관 기간은 해당 검증 결과와 같다(BoM 건을 삭제하면 함께 삭제). 화면에서는 조회할 수 없고, 사후 추적용으로 DB에만 남긴다. 사용량 집계(토큰·횟수·모델·사용자, 원문 없음)는 BoM 건을 지워도 보관한다(POL-041, CR-002).
+- **예외**: 사내 보안 정책이 바뀌어 전송 범위가 달라지면 이 정책의 전송 필드만 고친다. 환경설정의 [연결 테스트](POL-040)는 고정 예시 품목 1건(Cisco `C9300-48UXM-A`)만 보내고 고객 데이터를 보내지 않으며, 같은 전송 필드 검사를 거친다. 호출 기록은 검증 결과 없이 남긴다.
 - **검증 의사코드**:
 
   ```js
@@ -523,20 +546,20 @@
   }
   ```
 
-- **관련 요구사항**: REQ-009, REQ-008, NFR-007
+- **관련 요구사항**: REQ-009, REQ-008, NFR-007, REQ-031
 - **관련 화면**: 해당 없음
-- **관련 테스트**: TC-094, TC-095, TC-098, TC-102, TC-103, TC-143
+- **관련 테스트**: TC-094, TC-095, TC-098, TC-102, TC-103, TC-143, TC-168, TC-171
 
 ### POL-013 사용자 정보 수집·보관 [미확정]
 
-- **규칙** (한 문장): 사용자 정보는 Naver Works가 주는 이름·계정(메일)·부서와, 시스템이 기록하는 최초·최근 로그인 일시만 저장한다. 그 밖의 개인정보는 수집하지 않는다.
+- **규칙** (한 문장): 사용자 정보는 Naver Works가 주는 이름·계정(메일)·부서와, 시스템이 기록하는 최초·최근 로그인 일시·비활성화 일시(POL-047, DEC-63)와, 작성자가 견적서 다운로드 창에서 직접 저장한 **내 견적서 기본값**(담당자 연락처 — 본인 전화번호, 부 담당자 이름·전화번호·메일 — 와 하자 보증기간·납기·결제조건, POL-042)만 저장한다. 그 밖의 개인정보는 수집하지 않는다. 내 기본값은 본인만 보고 바꾼다.
 - **적용 시점**: SSO 콜백(POL-002), 사용자 목록 화면
 - **위반/실패 시 처리**: Naver Works 응답에 계정 ID·이름·메일 중 하나라도 없으면 로그인을 실패로 처리하고 세션을 만들지 않는다. 문구: 「Naver Works 계정 정보를 받지 못했습니다. 관리자에게 문의해 주세요.」
 - **예외**: 부서가 없으면 빈 값으로 저장한다. Naver Works 계정이 비활성화된 사용자(퇴사자 등)는 로그인할 수 없지만, BoM 작성자 표시를 위해 사용자 정보는 남긴다. **보관·파기 기간은 미정이다(OI-12)** — MVP는 삭제하지 않고 보관하며, 2차 착수 전에 정한다(D-36).
 - **검증 의사코드**:
 
   ```js
-  const USER_FIELDS = ["nwId", "name", "email", "dept", "role", "firstLoginAt", "lastLoginAt"];
+  const USER_FIELDS = ["nwId", "name", "email", "dept", "role", "firstLoginAt", "lastLoginAt", "disabledAt", "docDefaults"];
   function checkPol013(nw) {
     if (!nw.id || !nw.name || !nw.email) return block("MSG_NW_PROFILE_MISSING");
     return ok(); // 저장 스키마는 USER_FIELDS 외 컬럼을 두지 않는다
@@ -909,7 +932,7 @@
 
 - **규칙** (한 문장): 작성자가 작성중 버전에서 [검증]을 누르면 그 시점의 내용(수정 번호)을 기준으로 ① 고정 규칙 R1 ~ R7·R9 → ② EOS 조회 R8 → ③ AI 검토 권고 순서로 실행한다. 판정은 한 건마다 규칙 ID·등급·대상 행·대상 필드·문구를 갖는다.
 - **등급**: `오류`(확정 차단) / `경고`(「확인함」 후 확정 가능) / `검토 권고`(AI, 「확인함」 후 확정 가능)
-- **진행 표시**: 「고정 규칙 검사 중」 → 「EOS 조회 중 ({완료}/{전체})」 → 「AI 검토 중」. 단계별 시간 한도는 NFR-003을 따른다. EOS 120초·AI 90초를 넘기면 각 정책의 실패 처리를 따른다(POL-029, POL-031).
+- **진행 표시**: 「고정 규칙 검사 중」 → 「EOS 조회 중 ({완료}/{전체})」 → 「AI 검토 중」. 단계별 시간 한도는 NFR-003을 따른다. EOS·AI 시간 한도(기본 120초·90초, 관리자 설정 — POL-040)를 넘기면 각 정책의 실패 처리를 따른다(POL-029, POL-031).
 - **결과 기록**: 검증 ID, 대상 버전, 대상 수정 번호, 시작·완료 일시, 판정 목록, AI 단계 상태(성공/실패)
 - **정렬**: 등급(오류 → 경고 → 검토 권고) → 행 번호 → 규칙 ID. 화면 목록과 xlsx 리포트는 같은 순서다(REQ-010).
 - **최신성**: 검증이 끝났을 때 버전의 수정 번호가 검증 시작 때와 같으면 `검증 완료`다. 다르면(검증 중에 저장됨) `재검증 필요`다. 검증 뒤에 저장하면 `재검증 필요`가 된다(POL-005).
@@ -927,9 +950,10 @@
     if (version.rows.length === 0) return block("MSG_NO_ROWS_TO_VALIDATE");
     if (version.validationRunning) return block("MSG_VALIDATION_RUNNING");
     const rev = version.revision, prev = version.latestValidation;
+    const cfg = readSetting("llm", envDefaults(), checkLlm);          // 시작할 때 한 번 (POL-040)
     const findings = [...fixedRules(version.rows)];                  // R1~R7, R9
-    findings.push(...await eosRule(version.rows, {timeoutSec: 120})); // R8
-    const ai = await aiReview(version.rows, {timeoutSec: 90});        // {ok, recommendations}
+    findings.push(...await eosRule(version.rows, {timeoutSec: cfg.eosTimeoutSec})); // R8 (기본 120)
+    const ai = await aiReview(version.rows, {timeoutSec: cfg.aiTimeoutSec});        // {ok, recommendations} (기본 90)
     for (const f of findings) {
       const same = prev?.findings.find(p => p.rule === f.rule && p.rowId === f.rowId && p.field === f.field && p.message === f.message);
       if (same?.ackBy) Object.assign(f, {ackBy: same.ackBy, ackAt: same.ackAt});
@@ -1119,7 +1143,7 @@
 
 ### POL-029 R8 EOS 조회·판정
 
-- **규칙** (한 문장): 검증할 때 표준 BoM의 개별 SKU마다 EOS를 조회해 상태를 붙인다. MVP의 조회 방식은 **Cisco·Dell 모두 AI 웹 검색**이고(D-19, D-38), 판정 등급은 아래 표를 따른다.
+- **규칙** (한 문장): 검증할 때 표준 BoM의 조회 단위(Cisco는 개별 SKU, Dell은 제품 품명 — DEC-56)마다 EOS를 조회해 상태를 붙인다. MVP의 조회 방식은 **Cisco·Dell 모두 AI 웹 검색**이고(D-19, D-38), 관리자 등록값(POL-043)이 있으면 그것을 캐시·AI 검색보다 먼저 쓴다. 판정 등급은 아래 표를 따른다.
 
 | EOS 상태 | 조건 | 판정 (Cisco·Dell 공통) |
 |---|---|---|
@@ -1129,56 +1153,83 @@
 | 확인 불가 | AI 검색 실패·시간 초과, 결과에 유효한 출처 없음, AI가 SKU를 찾지 못함 | 경고 |
 
 - **P1 (REQ-029)**: Cisco EoX API를 연동하면 Cisco만 API로 조회한다. 그때 Cisco 「판매 종료」는 **오류**이고, API가 정상 응답했는데 레코드가 없으면 「판매중」이다(D-28). 레코드 없음과 잘못된 PID의 구분은 API 계정을 확보한 뒤 정한다.
-- **조회 단위**: 개별 SKU다. Dell 쉼표 목록은 나누어 조회하고, 중복 SKU는 한 번만 조회한다. SKU가 없는 행(Dell 상위 품목·하위 제품)은 조회하지 않는다. 행의 EOS 상태는 그 행 SKU들 중 가장 나쁜 상태다. 나쁜 순서: 판매 종료 > EoS 예정 > 확인 불가 > 판매중.
+- **조회 단위** (DEC-56, CR-003)
+  - Cisco: 개별 SKU다. 중복 SKU는 한 번만 조회한다. 행의 EOS 상태는 그 행 SKU들 중 가장 나쁜 상태다. 나쁜 순서: 판매 종료 > EoS 예정 > 확인 불가 > 판매중.
+  - Dell: 구성품 SKU는 조회하지 않고 **제품 품명**으로 조회한다. 하위 제품이 있으면 하위 제품 품명, 없으면(서버) 상위 품목 품명의 「/」 뒤 제품명이다(예: `4. GPU 서버 / PowerEdge XE7740` → `PowerEdge XE7740`). 하위 제품이 있는 상위 품목은 조회하지 않는다. 같은 품명은 한 번만 조회한다.
+  - Dell 구성품 행은 소속 제품(가장 가까운 하위 제품, 없으면 상위 품목)의 EOS 상태를 이어받고, R8 판정은 **제품 행에만 1건** 붙는다.
+  - 단건·여러 SKU 검색(REQ-019·040)은 Cisco·Dell 모두 입력한 SKU로 조회한다.
 - **검증일**: 검증을 시작한 시각의 KST 날짜
 - **AI 검색 결과 형식** (LLM 응답 JSON, 입력 필드는 POL-012): `{status: "ON_SALE"|"EOS_ANNOUNCED"|"END_OF_SALE"|"NOT_FOUND", eosAnnounceDate, endOfSaleDate, ldosDate, replacementSku, sourceUrls: []}`
-  - **유효한 출처**: `https://`로 시작하고 호스트가 그 벤더의 공식 도메인이거나 그 하위 도메인인 URL. Cisco는 `cisco.com`, Dell은 `dell.com`·`delltechnologies.com`이다(D-35, D-38). 유효한 출처가 없으면 결과와 상관없이 「확인 불가」다.
+  - **AI 검색 호출**: SKU(품명)당 웹 검색 횟수는 기본 3회이고, 시간 한도·모델·생각 강도와 함께 관리자가 바꿀 수 있다(POL-040). 설정은 검증·단건 검색을 시작할 때 한 번 읽는다.
+  - **유효한 출처** (DEC-57, CR-003): `https://`로 시작하고 호스트가 그 벤더의 공식 도메인 또는 참고 사이트이거나 그 하위 도메인인 URL. 공식 도메인은 Cisco `cisco.com`, Dell `dell.com`·`delltechnologies.com`이고(D-35, D-38), 참고 사이트는 `router-switch.com`(EOL/EOSL 자료)이다. 같은 목록을 웹 검색 허용 도메인으로도 쓰며, AI에는 공식 사이트를 먼저 보게 한다. 유효한 출처가 없으면 결과와 상관없이 「확인 불가」다. 관리자 등록값(POL-043)은 관리자가 확인한 근거이므로 도메인을 검사하지 않는다.
   - 날짜가 있으면 날짜로 상태를 정한다(`status`와 날짜가 어긋나면 날짜가 우선).
-- **캐시**: 키는 (벤더, 대문자 SKU)이고, 유효 기간은 **7일**이다. 「확인 불가」 결과는 캐시하지 않는다. 단건 검색(REQ-019)의 [다시 조회]는 캐시를 쓰지 않고 새로 조회한 뒤 캐시를 갱신한다.
+- **조회 순서**: 관리자 등록값(POL-043, 만료 없음) → 캐시 → AI 검색.
+- **캐시**: 키는 (벤더, 대문자 SKU)이고, Dell 품명 조회는 (벤더, `PRODUCT:` + 대문자 품명)이다. 유효 기간은 **7일**이다. 「확인 불가」 결과는 캐시하지 않는다 — 단 「확인 불가(SKU를 찾지 못함)」은 7일 캐시한다(DEC-37: 찾지 못한 SKU 를 재검증마다 다시 찾느라 드는 토큰을 막는다). 호출 실패·시간 초과·출처 없음은 캐시하지 않는다. 단건 검색(REQ-019)의 [다시 조회]는 캐시를 쓰지 않고 새로 조회한 뒤 캐시를 갱신한다(관리자 등록값이 있으면 그대로 쓰고 AI를 부르지 않는다). 관리자가 SCR-014에서 전체·벤더·고른 항목 단위로 비울 수 있고, 비워도 관리자 등록값은 남는다(POL-040, POL-043).
 - **표시 문구** (판정·단건 검색 공통, Cisco·Dell 공통)
-  - 판매중: 「판매중 (AI 검색 결과 — 틀릴 수 있습니다, 출처: {URL})」
-  - EoS 예정: 「EoS 예정 — End-of-Sale {날짜}, LDoS {날짜} (출처: {URL})」
-  - 판매 종료: 「판매 종료로 보입니다 (AI 검색 결과 — 틀릴 수 있습니다) — End-of-Sale {날짜}, LDoS {날짜} (출처: {URL})」
-  - 확인 불가: 「EOS 정보를 확인하지 못했습니다 — {사유}」. 사유는 「AI 검색 응답 없음」·「조회 시간 초과」·「AI 검색 결과에 출처가 없음」·「SKU를 찾지 못함」 중 하나다.
-  - 대체 SKU가 있으면 끝에 「 · 대체 제품: {SKU}」를 붙인다. 모든 결과에 조회 일시와 「AI 검색 결과」 표시를 함께 보여준다. 값이 없는 날짜는 그 항목을 빼고 표시한다. 출처 URL이 여러 개면 첫 번째 유효한 URL을 쓴다.
-- **적용 시점**: 검증 ② 단계(REQ-008), SKU EOS 단건 검색 `GET /api/eos?vendor=&sku=`(REQ-019)
+  - 판매중: 「판매중 (AI 검색 결과 — 틀릴 수 있습니다, 출처: {url})」
+  - EoS 예정: 「EoS 예정 — {dates} (출처: {url})」
+  - 판매 종료: 「판매 종료로 보입니다 (AI 검색 결과 — 틀릴 수 있습니다) — {dates} (출처: {url})」
+  - `{dates}`는 「End-of-Sale {date}」와 「LDoS {date}」를 「, 」로 이은 것이다. 값이 없는 날짜는 그 항목을 뺀다.
+  - 관리자 등록값(POL-043): 「판매중 (관리자 등록, 출처: {url})」 / 「EoS 예정 — {dates} (관리자 등록, 출처: {url})」 / 「판매 종료 — {dates} (관리자 등록, 출처: {url})」
+  - 확인 불가: 「EOS 정보를 확인하지 못했습니다 — {reason}」. 사유는 「AI 검색 응답 없음」·「조회 시간 초과」·「AI 검색 결과에 출처가 없음」·「SKU를 찾지 못함」 중 하나다.
+  - 대체 SKU가 있으면 끝에 「 · 대체 제품: {sku}」를 붙인다. 모든 결과에 조회 일시와 「AI 검색 결과」 표시(관리자 등록값은 「관리자 등록」)를 함께 보여준다. 출처 URL이 여러 개면 첫 번째 유효한 URL을 쓴다.
+- **적용 시점**: 검증 ② 단계(REQ-008), SKU EOS 단건 검색 `GET /api/eos?vendor=&sku=`(REQ-019), 여러 SKU 검색(REQ-040, POL-050)
 - **위반/실패 시 처리**
-  - 검증: 표의 등급으로 판정한다. 120초 안에 끝나지 않은 SKU는 「확인 불가(조회 시간 초과)」로 판정하고, 나머지 검증은 끝까지 진행한다.
-  - 단건 검색 입력 오류: 벤더를 고르지 않으면 「벤더를 선택해 주세요.」, SKU가 비었거나 쉼표가 있으면 「SKU를 하나만 입력해 주세요.」, 형식이 R3와 맞지 않으면 「{벤더} SKU 형식이 아닙니다.」
+  - 검증: 표의 등급으로 판정한다. 시간 한도(기본 120초, POL-040) 안에 끝나지 않은 SKU(품명)는 「확인 불가(조회 시간 초과)」로 판정하고, 나머지 검증은 끝까지 진행한다. 관리자가 AI 호출을 껐거나 서버 설정이 꺼 두었으면 관리자 등록값·캐시가 없는 조회는 「확인 불가」다(POL-040).
+  - 단건 검색 입력 오류: 벤더를 고르지 않으면 「벤더를 선택해 주세요.」, SKU가 비었거나 쉼표가 있으면 「SKU를 하나만 입력해 주세요.」, 형식이 R3와 맞지 않으면 「{vendor} SKU 형식이 아닙니다.」
   - 단건 검색 실패(AI 검색 실패·시간 초과·출처 없음): 「EOS 정보를 가져오지 못했습니다」 [다시 시도]
-  - 단건 검색에서 AI가 `NOT_FOUND`로 답하면: 「{벤더} 자료에서 찾을 수 없는 SKU입니다 (AI 검색 결과 — 틀릴 수 있습니다)」
+  - 단건 검색에서 AI가 `NOT_FOUND`로 답하면: 「{vendor} 자료에서 찾을 수 없는 SKU입니다 (AI 검색 결과 — 틀릴 수 있습니다)」
 - **예외**: Cisco 부속·자리표시 SKU(-NONE, -BLANK, 케이블 등)는 EoS 공지가 없어 AI가 출처를 내지 못하면 「확인 불가」 경고가 된다(PRD 리스크 3). P1에서 EoX API로 바꾸면 이 경고는 「판매중」이 된다(D-28).
 - **검증 의사코드**:
 
   ```js
   const WORST = ["판매 종료", "EoS 예정", "확인 불가", "판매중"];
-  const HOSTS = {Cisco: ["cisco.com"], Dell: ["dell.com", "delltechnologies.com"]}; // D-35, D-38
-  const validSource = (vendor, u) => { try { const x = new URL(u); return x.protocol === "https:" && HOSTS[vendor].some(h => x.hostname === h || x.hostname.endsWith("." + h)); } catch { return false; } };
+  const OFFICIAL = {Cisco: ["cisco.com"], Dell: ["dell.com", "delltechnologies.com"]}; // D-35, D-38
+  const REFERENCE = ["router-switch.com"];                                          // DEC-57
+  const hosts = vendor => [...OFFICIAL[vendor], ...REFERENCE];   // 웹 검색 허용 도메인 = 출처 검사 목록
+  const validSource = (vendor, u) => { try { const x = new URL(u); return x.protocol === "https:" && hosts(vendor).some(h => x.hostname === h || x.hostname.endsWith("." + h)); } catch { return false; } };
   function statusByDates(r, today) {
     if (r.endOfSaleDate) return r.endOfSaleDate <= today ? "판매 종료" : "EoS 예정";
     return "판매중";
   }
-  function eosOfSku(vendor, sku, today, res) {           // res: AI 검색 응답 (캐시 포함)
+  function lookup(key) {                                 // 조회 순서: 관리자 등록 → 캐시(7일) → AI 검색
+    return overrides.get(key) ?? cache.get(key) ?? aiSearch(key, cfg);   // cfg: POL-040 시간 한도·웹 검색 횟수
+  }
+  function eosOf(vendor, today, res) {                   // res = lookup() 결과
     if (res.timeout) return {status: "확인 불가", reason: "조회 시간 초과"};
     if (res.error) return {status: "확인 불가", reason: "AI 검색 응답 없음"};
-    const src = (res.sourceUrls ?? []).filter(u => validSource(vendor, u));
+    const src = res.manual ? res.sourceUrls : (res.sourceUrls ?? []).filter(u => validSource(vendor, u));
     if (src.length === 0) return {status: "확인 불가", reason: "AI 검색 결과에 출처가 없음"};
     if (res.status === "NOT_FOUND") return {status: "확인 불가", reason: "SKU를 찾지 못함"};
     return {status: statusByDates(res, today), ...res, sourceUrls: src};
   }
-  function r8(row, perSku) {
-    if (!row.sku) return [];
-    const list = (row.vendor === "Dell" ? row.sku.split(",") : [row.sku]).map(s => perSku[s.trim().toUpperCase()]);
+  // 조회 단위 (DEC-56)
+  function productOf(row, rows) {                        // Dell: 가장 가까운 하위 제품, 없으면 상위 품목
+    for (let r = row; r; r = rows.byId(r.parentRowId)) {
+      if (r.rowType === "하위 제품") return r;
+      if (r.rowType === "상위 품목") return rows.some(c => c.parentRowId === r.id && c.rowType === "하위 제품") ? null : r;
+    }
+    return null;
+  }
+  const productName = p => (p.rowType === "상위 품목" && p.name.includes("/") ? p.name.split("/").at(-1) : p.name).trim();
+  function eosKeys(row, rows) {
+    if (row.vendor === "Dell") { const p = productOf(row, rows); return p ? [["Dell", "PRODUCT:" + productName(p).toUpperCase()]] : []; }
+    return (row.sku ?? "").split(",").map(s => s.trim()).filter(Boolean).map(s => ["Cisco", s.toUpperCase()]);
+  }
+  function r8(row, rows, perKey) {
+    const list = eosKeys(row, rows).map(k => perKey[k]);
+    if (!list.length) return [];
     const worst = list.sort((a, b) => WORST.indexOf(a.status) - WORST.indexOf(b.status))[0];
-    row.eosStatus = worst.status;
+    row.eosStatus = worst.status;                                      // Dell 구성품은 제품 상태를 이어받는다
+    if (row.vendor === "Dell" && productOf(row, rows)?.id !== row.id) return [];  // R8 판정은 제품 행에만
     if (worst.status === "판매중") return [];
     return [finding("R8", "경고", row, "EOS 상태", eosMessageCode(worst), worst)]; // MVP는 모두 경고 (D-38). P1 EoX API: Cisco 판매 종료 = 오류
   }
   ```
 
-- **관련 요구사항**: REQ-008, REQ-019
-- **관련 화면**: SCR-005, SCR-007, SCR-011
-- **관련 테스트**: TC-094, TC-095, TC-096, TC-097, TC-142, TC-143, TC-144, TC-145, TC-146, TC-157
+- **관련 요구사항**: REQ-008, REQ-019, REQ-033
+- **관련 화면**: SCR-005, SCR-007, SCR-011, SCR-014
+- **관련 테스트**: TC-094, TC-095, TC-096, TC-097, TC-142, TC-143, TC-144, TC-145, TC-146, TC-157, TC-167, TC-174, TC-175, TC-184
 
 ### POL-030 R9 벤더 파일 합계 불일치
 
@@ -1229,7 +1280,7 @@
 - **표시**: 권고마다 분류, 대상 행 번호, 지적 내용(`message`), 근거(`evidence`)를 표시한다. 권고 영역 위에는 항상 「AI가 생성한 권고이며 틀릴 수 있습니다」를 표시한다.
 - **적용 시점**: 검증 ③ 단계, AI 단계 [다시 시도]
 - **위반/실패 시 처리**
-  - LLM 호출 실패, 90초 초과, JSON 오류, 전송 필드 위반(POL-012)이면 AI 단계를 실패로 기록한다. 「AI 검토를 완료하지 못했습니다」와 [다시 시도]를 표시하고, 고정 규칙·EOS 결과는 그대로 둔다.
+  - LLM 호출 실패, 시간 한도(기본 90초, POL-040) 초과, JSON 오류, 전송 필드 위반(POL-012)이면 AI 단계를 실패로 기록한다. 관리자가 AI 호출을 껐거나 서버 설정이 꺼 두었을 때도 같다(POL-040). 「AI 검토를 완료하지 못했습니다」와 [다시 시도]를 표시하고, 고정 규칙·EOS 결과는 그대로 둔다.
   - [다시 시도]는 AI 단계만 다시 실행한다. 버전의 수정 번호가 검증 때와 다르면 실행하지 않고 「BoM이 수정되었습니다. 다시 검증해 주세요.」를 표시한다.
   - AI 단계가 실패한 상태의 확정은 POL-032를 따른다(D-30).
 - **예외**: AI 권고는 검증할 때마다 새로 만들고 「확인함」을 이어받지 않는다(POL-021). 「고객에게 불필요한 항목」 권고의 대상 행은 견적서 일괄 제외에 쓴다(POL-037).
@@ -1253,12 +1304,12 @@
 
 - **관련 요구사항**: REQ-009
 - **관련 화면**: SCR-007, SCR-009
-- **관련 테스트**: TC-090, TC-098, TC-099, TC-100, TC-101, TC-132
+- **관련 테스트**: TC-090, TC-098, TC-099, TC-100, TC-101, TC-132, TC-167
 
 ### POL-032 BoM 확정 조건
 
 - **규칙** (한 문장): 작성자는 작성중 버전의 최신 검증이 현재 내용 기준(`검증 완료`)이고, 오류가 0건이고, 모든 경고·검토 권고에 「확인함」이 체크되어 있을 때 확정할 수 있다. AI 단계가 실패했으면 「AI 검토 없이 확정합니다」에도 체크해야 한다(D-30).
-- **적용 시점**: [확정] 버튼 활성 여부, 확정 확인 대화상자, `POST /api/versions/{id}/confirm`
+- **적용 시점**: [확정] 버튼 활성 여부, 확정 확인 대화상자, `POST /api/versions/{id}/confirm`, 「확인함」 일괄 체크·해제 `PUT /api/validations/{id}/ack`
 - **위반/실패 시 처리**: 조건을 만족하지 않으면 [확정]이 비활성이다. 버튼에 마우스를 올리면 처음 걸린 사유를 보여준다. API로 호출해도 HTTP 409와 같은 문구로 거부한다.
 
 | 순서 | 사유 | 문구 |
@@ -1273,12 +1324,16 @@
   - 조건을 만족하면 확인 대화상자를 띄운다: 「v{n}을 확정합니다. 확정한 버전은 수정할 수 없습니다. 확정하시겠습니까?」 [확정] [취소]
   - 확정하면 확정 일시·확정자를 기록하고, 상태를 「확정」으로 바꾼다. 「확인함」 체크(체크한 사람·일시)와 「AI 검토 없이 확정」 여부를 이력에 남긴다(POL-011).
 - **예외**: 가격 정보가 비어 있어도 확정할 수 있다(D-14). 확정 취소 기능은 없다. 「확인함」은 작성자만 체크·해제할 수 있다.
+  - **일괄 체크·해제(CR-001)**: 작성자는 판정 표·권고 표마다 화면에 보이는(필터를 거친) 체크 가능 항목(경고·검토 권고)을 한 번에 체크·해제할 수 있다. 이미 체크된 항목의 체크한 사람·일시는 바꾸지 않는다.
+  - 한 요청의 항목 중 하나라도 체크할 수 없으면(오류 판정 포함, 다른 검증 결과의 항목, 확정 버전, 재검증 필요) **아무것도 바꾸지 않는다**. 거부 문구는 낱건과 같다: 오류 판정 → HTTP 409 「확인함은 경고·검토 권고에만 체크할 수 있습니다.」, 재검증 필요 → HTTP 409 「BoM이 수정되었습니다. 다시 검증해 주세요.」, 없는 항목 → HTTP 404.
+  - 체크할 때는 확인 대화상자 「표시된 {n}건을 모두 「확인함」으로 체크합니다.」 [체크] [취소]를 띄운다({n} = 아직 체크하지 않은 대상 수). 해제는 대화상자 없이 바로 한다.
+  - 완료 토스트: 체크 「{n}건을 「확인함」으로 체크했습니다.」 / 해제 「{n}건의 「확인함」을 해제했습니다.」({n} = 실제로 상태가 바뀐 항목 수)
 - **검증 의사코드**:
 
   ```js
   function canConfirm(version, user, {skipAi = false} = {}) {
     if (version.status !== "작성중") return block("MSG_CONFIRMED_LOCKED");
-    if (version.authorId !== user.id || user.role !== "영업") return block("FORBIDDEN", {status: 403});
+    if (version.authorId !== user.id || !AUTHOR_ROLES.includes(user.role)) return block("FORBIDDEN", {status: 403}); // POL-008
     const v = version.latestValidation;
     if (version.validationRunning) return block("MSG_VALIDATION_RUNNING");
     if (!v) return block("MSG_NEED_VALIDATION");
@@ -1290,29 +1345,50 @@
     if (!v.ai.ok && !skipAi) return block("MSG_AI_INCOMPLETE");
     return ok();
   }
+
+  // 「확인함」 일괄 체크·해제 (CR-001) — 전부 되거나 전부 안 된다
+  function bulkAck(validation, user, findingIds, recommendationIds, acked) {
+    assertAuthor(user, validation.bom);                                  // 아니면 403 FORBIDDEN
+    const items = [...findingIds.map(findingOf), ...recommendationIds.map(recOf)];
+    if (items.some(i => !i || i.validationId !== validation.id)) return reject(404);
+    guardAckable(validation);                                            // 확정 버전 / MSG_REVALIDATE → 409
+    if (items.some(i => i.kind === "판정" && i.grade !== "경고")) return reject(409, "MSG_ACK_NOT_ALLOWED");
+    const changed = items.filter(i => (acked ? !i.ackBy : !!i.ackBy));   // 이미 같은 상태면 건드리지 않는다
+    for (const i of changed) Object.assign(i, acked ? {ackBy: user.id, ackAt: now()} : {ackBy: null, ackAt: null});
+    commit();                                                            // 한 트랜잭션
+    for (const i of changed) audit("확인함 체크·해제", {item: i, acked, bulk: true});   // POL-011
+    return {changed: changed.length};
+  }
   ```
 
 - **관련 요구사항**: REQ-011
 - **관련 화면**: SCR-007
-- **관련 테스트**: TC-080, TC-088, TC-098, TC-104, TC-105, TC-106, TC-107, TC-153
+- **관련 테스트**: TC-080, TC-088, TC-098, TC-104, TC-105, TC-106, TC-107, TC-153, TC-163
 
 ## 10. 견적·출력 정책
 
 ### POL-033 견적 생성·저장 조건
 
-- **규칙** (한 문장): 견적은 **확정 버전 하나**를 기준으로 작성자(역할 영업)만 만든다. 한 확정 버전으로 여러 견적을 만들 수 있다. 아래 저장 조건을 모두 만족해야 견적을 저장하고 다운로드할 수 있다.
-- **저장 조건**: ① 금액 합산 대상 행(POL-034) 중 List 금액이 빈 행이 0개(번들 포함 구성품 제외) ② BoM에 있는 KRW 외 통화마다 환율이 입력됨 ③ 통화가 빈 행이 있으면 그 행의 통화가 선택됨 ④ 기본 마진율이 입력됨
-- **번들 포함 구성품**: Cisco 구성품 중 List 금액이 비어 있고, 상위 품목의 List 금액은 비어 있지 않은 행이다. CCW 하단 주석의 「child line 값은 bundle 가격에 포함」 규칙을 따르며, 0원으로 계산한다.
-- **단가 입력**: 견적 화면에서 List 금액이 빈 행에 단가를 넣을 수 있다. 값은 0 이상이고 소수점 둘째 자리까지다. 이 값은 그 견적에만 저장한다(`List 금액 = 입력 단가 × 수량`). 규칙을 벗어나면 입력칸 아래에 「단가는 0 이상 숫자여야 합니다. (소수점 둘째 자리까지)」를 표시하고 저장을 차단한다.
-- **견적 기록**: 견적 ID, 기준 BoM 버전, 환율, DC율·마진율, 입력 단가, 작성 일시·최종 수정 일시
-- **적용 시점**: [견적 만들기] `POST /api/versions/{id}/quotes`, 견적 저장 `PUT /api/quotes/{id}`, 견적서·원가분석표 다운로드 직전
-- **위반/실패 시 처리**: 차단(저장·다운로드 불가).
+> **v1.2 변경(CR-003, DEC-58)**: 견적 계산을 인성정보 견적서 표준양식(VER1) 방식으로 바꿨다. 저장 조건에서 「기본 마진율」이 빠지고, ①은 「공급단가를 정할 수 없는 행」으로 바뀌었다.
+
+- **규칙** (한 문장): 견적은 **확정 버전 하나**를 기준으로 그 BoM 건의 작성자(작성자 역할 영업·관리자, POL-008)만 만든다. 한 확정 버전으로 여러 견적을 만들 수 있다. 아래 저장 조건을 모두 만족해야 견적을 저장하고 견적서를 내려받을 수 있다.
+- **저장 조건** (DEC-58, 검사 순서 DEC-13)
+  - ① 견적서에 넣는 금액 합산 대상 행(POL-034, 「견적서 제외」 행은 뺀다) 중 **공급단가를 정할 수 없는 행**이 0개. 판매단가 직접입력도 없고 소비자가(List 단가 또는 견적에서 입력한 소비자가)도 없는 행이다. 가격은 있는데 통화·환율만 빈 행은 ①이 아니라 ②·③으로 알린다. 번들 포함 구성품은 ①에 넣지 않는다.
+  - ② 통화가 빈 합산 대상 행(번들 포함 구성품 제외)이 있으면 그 행의 통화가 선택됨
+  - ③ 합산 대상 행에 있는 KRW 외 통화마다 환율이 입력됨
+  - ②·③은 「견적서 제외」 행도 검사한다(제외 행도 원가 계산에 들어간다 — POL-036).
+  - 「기본 마진율이 입력됨」 조건은 폐지했다(DEC-58).
+- **번들 포함 구성품**: Cisco 구성품 중 List 금액이 비어 있고, 상위 품목의 List 금액은 비어 있지 않은 행이다. CCW 하단 주석의 「child line 값은 bundle 가격에 포함」 규칙을 따르며, 소비자가·원가·공급단가 모두 0원으로 계산한다(화면 표시 「번들 포함」).
+- **소비자가 입력**: List 단가가 없는 합산 대상 행(번들 포함 구성품 제외)에는 견적 화면에서 소비자가 단가(행 통화)를 넣을 수 있다. 값은 0 이상이고 소수점 둘째 자리까지다. 이 값은 그 견적에만 저장한다. 형식은 POL-035를 따른다.
+- **새 견적의 처음 값**: 행 매입 DC율 = 그 행 가격 정보의 할인율(빈 값이면 빈 값), 전체 설정의 단가 단위·최소 GP율 = 관리자 견적 기본값(POL-040, 기본 1,000원·10%), 그 밖의 전체 설정·행별 입력·환율은 빈 값이다. 이전 버전 견적에서 만들면 POL-049를 따른다.
+- **견적 기록**: 견적 ID, 기준 BoM 버전, 환율, 전체 설정(전체 DC율·기본 매입 DC율·전체 목표 GP율·단가 단위·최소 GP율), 행별 입력(할인율·목표 GP율·판매단가 직접입력·매입 DC율·매입단가 직접입력·소비자가 입력·통화·견적서 제외), 견적서 머리(POL-037), 수정 번호, 작성 일시·최종 수정 일시
+- **적용 시점**: [견적 만들기] `POST /api/versions/{id}/quotes`, 즉시 재계산 `POST /api/quotes/{id}/calculate`(저장하지 않음), 견적 저장 `PUT /api/quotes/{id}`, 견적서 다운로드 직전(저장된 값으로 다시 검사)
+- **위반/실패 시 처리**: 차단(저장·다운로드 불가). HTTP 409와 첫 사유의 문구, 사유 전체 목록을 반환한다. 화면 배너에는 사유를 모두 나열한다.
   - 작성중 버전: [견적 만들기]를 표시하지 않는다. API는 「확정된 버전으로만 견적을 만들 수 있습니다.」로 거부한다.
   - ①: 「단가가 없는 행이 {n}개 있습니다」와 해당 행 목록(행 번호·SKU·품명)을 표시한다.
-  - ②: 「환율을 입력해 주세요: {통화}」
-  - ③: 「통화를 선택해 주세요: 행 {행 번호 목록}」
-  - ④: 「기본 마진율을 입력해 주세요.」
-- **예외**: 견적은 확정 뒤에도 계속 고칠 수 있다(잠금 없음). 다운로드는 그 시점의 값으로 만든다. 새 버전을 만들어도 이전 버전의 견적은 새 버전으로 복사하지 않는다.
+  - ②: 「통화를 선택해 주세요: 행 {rows}」
+  - ③: 「환율을 입력해 주세요: {currency}」
+- **예외**: 견적은 확정 뒤에도 계속 고칠 수 있다(잠금 없음). 다운로드는 그 시점에 저장된 값으로 만든다. 새 버전을 만들어도 이전 버전의 견적은 새 버전으로 복사하지 않는다(필요하면 POL-049로 가져온다). 화면은 계산하지 않고 서버 계산 결과만 표시한다.
 - **검증 의사코드**:
 
   ```js
@@ -1320,110 +1396,175 @@
     const p = rows.find(r => r.id === row.parentRowId);
     return row.vendor === "Cisco" && row.rowType === "구성품" && row.listAmount == null && p?.listAmount != null;
   }
-  function checkPol033(version, quote) {
-    if (version.status !== "확정") return block("MSG_QUOTE_NEEDS_CONFIRMED");
-    const rows = summableRows(version.rows);                               // POL-034
-    const missing = rows.filter(r => quoteListAmount(quote, r) == null && !isBundleIncluded(r, version.rows));
-    if (missing.length) return block("MSG_MISSING_PRICE", {n: missing.length, rows: missing});
-    const noCur = rows.filter(r => !(quote.currencyOverride[r.id] ?? r.currency));
-    if (noCur.length) return block("MSG_PICK_CURRENCY", {rows: noCur.map(r => r.rowNo)});
-    for (const c of new Set(rows.map(r => quote.currencyOverride[r.id] ?? r.currency)))
-      if (c !== "KRW" && quote.fx[c] == null) return block("MSG_FX_REQUIRED", {currency: c});
-    if (quote.baseMargin == null) return block("MSG_BASE_MARGIN_REQUIRED");
-    return ok();
+  function checkPol033(version, quote, calc) {          // calc: POL-034 ~ 036 계산 (서버 한 곳)
+    if (version.status !== "확정") return block("QUOTE_NEEDS_CONFIRMED");
+    const rows = calc.summableRows(), out = [];
+    const missing = rows.filter(r => !calc.isExcluded(r) && calc.unitPrice(r) == null
+      && !(calc.baseUnit(r) != null && calc.fx(calc.currency(r)) == null));   // 통화·환율만 빈 행은 ②·③
+    if (missing.length) out.push(blocker("MISSING_PRICE", {n: missing.length}, missing));
+    const noCur = rows.filter(r => !calc.currency(r) && !isBundleIncluded(r, version.rows));
+    if (noCur.length) out.push(blocker("PICK_CURRENCY", {rows: noCur.map(r => r.rowNo).join(", ")}));
+    for (const c of calc.foreignCurrencies()) if (quote.fx[c] == null) out.push(blocker("FX_REQUIRED", {currency: c}));
+    return out;                                          // 비어 있으면 저장 가능. API 409 문구 = out[0]
   }
   ```
 
 - **관련 요구사항**: REQ-016
 - **관련 화면**: SCR-009, SCR-010
-- **관련 테스트**: TC-108, TC-117, TC-118, TC-120, TC-122, TC-123, TC-124, TC-129, TC-130, TC-139, TC-155
+- **관련 테스트**: TC-108, TC-117, TC-118, TC-120, TC-122, TC-123, TC-124, TC-129, TC-130, TC-139, TC-155, TC-166, TC-183
 
-### POL-034 원가 계산
+### POL-034 소비자가·원가 계산
 
-- **규칙** (한 문장): 원가는 **금액 합산 대상 행**마다 `원가(원화) = floor(List 금액 × (1 − DC율 ÷ 100) × 환율)`로 계산한다. 합계 원가는 행별 원가(원화)의 합이다. 계산은 모두 Decimal로 한다(NFR-012).
+> **v1.2 변경(CR-003, DEC-58)**: 정책명 「원가 계산」 → 「소비자가·원가 계산」. `원가 = floor(List 금액 × (1 − DC율) × 환율)`을 표준양식 「견적서」 시트 L ~ X열 방식(소비자가 → 매입 DC → 원가 단가, 원 단위 반올림)으로 바꿨다.
+
+- **규칙** (한 문장): 금액 합산 대상 행마다 원화 **소비자가 단가(LP)** = `ROUND(List 단가 × 환율)`, **원가 단가** = 매입단가 직접입력이 있으면 그 값, 없으면 `ROUND(LP × (1 − 매입 DC율 ÷ 100))`로 계산하고, 원가 합 = 원가 단가 × 수량이다. 계산은 인성정보 견적서 표준양식(VER1) 「견적서」 시트 L ~ X열 수식과 같고, 모두 Decimal로 한다(NFR-012).
 - **금액 합산 대상 행**
   - Cisco: 모든 품목 행. 상위 품목(번들) 가격과 구성품 가격은 별개다. 번들 포함 구성품은 0원이다(POL-033).
   - Dell: 구성품 행, 그리고 구성품이 하나도 없는 상위 품목 행. 구성품이 있는 상위 품목과 하위 제품은 구성품 금액의 합이므로 **제외**한다(이중 계산 방지).
-- **List 금액**: 가격 정보의 저장값(POL-019). 견적에서 입력한 단가가 있으면 `입력 단가 × 수량`
-- **환율**: 통화가 KRW면 1. 그 밖에는 견적에 입력한 값
-- **적용 시점**: 견적 화면에서 값을 입력하거나 바꿀 때(즉시 재계산), 견적 저장, 견적서·원가분석표 생성. 화면 계산과 서버 계산은 같은 함수를 쓴다.
-- **위반/실패 시 처리**: 계산할 수 없는 행이 있으면 저장 조건(POL-033)에서 차단한다. 계산 자체는 실패하지 않는다.
-- **예외**: 원 미만 절사는 행 단위로만 한다. 합계는 절사된 행 값을 더한다(합계를 다시 절사하지 않음).
-- **샘플 기대 결과** (PRD REQ-016 인수 조건과 같음)
-  - EY한영 C9300-48T-M: 20,051,583 × 2 × (1 − 0.70) × 1 = 12,030,949.8 → **12,030,949원**
-  - Dell 기준 샘플 메모리 행: 276,496,000 × (1 − 0) × 1 → **276,496,000원**
-  - USD 1,000 × 3 × (1 − 0.40) × 1,385.50 → **2,493,900원**
+- **List 단가**: 가격 정보의 List 단가(POL-019). 없으면 List 금액 ÷ 수량. 둘 다 없으면 견적에서 입력한 소비자가(POL-033).
+- **환율**: 행 통화(견적에서 고른 통화 > 가격 정보의 통화)가 KRW면 1, 그 밖에는 견적에 입력한 값
+- **매입 DC율**: 행 값 > 전체 기본 매입 DC율. 행 값의 처음 값은 BoM 가격 정보의 할인율이다(POL-033). 매입 DC율도 매입단가 직접입력도 없으면 그 행은 원가가 없고 GP 계산에서 빠진다(POL-036).
+- **ROUND**: 원 단위 반올림(0.5 올림, 표준양식 `ROUND`와 같음)
+- **적용 시점**: 견적 화면에서 값을 입력하거나 바꿀 때(서버 `POST /api/quotes/{id}/calculate`로 즉시 재계산 — 화면은 계산하지 않는다), 견적 저장, 견적서 생성. 미리보기·저장·견적서가 모두 같은 계산 하나를 쓴다.
+- **위반/실패 시 처리**: 계산할 수 없는 행이 있으면 저장 조건(POL-033)에서 차단한다. 원가만 없는 행은 차단하지 않고 경고한다(POL-036). 계산 자체는 실패하지 않는다.
+- **예외**: 반올림은 행 단가에서만 한다. 금액 합과 합계는 반올림된 단가 × 수량을 더한다(합계를 다시 반올림하지 않음). 견적에서 바꾼 값은 표준 BoM 가격 정보를 바꾸지 않는다.
+- **샘플 기대 결과** (표준양식 「예시_견적서A」 — 기본 매입 DC 80%)
+  - List 단가 2,219,393원, 매입 DC 80% → 원가 단가 ROUND(443,878.6) = **443,879원**
+  - List 단가 1,904,460원, 행 매입 DC 86% → 원가 단가 ROUND(266,624.4) = **266,624원**
+  - List 단가 62,975,530원, 매입 DC 80% → 원가 단가 **12,595,106원**
+  - USD 1,000 × 환율 1,385.50 → 소비자가 단가 **1,385,500원** (수량 3 → 소비자가 합 4,156,500원)
 - **검증 의사코드**:
 
   ```js
+  const ROUND = d => d.toDecimalPlaces(0, ROUND_HALF_UP);
   function summableRows(rows) {
     return rows.filter(r => r.vendor === "Cisco"
       || r.rowType === "구성품"
       || (r.rowType === "상위 품목" && !rows.some(c => c.parentRowId === r.id)));
   }
-  function costKrw(row, quote, rows) {
-    const amt = isBundleIncluded(row, rows) ? D(0) : quoteListAmount(quote, row); // 입력 단가 × 수량 또는 저장 List 금액
-    const dc = D(quote.dcRate[row.id] ?? row.discountRate ?? 0);
-    const cur = quote.currencyOverride[row.id] ?? row.currency;
-    const fx = cur === "KRW" ? D(1) : D(quote.fx[cur]);
-    return amt.mul(D(1).sub(dc.div(100))).mul(fx).floor();
+  function baseUnit(row, quote) {                         // 행 통화 기준 단가
+    if (row.listUnitPrice != null) return D(row.listUnitPrice);
+    if (row.listAmount != null && row.qty) return D(row.listAmount).div(row.qty);
+    return quote.rows[row.id]?.listPrice ?? null;          // 견적에서 입력한 소비자가
   }
-  const totalCost = (rows, q) => summableRows(rows).reduce((s, r) => s.add(costKrw(r, q, rows)), D(0));
+  function lp(row, quote) {
+    const cur = quote.rows[row.id]?.currency ?? row.currency;
+    const fx = cur === "KRW" ? D(1) : quote.fx[cur];
+    const base = baseUnit(row, quote);
+    return base != null && fx != null ? ROUND(base.mul(fx)) : null;
+  }
+  function costUnit(row, quote) {
+    const q = quote.rows[row.id] ?? {};
+    if (q.costPrice != null) return D(q.costPrice);                       // 매입단가 직접입력
+    const pdc = q.purchaseDc ?? quote.settings.purchaseDc;                // 행 매입 DC > 기본 매입 DC
+    const l = lp(row, quote);
+    return l != null && pdc != null ? ROUND(l.mul(D(1).sub(D(pdc).div(100)))) : null;
+  }
+  // 번들 포함 구성품: lp = null, costUnit = 0, unitPrice = 0 (POL-033)
   ```
 
 - **관련 요구사항**: REQ-016, NFR-012
 - **관련 화면**: SCR-009
 - **관련 테스트**: TC-118, TC-119, TC-120, TC-121, TC-122, TC-130
 
-### POL-035 환율·DC율 입력
+### POL-035 환율·할인율·GP율 입력
 
-- **규칙** (한 문장): 환율은 0보다 크고 **100,000 이하**인 숫자로 소수점 둘째 자리까지 입력한다. DC율은 **0.00~100.00%**로 소수점 둘째 자리까지 입력한다(CCW 샘플에 93.95% 있음).
-- **DC율 기본값**: 행의 가격 정보 할인율. 빈 값이면 0%
-- **구분별 일괄 입력**: 견적 화면에서 PRODUCT / SERVICE / SOFTWARE별로 DC율을 넣고 [적용]을 누르면, 그 구분의 합산 대상 행 모두에 값이 들어간다. 그 뒤 행별로 다시 바꿀 수 있다. 「미분류」 행에는 일괄 입력이 없어 행별로만 넣는다.
-- **적용 시점**: 견적 화면 환율 입력칸·DC율 입력칸(구분별·행별), 견적 저장 API
-- **위반/실패 시 처리**
-  - 범위·형식을 벗어나면 입력칸 아래에 문구를 표시하고, 견적 저장을 차단한다.
-    - 환율: 「환율은 0보다 크고 100,000 이하인 숫자여야 합니다. (소수점 둘째 자리까지)」
-    - DC율: 「DC율은 0~100 사이 숫자여야 합니다. (소수점 둘째 자리까지)」
-  - 구분별 [적용] 때 행별로 다른 값이 이미 들어 있으면 확인 대화상자를 띄운다: 「{구분} 행 {n}개의 DC율을 {값}%로 바꿉니다. 행별로 입력한 값도 바뀝니다.」 [바꾸기] [취소]
-- **예외**: 견적에서 바꾼 DC율은 견적에만 저장하고, 표준 BoM 가격 정보는 바꾸지 않는다(REQ-016). 환율 자동 조회는 하지 않는다(D-07).
+> **v1.2 변경(CR-003, DEC-58)**: 정책명 「환율·DC율 입력」 → 「환율·할인율·GP율 입력」. 행별 할인율·목표 GP율·판매단가·매입 DC율·매입단가와 전체 설정을 더했고, **구분별 DC율 일괄 입력([적용])은 폐지**했다(행별 입력과 전체 설정으로 대체, DEC-55 대체).
+
+- **규칙** (한 문장): 견적 입력값은 아래 표의 범위·형식을 따른다. 모두 소수점 둘째 자리까지이며, 형식을 벗어난 값은 저장하지 않는다.
+
+| 입력 | 어디에 | 범위 | 위반 문구 |
+|---|---|---|---|
+| 환율 | 통화마다 | 0 초과 **100,000 이하** | 「환율은 0보다 크고 100,000 이하인 숫자여야 합니다. (소수점 둘째 자리까지)」 |
+| 할인율 DC · 매입 DC율 | 행별, 전체(전체 DC율·기본 매입 DC율) | **0.00 ~ 100.00%** (CCW 샘플에 93.95% 있음) | 「DC율은 0~100 사이 숫자여야 합니다. (소수점 둘째 자리까지)」 |
+| 목표 GP율 · 최소 GP율 | 행별(목표 GP율), 전체(전체 목표 GP율·최소 GP율) | **0 이상 100 미만 %** (`원가 ÷ (1 − GP율)`이 정의되어야 한다) | 「GP율은 0 이상 100 미만 숫자여야 합니다. (소수점 둘째 자리까지)」 |
+| 판매단가 직접입력 · 매입단가 직접입력 · 소비자가 입력 | 행별 | 0 이상 (원. 소비자가 입력은 행 통화) | 「단가는 0 이상 숫자여야 합니다. (소수점 둘째 자리까지)」 |
+| 단가 단위 | 전체 | 1 · 10 · 100 · 1,000 · 10,000원 중 하나, 또는 비움(원 단위) | 「입력값을 확인해 주세요.」 (화면은 선택 상자) |
+
+- **처음 값**: POL-033 「새 견적의 처음 값」. 빈 칸은 「값 없음」이고, 공급단가·원가는 다음 우선순위로 넘어간다(POL-034, POL-036).
+- **적용 시점**: 견적 화면 입력칸(전체 설정·행별·환율), `POST /api/quotes/{id}/calculate`, 견적 저장 `PUT /api/quotes/{id}`
+- **위반/실패 시 처리**: 범위·형식을 벗어나면 입력칸 아래에 문구를 표시하고, 그 값은 계산에서 빈 값으로 본다. 견적 저장은 차단한다(HTTP 400, 첫 오류 문구 + 칸별 오류 목록).
+- **예외**: 견적에서 바꾼 값은 견적에만 저장하고, 표준 BoM 가격 정보는 바꾸지 않는다(REQ-016). 환율 자동 조회는 하지 않는다(D-07). 모든 행이 KRW이면 환율 칸 대신 「모든 행이 KRW입니다. 환율을 입력하지 않아도 됩니다.」를 표시한다.
 - **검증 의사코드**:
 
   ```js
   const FX_MAX = D(100000); // D-35
-  const dp2 = s => /^\d+(\.\d{1,2})?$/.test(String(s));
-  function checkFx(v) { return dp2(v) && D(v).gt(0) && D(v).lte(FX_MAX) ? ok() : block("MSG_FX_RANGE"); }
-  function checkDc(v) { return dp2(v) && D(v).gte(0) && D(v).lte(100) ? ok() : block("MSG_DC_RANGE"); }
-  function applyCategoryDc(quote, rows, category, value) {
-    const targets = summableRows(rows).filter(r => r.category === category);
-    const differs = targets.filter(r => quote.dcRate[r.id] != null && !D(quote.dcRate[r.id]).eq(value)).length;
-    if (differs && !confirm("MSG_DC_OVERWRITE", {category, n: targets.length, value})) return;
-    targets.forEach(r => quote.dcRate[r.id] = value);
-  }
+  const ROUND_UNITS = [1, 10, 100, 1000, 10000];
+  const dp2 = s => /^\d+(\.\d{1,2})?$/.test(String(s).replace(/,/g, ""));
+  const parse = (v, ok, code) => v == null || String(v).trim() === "" ? null   // 빈 값 = 값 없음
+    : dp2(v) && ok(D(v)) ? D(v) : block(code);
+  const checkFx    = v => parse(v, d => d.gt(0) && d.lte(FX_MAX), "FX_RANGE");
+  const checkDc    = v => parse(v, d => d.gte(0) && d.lte(100), "DC_RANGE");      // 할인율·매입 DC율
+  const checkGp    = v => parse(v, d => d.gte(0) && d.lt(100), "GP_RANGE");       // 목표 GP율·최소 GP율
+  const checkPrice = v => parse(v, d => d.gte(0), "UNIT_PRICE_RANGE");            // 판매단가·매입단가·소비자가
+  const checkUnit  = v => v == null || v === "" || ROUND_UNITS.includes(Number(v)) ? ok() : block("VALIDATION_FAILED");
   ```
 
 - **관련 요구사항**: REQ-016
 - **관련 화면**: SCR-009
-- **관련 테스트**: TC-120, TC-125, TC-126, TC-127, TC-128
+- **관련 테스트**: TC-120, TC-125, TC-126, TC-128 (TC-127 구분별 일괄 적용은 삭제 — CR-003)
 
-### POL-036 견적가·마진율
+### POL-036 공급단가·GP
 
-- **규칙** (한 문장): 마진율은 **0.0~100.0%**(D-31)로 소수점 첫째 자리까지 입력한다. 행별 견적가는 `floor(원가(원화) × (1 + 마진율 ÷ 100))`, 견적 단가는 `floor(견적가 ÷ 수량)`이다(D-29).
-- **적용 방식**: 기본 마진율 하나를 견적 전체에 적용하고, 행별 마진율로 덮어쓸 수 있다. 값을 바꾸면 그 영향을 받는 행과 합계를 즉시 다시 계산한다.
-- **합계 견적가**: 행별 견적가의 합. 견적서 합계는 여기서 「견적서 제외」 행을 뺀 값이다(POL-037).
-- **적용 시점**: 견적 화면 마진율 입력(기본·행별), 견적 저장, 견적서·원가분석표 생성
-- **위반/실패 시 처리**: 범위·형식을 벗어나면 입력칸 아래에 「마진율은 0.0~100.0 사이 숫자여야 합니다. (소수점 첫째 자리까지)」를 표시하고 저장을 차단한다.
-- **예외**: 이 공식은 기존 원가분석표 관행(할인단가 ÷ (1 − 마진율), 천원 단위 올림)과 다르다(D-15, PRD 리스크 12). 견적 단가 × 수량이 견적가와 몇 원 다를 수 있는데, 견적서에는 견적가를 공급가로 쓴다(D-29).
-- **샘플 기대 결과**: 원가 12,030,949원 × 1.20 = 14,437,138.8 → **14,437,138원** / 원가 2,493,900원 × 1.15 → **2,867,985원** / 견적가 1,000원·수량 3 → 견적 단가 **333원**
+> **v1.2 변경(CR-003, DEC-58)**: 정책명 「견적가·마진율」 → 「공급단가·GP」. 마진율(`floor(원가 × (1 + 마진율))`, D-29·D-31)을 폐지하고 표준양식의 할인율·목표 GP 방식으로 바꿨다. 문구 「마진율은 0.0~100.0 사이 숫자여야 합니다. (소수점 첫째 자리까지)」도 폐지했다.
+
+- **규칙** (한 문장): 행별 공급단가는 **판매단가 직접입력 > 행 목표 GP율 > 행 할인율 > 전체 목표 GP율 > 전체 할인율 > 소비자가** 순서에서 처음으로 정해지는 값이다. GP율로 정하면 `원가 단가 ÷ (1 − GP율 ÷ 100)`, 할인율로 정하면 `LP × (1 − 할인율 ÷ 100)`이고, 이 산출값은 단가 단위로 반올림한다. 공급가 합 = 공급단가 × 수량이다.
+
+| 순서 | 적용 방식 (화면 표시) | 조건 | 공급단가 |
+|---|---|---|---|
+| 1 | 직접입력 | 판매단가 직접입력이 있음 | 입력값 그대로 |
+| 2 | 행 GP | 행 목표 GP율이 있고 원가 단가가 있음 | `반올림(원가 단가 ÷ (1 − 행 GP율))` |
+| 3 | 행 DC | 행 할인율이 있고 LP가 있음 | `반올림(LP × (1 − 행 할인율))` |
+| 4 | 전체 GP | 전체 목표 GP율이 있고 원가 단가가 있음 | `반올림(원가 단가 ÷ (1 − 전체 GP율))` |
+| 5 | 전체 DC | 전체 DC율이 있고 LP가 있음 | `반올림(LP × (1 − 전체 DC율))` |
+| 6 | 소비자가 | LP가 있음 | LP |
+| — | 번들 | 번들 포함 구성품(POL-033) | 0 |
+
+- **단가 단위 반올림**: `ROUND(x ÷ 단위) × 단위`(0.5 올림). 단가 단위가 비어 있으면 원 단위 반올림이다. 직접입력·소비자가는 반올림하지 않는다.
+- **행 지표**: GP = 공급가 합 − 원가 합, GP율 = GP ÷ 공급가 합, 실 DC율 = 1 − 공급단가 ÷ LP. 원가가 없으면 GP·GP율이 없다.
+- **최소 GP율**: GP율이 최소 GP율(전체 설정, 처음 값 POL-040)보다 낮은 행은 화면에 표시하고 경고한다(차단하지 않음).
+- **손익 요약** (견적 화면, 고객 견적서에는 넣지 않는다)
+  - 소비자가 합계 = 견적서에 넣는 행의 LP × 수량 합
+  - **공급가액** = 견적서에 넣는 행의 공급가 합의 합 = 견적서 합계(VAT 별도, POL-037)
+  - 원가 = 합산 대상 행 **전부**의 원가 합(견적서 제외 행 포함 — 제외해도 벤더에서 사는 품목이다)
+  - GP = 원가가 있는 견적서 행의 GP 합 − 견적서 제외 행의 원가 합, GP율 = GP ÷ 원가가 있는 견적서 행의 공급가 합
+  - 평균 DC = 1 − (LP가 있는 견적서 행의 공급가 합 ÷ 소비자가 합계)
+  - 부가세 = `floor(공급가액 × 0.1)`, 합계금액 = 공급가액 + 부가세
+  - 표시: 「소비자가 합계 {lp} · 공급가액 {supply} · 원가 {cost} · GP {gp} ({gpRate}) · 평균 DC {avgDc}」, 「합계금액(VAT 포함) {total}원」
+- **적용 시점**: 견적 화면 전체 설정·행별 입력(즉시 재계산 `POST /api/quotes/{id}/calculate`), 견적 저장, 견적서 생성
+- **위반/실패 시 처리**: 입력 형식은 POL-035, 저장 조건은 POL-033에서 차단한다. 아래는 경고(차단 아님)다.
+  - 원가가 없는 견적서 행: 「원가를 알 수 없는 행이 {n}개 있습니다. 이 행은 GP 계산에서 빠집니다.」
+  - 최소 GP율 미달 행: 「GP율이 최소 GP율({min}%)보다 낮은 행이 {n}개 있습니다.」
+  - 화면 안내: 「행에 입력한 값이 전체 값보다 먼저 쓰입니다. 공급단가 = 판매단가 직접입력 > 행 목표 GP > 행 할인율 > 전체 목표 GP > 전체 할인율 > 소비자가」
+- **예외**: 공급가 합은 공급단가 × 수량이므로 견적서의 단가 × 수량과 금액이 항상 같다(D-29의 「몇 원 차이」는 더 이상 생기지 않는다). 이 방식은 기존 원가분석표 관행(D-15, PRD 리스크 12)을 표준양식 그대로 옮긴 것이다(DEC-58).
+- **샘플 기대 결과** (표준양식 「예시_견적서A」 — 전체 DC 77%, 기본 매입 DC 80%, 단가 단위 1,000원, 최소 GP 10%)
+  - List 단가 2,219,393원 × 252, 행 입력 없음 → 전체 DC: 반올림(510,460.39) = **510,000원**, 공급가 합 **128,520,000원**
+  - List 단가 1,904,460원 × 252, 행 할인율 84%·행 매입 DC 86% → 행 DC: 반올림(304,713.6) = **305,000원**, 공급가 합 **76,860,000원** (원가 단가 266,624원)
+  - List 단가 62,975,530원 × 1, 행 목표 GP 15% → 행 GP: 반올림(12,595,106 ÷ 0.85) = **14,818,000원**, GP **2,222,894원**(15.00%), 실 DC 76.47%
+  - 같은 행에 목표 GP 5% → 최소 GP율 10% 미달 경고 1행
 - **검증 의사코드**:
 
   ```js
-  const dp1 = s => /^\d+(\.\d)?$/.test(String(s));
-  function checkMargin(v) { return dp1(v) && D(v).gte(0) && D(v).lte(100) ? ok() : block("MSG_MARGIN_RANGE"); }
-  function quotePrice(row, quote, rows) {
-    const m = D(quote.rowMargin[row.id] ?? quote.baseMargin);
-    const price = costKrw(row, quote, rows).mul(D(1).add(m.div(100))).floor();
-    return {price, unitPrice: price.div(row.qty).floor()};
+  const roundUnit = (d, unit) => unit ? ROUND(d.div(unit)).mul(unit) : ROUND(d);
+  function unitPrice(row, quote) {                        // → {price, method}
+    const q = quote.rows[row.id] ?? {}, s = quote.settings, unit = s.roundUnit;
+    if (isBundleIncluded(row, quote.bomRows)) return {price: D(0), method: "BUNDLE"};
+    const l = lp(row, quote), c = costUnit(row, quote);
+    if (q.salePrice != null) return {price: D(q.salePrice), method: "DIRECT"};
+    if (q.targetGp != null && c != null) return {price: roundUnit(c.div(D(1).sub(D(q.targetGp).div(100))), unit), method: "ROW_GP"};
+    if (q.saleDc != null && l != null) return {price: roundUnit(l.mul(D(1).sub(D(q.saleDc).div(100))), unit), method: "ROW_DC"};
+    if (s.targetGp != null && c != null) return {price: roundUnit(c.div(D(1).sub(D(s.targetGp).div(100))), unit), method: "ALL_GP"};
+    if (s.saleDc != null && l != null) return {price: roundUnit(l.mul(D(1).sub(D(s.saleDc).div(100))), unit), method: "ALL_DC"};
+    if (l != null) return {price: l, method: "LIST"};
+    return {price: null, method: null};                   // 저장 조건 ① (POL-033)
+  }
+  function line(row, quote) {
+    const {price, method} = unitPrice(row, quote), c = costUnit(row, quote), qty = D(row.qty ?? 0);
+    const amount = price?.mul(qty), cost = c?.mul(qty);
+    const gp = amount != null && cost != null ? amount.sub(cost) : null;
+    const gpRate = gp != null && !amount.isZero() ? gp.div(amount) : null;
+    const belowMin = gpRate != null && quote.settings.minGp != null && gpRate.lt(D(quote.settings.minGp).div(100));
+    return {price, method, amount, cost, gp, gpRate, belowMin};
   }
   ```
 
@@ -1433,72 +1574,108 @@
 
 ### POL-037 고객 견적서
 
-- **규칙** (한 문장): 고객 견적서는 견적마다 **단일 표형** 또는 **Summary + 세부 시트형**을 골라 xlsx 또는 PDF로 만든다. 어느 셀에도 원가·DC율·환율·마진율이 없어야 하고, 합계는 「견적서 제외」 행을 뺀 합계 견적가와 원 단위까지 같아야 한다.
+> **v1.2 변경(CR-003 DEC-59·60·61, CR-002, CR-004)**: 배치를 인성정보 견적서 표준양식(VER1) 「견적서」·「Summary」 시트로 바꿨다. 문서번호 형식, 거래 조건 6항목, 견적 담당(정·부), 구매 확인란, 공급자 회사 정보·CI(관리자 설정), Summary형 뒤 상세 견적서, EOS × 유효기간 표시를 더했다. 소비자가 열과 Summary형 세부 시트, 「무상유지보수」 입력은 없앴다.
+
+- **규칙** (한 문장): 고객 견적서는 견적마다 **견적서(단일 표형)** 또는 **Summary(견적 요약 + 견적서 상세)**를 골라 xlsx 또는 PDF로 만든다. 배치는 인성정보 견적서 표준양식(VER1) 「견적서」·「Summary」 시트를 따른다(DEC-59). 어느 머리글에도 원가·DC율·할인율·마진율·환율·GP가 없어야 하고, 합계는 「견적서 제외」 행을 뺀 공급가액(POL-036)과 원 단위까지 같아야 한다.
 - **견적서 제외**
   - 견적 화면에서 합산 대상 행마다 「견적서 제외」를 체크할 수 있다. Dell 상위 품목·하위 제품을 체크하면 그 아래 행이 모두 제외된다.
   - [AI 권고 불필요 항목 일괄 제외]를 누르면, 기준 버전의 최신 검증에서 「고객에게 불필요한 항목」 권고를 받은 행에 한 번에 체크한다.
   - 제외는 견적에만 저장하고, 표준 BoM에서는 행을 지우지 않는다.
-- **입력 항목** (견적마다 저장, D-33)
+- **입력 항목** (견적마다 저장, D-33 — 견적서 다운로드 창)
 
-| 항목 | 규칙 | 기본값 |
+| 항목 | 규칙 | 처음 값 |
 |---|---|---|
 | 견적일자 | 날짜 | 오늘 |
-| 견적명(프로젝트명) | 1~100자 | BoM 건명 |
-| 수신 / 참조 | 각 0~50자 | 빈 값 |
-| 유효기간 | 1~90일 정수 | 14일 |
-| 결제조건 | 0~100자 | 「계산서 발행 후 60일 이내」 |
-| 무상유지보수 (Summary형) | 0~50자 | 구분 SERVICE 행 기간의 최빈값. 12의 배수면 「{n}년」, 아니면 「{n}개월」. SERVICE 행이 없으면 빈 값 |
+| 견적명 | 1~100자 | BoM 건명 |
+| 수신 / 참조 | 각 0~50자 | 빈 값. 입력 예시 「예) ABC 주식회사 귀중」 / 「예) 홍길동 상무님」 |
+| 견적 유효기간 | 1~90일 정수 | 관리자 설정(POL-040, 기본 14일) |
+| 하자 보증기간 | 0~50자, 선택지 또는 직접 입력 | 내 견적서 기본값(POL-042) > 「{n} Months」(구분 SERVICE 행 기간의 최빈값, 같으면 긴 기간) > 관리자 설정(기본 「제조사 정책에 따름」) |
+| 장비 설치지원 | 0~50자, 선택지 또는 직접 입력 | 관리자 설정(기본 「별도 협의」) |
+| 납기 / 장소 | 0~100자, 선택지 또는 직접 입력 | 내 견적서 기본값 > 관리자 설정(기본 「발주 후 4주 이내 / 귀사 지정 장소」) |
+| 대금 결제조건 | 0~100자, 선택지 또는 직접 입력 | 내 견적서 기본값 > 관리자 설정(기본 「계산서 발행 후 60일 이내」) |
+| 특기사항 | 0~200자 | 빈 값 |
+| 담당자 HP / 담당자(부) / 담당자(부) HP / 담당자(부) E-mail | 0~30 / 30 / 30 / 100자 | 내 견적서 기본값(없으면 빈 값) |
 | 상세 내역 (Summary형, 상위 품목마다) | 0~500자 | 상위 품목 품명 |
-| 담당자 | 자동 | 작성자 이름·메일 |
+| 견적 담당(정) 이름·메일 | 자동 | 작성자 이름·메일 |
+| 양식 · 형식 | 견적서 / Summary, xlsx / PDF | 그 견적에서 마지막으로 고른 값 |
 
-- **공통 머리**: 인성정보 사업자 정보를 고정 문구로 넣는다(사업자번호 215-81-58985, 상호 ㈜ 인성정보, 주소 서울특별시 강남구 테헤란로 301 9층, 대표자 조승필 — DC사업부 샘플 기준). 문서번호는 `IS-{견적일자 YYYYMMDD}-{견적 ID}`다. 유효기간 문구: 「본 견적서의 유효기간은 견적일로부터 {n}일 입니다.」 단위 표기: 「(단위: 원, VAT별도)」
-- **단일 표형**: 품목 표의 열은 제품번호(SKU) / 제품설명(품명) / 수량 / 소비자가 / 공급단가 / 공급가 합 / 비고다.
-  - 소비자가 = `floor(List 단가 × 환율)`, 단가를 입력한 행은 `floor(입력 단가 × 환율)`이다(D-24).
-  - 공급단가 = 견적 단가, 공급가 합 = 견적가(D-29). 비고는 빈칸이다.
-  - Dell 상위 품목·하위 제품은 금액 칸이 빈 묶음 제목 행으로 넣는다.
-  - 표 아래 합계 1줄: 「합계 (VAT 별도)」
-- **Summary + 세부 시트형**
-  - Summary 시트: 상위 품목 1개당 1행이다. 열은 NO / 구분(상위 품목 품명) / 상세 내역 / 수량(상위 품목 수량) / 제안 단가 = `floor(제안가합 ÷ 수량)` / 제안가합 / 비고다. 제안가합은 그 상위 품목과 모든 자손 행 중 합산 대상이면서 제외되지 않은 행의 견적가 합이다.
-  - 합계 2줄: 「제안 공급가 합계 (V.A.T 별도)」, 「제안 공급가 합계 (V.A.T 포함)」 = 별도 합계 + `floor(별도 합계 × 0.1)`. 이어서 결제조건·무상유지보수·담당자를 적는다.
-  - 세부 시트: 상위 품목마다 1개다. 시트 이름은 「{NO}. {품명}」에서 `[ ] : * ? / \`를 뺀 앞 31자다. 열은 모듈명(Cisco는 SKU) / 상세 내역(품명) / 수량이고 금액은 없다. 제외 행은 뺀다.
-- **PDF**: A4 세로, 한글 글꼴 내장, 품목 표 머리글을 페이지마다 반복한다. Summary형은 Summary 다음에 세부 내역을 상위 품목 순서대로 잇는다. 품목·수량·금액은 같은 견적의 xlsx와 같다.
-- **적용 시점**: [견적서 다운로드] → 양식 선택 → 형식 선택, `GET /api/quotes/{id}/document?form=single|summary&type=xlsx|pdf`
+  - 거래 조건 4종(하자 보증기간·장비 설치지원·납기/장소·대금 결제조건)의 선택지와 처음 값은 관리자 설정(SCR-014, POL-040)이다. 견적에 저장한 머리가 있으면 처음 값 대신 그 값을 쓴다.
+  - [다운로드] 때 머리를 견적에 저장한다(`PUT /api/quotes/{id}/doc-header`, 견적 수정 번호 검사 — POL-005). 입력이 규칙을 벗어나면 저장도 다운로드도 하지 않는다.
+- **공통 머리** (두 양식)
+  - 제목: 견적서 `QUOTATION`·`견   적   서`, Summary `SUMMARY`·`견   적   요   약`
+  - 문서번호: `{접두어}{YY}-{MMDD}-Q{견적 ID 4자리}` — 날짜는 견적일자, 접두어는 관리자 설정(POL-040, 기본 `ISI`). 예: `ISI26-1006-Q0012`
+  - 견적일자, 수신(TO), 참조(ATTN), 견적명, 견적 담당(이름 · ⓜ 담당자 HP · ⓔ 메일)
+  - 공급자: 관리자가 설정한 회사 정보·CI(POL-040, 기본값 = 표준양식 「기준정보」) — 영문 회사명·영문 주소·전화/팩스 머리글과 CI 2종, 사업자번호·상호·대표자·주소·업태·종목. 직인 이미지는 넣지 않는다.
+  - 견적금액 합계(VAT 포함)와 한글 금액 `일금 {한글 금액}원정`(Excel `NUMBERSTRING(n, 1)` 방식. 예: 358,224,900 → 삼억오천팔백이십이만사천구백)
+- **품목 표 열** (두 양식 공통): NO / 구분(Category) / 모델명 / Part No. / 상세 내역(Product Description) / 수량(Q'ty) / 공급단가(Unit Price) / 공급가 합(Total Price) / 비고(Remarks)
+  - 구분 = PRODUCT·SERVICE·SOFTWARE·미분류, 모델명 = SKU, 상세 내역 = 품명, 공급단가·공급가 합 = POL-036. **소비자가 열은 넣지 않는다.**
+  - 비고: 구분 SERVICE·SOFTWARE 행은 기간 `{n}개월`, 그 밖에는 빈칸
+  - Dell 상위 품목(구성품 있음)·하위 제품은 금액 칸이 빈 묶음 제목 행으로 넣는다.
+  - 표 위에 `(단위 : 원)`, 머리글 행은 페이지마다 반복한다.
+- **합계 3행**: 공급가액(VAT 별도) / 부가가치세(VAT 10%) = `floor(공급가액 × 0.1)` / 합계금액(VAT 포함)
+- **거래 조건·견적 담당 표**: 하자 보증기간 · 장비 설치지원 · 납기 / 장소 · 대금 결제조건 · 견적 유효기간(`견적일로부터 {n}일`) · 특기사항, 그리고 담당자(정)·HP·E-mail·담당자(부)·HP·E-mail
+- **견적서 (단일 표형, 시트 「견적서」)**: 공통 머리 → 품목 표(합산 대상 행에 NO 1부터) → 합계 3행 → 거래 조건·견적 담당 → 구매 확인란(하단 발주 문구 — 관리자 설정 POL-040, 발주처·서명(인)·담당자/연락처 빈칸)
+- **Summary (시트 「Summary」 + 「견적서」)** (DEC-59, DEC-61)
+  - 「Summary」 시트: 공통 머리 → 거래 조건·견적 담당 → 품목 표 → 합계 3행. 품목 표는 상위 품목마다 블록이다: 블록 머리 행(NO `n`, 구분 `견적 n`, 모델명 = Cisco 상위 품목 SKU(Dell은 빈칸), 상세 내역 = 입력한 상세 내역(빈 값이면 상위 품목 품명)) → 그 상위 품목과 자손 중 합산 대상이면서 제외되지 않은 행(NO `n-k`, Dell 하위 제품은 묶음 제목 행) → `소계`. 넣을 행이 없는 상위 품목은 블록을 만들지 않는다.
+  - 뒤에 「견적서」 시트를 붙인다 — 단일 표형과 같은 내용이며 상세 내역 입력은 쓰지 않는다. PDF는 Summary 페이지 뒤에 새 페이지로 견적서를 잇는다.
+  - 소계의 합 = 품목 공급가 합의 합 = 공급가액이어야 한다.
+- **PDF**: A4 세로, 한글 글꼴 내장, 품목 표 머리글을 페이지마다 반복한다. 품목·수량·금액은 같은 견적의 xlsx와 같다.
+- **EOS × 견적 유효기간 표시** (DEC-60, CR-003)
+  - 견적 화면과 견적서 다운로드 창에만 표시한다. **견적서 파일에는 넣지 않고, 저장·다운로드를 막지 않는다.**
+  - 기준은 기준 버전 최신 검증의 행 End-of-Sale 일자다(POL-029 — Dell 구성품은 소속 제품의 값). 미검증이면 표시하지 않는다.
+  - End-of-Sale < 견적일 → 행 EOS 열에 「판매 종료」, 견적일 ≤ End-of-Sale ≤ 견적일 + 유효기간 → 「유효기간 내 판매 종료」
+  - 경고 배너: 「견적일 이전에 판매가 끝난 품목이 {n}개 있습니다: {items}」 / 「견적 유효기간({until}까지) 안에 판매가 끝나는 품목이 {n}개 있습니다: {items}」. 배너는 견적서 제외 행을 빼고, Dell 구성품은 빼고 제품 행으로 한 번만 센다. `{items}`는 SKU(없으면 품명) 목록이다.
+  - 견적 화면은 저장된 견적일·유효기간, 다운로드 창은 입력 중인 값으로 비교한다.
+- **적용 시점**: [견적서 다운로드] → 다운로드 창(양식·형식·머리 입력), `PUT /api/quotes/{id}/doc-header`, `GET /api/quotes/{id}/document?form=single|summary&type=xlsx|pdf`
 - **위반/실패 시 처리**
-  - 저장 조건(POL-033)을 만족하지 않으면 다운로드를 차단하고 해당 문구를 표시한다.
-  - 입력 항목이 규칙을 벗어나면 저장을 차단하고 입력칸 아래에 문구를 표시한다: 「{항목}은(는) {최대}자 이내로 입력해 주세요.」 / 「유효기간은 1~90일 사이 정수여야 합니다.」 / 견적명이 비면 「견적명을 입력해 주세요.」
+  - 저장 조건(POL-033)을 만족하지 않으면 다운로드를 차단하고(HTTP 409) 해당 문구를 표시한다.
+  - 입력 항목이 규칙을 벗어나면 저장을 차단하고 입력칸 아래에 문구를 표시한다(HTTP 400): 「{field}은(는) {max}자 이내로 입력해 주세요.」({field} = 견적명·수신·참조·하자 보증기간·장비 설치지원·납기 / 장소·결제조건·특기사항·담당자 HP·담당자(부)·담당자(부) HP·담당자(부) E-mail·상세 내역) / 「유효기간은 1~90일 사이 정수여야 합니다.」 / 견적명이 비면 「견적명을 입력해 주세요.」
   - 견적서 제외를 반영한 뒤 품목이 0행이면 다운로드를 차단한다: 「견적서에 넣을 품목이 없습니다. 견적서 제외를 해제해 주세요.」
-  - 제외 행 중 견적가가 0원이 아닌 행이 있으면 경고(차단 아님)를 표시한다: 「견적서에서 제외한 행 중 금액이 있는 행이 {n}개 있습니다. 이 금액은 견적서 합계에서 빠집니다.」
-  - 생성한 파일에서 금지 값이 발견되면(아래 의사코드) 파일을 내보내지 않는다. 문구: 「견적서를 만들지 못했습니다. 관리자에게 문의해 주세요.」 서버 오류로 기록한다.
-  - 다운로드마다 일시·견적 ID·양식·형식을 기록한다(POL-011).
-- **예외**: VAT 표기는 「VAT 별도」이고, Summary형은 VAT 포함 합계를 함께 적는다(D-35, OI-07 해결). 파일명은 POL-007을 따른다.
+  - 제외 행 중 공급가 합이 0원이 아닌 행이 있으면 경고(차단 아님)를 표시한다: 「견적서에서 제외한 행 중 금액이 있는 행이 {n}개 있습니다. 이 금액은 견적서 합계에서 빠집니다.」
+  - 생성한 파일에서 금지 값이 발견되면(아래 의사코드) 파일을 내보내지 않는다. 문구: 「견적서를 만들지 못했습니다. 관리자에게 문의해 주세요.」 서버 오류로 기록한다. Summary형은 Summary와 상세 견적서 모두 검사한다.
+  - 성공하면 「견적서를 내려받았습니다.」 다운로드마다 일시·견적 ID·양식·형식·버전을 기록한다(POL-011).
+- **예외**: VAT는 합계 3행으로 별도·포함을 모두 적는다(D-35, OI-07 해결). 파일명은 POL-007을 따른다(Summary형도 `견적서`). 회사 정보·CI·발주 문구·문서번호 접두어·거래 조건 선택지는 다운로드 시점의 관리자 설정을 쓰고, 이미 받은 파일은 바뀌지 않는다(POL-040). xlsx는 수식 없이 값으로 만든다.
 - **검증 의사코드**:
 
   ```js
   function lines(quote, rows) {
-    return summableRows(rows).filter(r => !isExcluded(quote, r, rows)).map(r => ({row: r, ...quotePrice(r, quote, rows)}));
+    return summableRows(rows).filter(r => !isExcluded(quote, r, rows)).map(r => ({row: r, ...line(r, quote)}));  // POL-036
   }
-  function docTotal(quote, rows) { return lines(quote, rows).reduce((s, l) => s.add(l.price), D(0)); }
-  function summaryRow(top, quote, rows) {
-    const ls = lines(quote, rows).filter(l => l.row.id === top.id || isDescendant(rows, l.row, top));
-    const sum = ls.reduce((s, l) => s.add(l.price), D(0));
-    return {qty: top.qty, sum, unit: sum.div(top.qty).floor()};
+  function docTotal(quote, rows) { return lines(quote, rows).reduce((s, l) => s.add(l.amount), D(0)); }  // = 공급가액
+  function docNumber(dateIso, quoteId, prefix = "ISI") {                // prefix: POL-040
+    const [y, m, d] = dateIso.split("-");
+    return `${prefix}${y.slice(2)}-${m}${d}-Q${String(quoteId).padStart(4, "0")}`;
   }
-  const vatIncluded = total => total.add(total.mul("0.1").floor());
-  const FORBIDDEN_HEADERS = ["원가", "DC율", "할인율", "마진율", "환율"];
-  function assertNoForbidden(doc, quote, rows) {
-    // 금지 열이 없고, 숨김 시트·숨김 행/열·이름 정의·메모가 없고, 합계가 docTotal과 같아야 한다
-    if (doc.headers.some(h => FORBIDDEN_HEADERS.some(f => h.includes(f)))) return block("MSG_DOC_BUILD_FAILED");
-    if (doc.hiddenSheets.length || doc.hiddenRanges.length || doc.definedNames.length || doc.comments.length) return block("MSG_DOC_BUILD_FAILED");
-    if (!D(doc.totalCell).eq(docTotal(quote, rows))) return block("MSG_DOC_BUILD_FAILED");
+  function summaryBlocks(quote, rows) {                  // 상위 품목마다 `견적 n` 블록
+    return topRows(rows).map(top => lines(quote, rows).filter(l => l.row.id === top.id || isDescendant(rows, l.row, top)))
+      .filter(ls => ls.length)
+      .map((ls, i) => ({no: i + 1, items: ls, subtotal: ls.reduce((s, l) => s.add(l.amount), D(0))}));
+  }
+  const vat = supply => supply.mul("0.1").floor();
+  const FORBIDDEN_HEADERS = ["원가", "DC율", "할인율", "마진율", "환율", "GP"];
+  function assertNoForbidden(doc, quote, rows) {          // Summary형은 Summary·상세 견적서 모두
+    // 금지 머리글이 없고, 숨김 시트·숨김 행/열·이름 정의·메모가 없고, 합계가 docTotal과 같아야 한다
+    if (doc.headers.some(h => FORBIDDEN_HEADERS.some(f => h.includes(f)))) return block("DOC_BUILD_FAILED");
+    if (doc.hiddenSheets.length || doc.hiddenRanges.length || doc.definedNames.length || doc.comments.length) return block("DOC_BUILD_FAILED");
+    if (!D(doc.totalCell).eq(docTotal(quote, rows))) return block("DOC_BUILD_FAILED");
+    if (doc.form === "summary" && !sum(doc.subtotals).eq(docTotal(quote, rows))) return block("DOC_BUILD_FAILED");
     return ok();
+  }
+  // EOS × 유효기간 (DEC-60) — 화면·다운로드 창만
+  function eosFlag(endOfSale, quoteDate, validDays) {
+    if (!endOfSale) return null;
+    if (endOfSale < quoteDate) return "판매 종료";
+    return endOfSale <= addDays(quoteDate, validDays) ? "유효기간 내 판매 종료" : null;
   }
   ```
 
-- **관련 요구사항**: REQ-018, REQ-009
+- **관련 요구사항**: REQ-018, REQ-009, REQ-030, REQ-032
 - **관련 화면**: SCR-009, SCR-010
-- **관련 테스트**: TC-132, TC-133, TC-134, TC-135, TC-136, TC-137, TC-138, TC-139, TC-156
+- **관련 테스트**: TC-132, TC-133, TC-134, TC-135, TC-136, TC-137, TC-138, TC-139, TC-156, TC-165, TC-166, TC-173, TC-185
 
-### POL-038 원가분석표
+### POL-038 원가분석표 [폐지]
+
+> **폐지(CR-003, DEC-58)** — 2026-10-02. 원가분석표 xlsx(REQ-028)와 `GET /api/quotes/{id}/cost-analysis.xlsx`, 견적 화면 [원가분석표 다운로드]를 없앴다. 품목별 원가·매입 DC·GP·GP율과 손익 요약(매출·원가·GP)은 **견적 화면**에서 본다(POL-034 ~ POL-036). 고객 견적서에는 이 값들을 넣지 않는다(POL-037). 아래는 v1.1 승인 내용으로, 이력 확인용으로만 남긴다.
 
 - **규칙** (한 문장): 원가분석표는 견적의 합산 대상 행 전부(견적서 제외 행 포함)를 구분별로 묶어 행별 원가·견적가·마진을 담은 xlsx다. 행 값은 견적 화면 값과 원 단위까지 같다. 작성자만 내려받는다.
 - **머리**: 고객사명(End user), 건명(Project Name), 작성자(Account Manager), 기준 BoM 버전, 견적 작성일, **매출합** = 견적서 합계(제외 행 뺌), **매입합** = 합산 대상 행 전부의 원가 합(제외 행 포함 — 제외해도 벤더에서 사는 품목이다), **이익** = 매출합 − 매입합, **GP율** = 이익 ÷ 매출합(소수 넷째 자리 반올림, 백분율로 표시. 예: 0.1667 → 16.67%). 매출합이 0이면 GP율은 「-」로 표시한다.
@@ -1522,9 +1699,9 @@
   }
   ```
 
-- **관련 요구사항**: REQ-028
-- **관련 화면**: SCR-009
-- **관련 테스트**: TC-139, TC-140, TC-141
+- **관련 요구사항**: REQ-028(폐지)
+- **관련 화면**: SCR-009 ([원가분석표 다운로드] 삭제)
+- **관련 테스트**: TC-139, TC-140(삭제 — CR-003), TC-141
 
 ### POL-039 표준 BoM·검증 리포트 xlsx
 
@@ -1564,6 +1741,551 @@
 - **관련 요구사항**: REQ-013, REQ-010
 - **관련 화면**: SCR-005, SCR-007, SCR-008
 - **관련 테스트**: TC-093, TC-113, TC-114
+
+## 11. 관리자 운영·편의 기능 정책 (CR-002 · CR-004)
+
+v1.2에서 추가했다. 정책 분류는 정책 목록 표를 따른다(운영 · 권한/등급 · 콘텐츠/데이터 · 검증 · 견적·출력). 화면 문구의 `{field}`는 칸 이름(환경설정은 화면의 항목 이름)으로 바뀐다.
+
+### POL-040 환경설정 (관리자)
+
+- **규칙** (한 문장): 관리자는 SCR-014에서 아래 표의 값을 바꿀 수 있고, 저장한 값이 없는 항목은 기본값(이 기능 이전의 고정값·서버 env)으로 동작한다.
+
+| 묶음 | 항목 | 기본값 | 규칙 | 반영 시점 |
+|---|---|---|---|---|
+| 견적서 회사 정보 | 사업자번호 · 상호 · 대표자 · 주소 · 업태 · 종목 · 영문 회사명 · 영문 주소 · 전화·팩스(머리글) | 표준양식 「기준정보」 시트 값 | 모두 필수. 최대 12 · 100 · 50 · 200 · 100 · 100 · 100 · 200 · 100자. 줄바꿈·제어 문자 금지. 사업자번호 `000-00-00000` | 이후 다운로드하는 견적서 |
+| 견적서 회사 정보 | CI — 견적서 머리(xlsx·PDF), 회사 정보 옆(xlsx) | 기본 CI 이미지 | PNG·JPG(파일 머리 바이트로 판별), 2MB 이하, 가로·세로 각 4,000px 이하, 열리는 이미지. 원래 CI 자리 안에 비율을 지켜 맞춘다 | 이후 다운로드하는 견적서 |
+| 견적 기본값 | 최소 GP율 · 단가 단위 | 10% · 1,000원 | GP율 0 이상 100 미만(소수 둘째 자리) · 1 / 10 / 100 / 1,000 / 10,000원 | **새로 만드는 견적부터** |
+| 견적 기본값 | 견적 유효기간 처음 값 | 14일 | 1 ~ 90일 | 견적서 다운로드 창(저장 안 한 견적) |
+| 견적서 거래 조건 | 하자 보증기간 · 장비 설치지원 · 납기/장소 · 대금 결제조건 — 선택지와 처음 값 | 표준양식 「기준정보」 목록 · 「제조사 정책에 따름」·「별도 협의」·「발주 후 4주 이내 / 귀사 지정 장소」·「계산서 발행 후 60일 이내」 | 선택지 1 ~ 10개(빈 줄·중복 제거), 항목마다 견적서 머리 입력의 최대 글자 수(50 · 50 · 100 · 100자). 처음 값 필수. 보증기간은 서비스 행 기간이 있으면 「{n} Months」가 먼저다(내 견적서 기본값이 있으면 그것이 더 먼저 — POL-042) | 견적서 다운로드 창 |
+| 견적서 문구 | 하단 발주 문구 · 문서번호 접두어 | 「당사는 이 견적서 상의 가격 및 조건들을 수용하고, 본 견적서를 귀사에 대한 공식 발주서로 대신하고자 합니다.」 · `ISI` | 1 ~ 300자, 제어 문자 금지 · 영문 대문자·숫자 1 ~ 8자 | 이후 다운로드하는 견적서 |
+| AI·EOS | AI 호출 켜기 | 켬 | 끄면 이후 검증은 「AI 검토 실패」·「EOS 확인 불가」 경로(POL-029·031·032) | 이후 시작하는 검증·EOS 검색 |
+| AI·EOS | EOS 검색 모델 · AI 검토 모델 | 서버 env `LLM_MODEL`(Claude Sonnet 5.5) | 검증한 모델 목록(Claude Sonnet 5.5, Claude Opus 5.5)과 서버 env 값만 | 〃 |
+| AI·EOS | EOS · AI 검토 시간 한도 | 서버 env(120초 · 90초) | 30 ~ 300초 정수(서버 env 값은 범위 밖이어도 허용) | 〃 |
+| AI·EOS | EOS · AI 검토 생각 강도 | 낮음 · 보통 | 낮음 / 보통 / 높음 | 〃 |
+| AI·EOS | EOS · AI 검토 최대 출력 토큰 | 4,000 · 16,000 | 1,000 ~ 16,000 · 2,000 ~ 32,000 | 〃 |
+| AI·EOS | SKU(품명)당 웹 검색 횟수 | 3 | 1 ~ 10 | 〃 |
+
+- 같은 화면의 [AI 사용량]·[EOS 관리]·[공지·점검] 탭은 POL-041·POL-043·POL-046을 따른다(CR-002 2차, CR-004).
+- **적용 시점**: SCR-014 저장, `GET·PUT /api/settings/company`, `GET·PUT·DELETE /api/settings/company/logos/{en|ko}`, `GET·PUT /api/settings/quote`, `GET·PUT /api/settings/llm`, `POST /api/settings/llm/test`, `POST /api/settings/eos-cache/clear`. 읽는 쪽: 견적 생성·견적 조회(거래 조건)·견적서 다운로드, 검증 시작·AI 다시 시도·EOS 단건 검색
+- **위반/실패 시 처리**: 저장하지 않고 입력칸 아래에 문구를 표시한다(HTTP 400, 첫 오류 문구 + 전체 목록).
+
+| 경우 | 문구 |
+|---|---|
+| 필수 항목 비어 있음 | 「{field}을(를) 입력해 주세요.」 |
+| 길이 초과 | 「{field}은(는) {max}자 이내로 입력해 주세요.」 |
+| 줄바꿈·제어 문자 | 「줄바꿈과 제어 문자는 입력할 수 없습니다.」 |
+| 사업자번호 형식 | 「사업자번호는 000-00-00000 형식으로 입력해 주세요.」 |
+| 목록 밖 값(모델·생각 강도·단가 단위) | 「{field} 값을 목록에서 골라 주세요.」 |
+| 정수 범위 밖 | 「{field}은(는) {min} ~ {max} 사이 정수로 입력해 주세요.」 |
+| 선택지 개수 | 「{field} 선택지는 1 ~ {max}개로 입력해 주세요.」 |
+| 최소 GP율 | 「GP율은 0 이상 100 미만 숫자여야 합니다. (소수점 둘째 자리까지)」 |
+| 유효기간 | 「유효기간은 1~90일 사이 정수여야 합니다.」 |
+| 문서번호 접두어 | 「문서번호 접두어는 영문 대문자·숫자 1 ~ 8자로 입력해 주세요.」 |
+| CI 2MB 초과 / 형식 / 열리지 않음·4,000px 초과 | 「이미지는 2MB 이하만 올릴 수 있습니다.」 / 「PNG 또는 JPG 이미지만 올릴 수 있습니다.」 / 「이미지 파일을 읽을 수 없습니다.」 |
+| 서버 설정이 AI 호출을 꺼 둔 상태에서 [연결 테스트] | HTTP 409 「서버 설정(LLM_ENABLED·API 키)에서 AI 호출이 꺼져 있습니다. 관리자 화면에서 켤 수 없습니다.」 |
+
+- 성공 토스트: 「저장했습니다.」, CI 「CI 이미지를 바꿨습니다.」·「기본 CI 이미지로 되돌렸습니다.」, 캐시 「EOS 캐시 {n}건을 지웠습니다.」. 캐시 비우기 확인 대화상자: 「EOS 결과 캐시 {n}건을 모두 지웁니다. 이후 검증·검색은 AI 로 새로 조회합니다(비용이 듭니다).」 [비우기] [취소]
+- **예외**
+  - 서버 env `LLM_ENABLED=false` 또는 API 키 없음이면 관리자 「켜기」와 상관없이 AI를 호출하지 않는다(env가 하드 스위치). 화면에 「서버 설정에서 AI 호출이 꺼져 있어, 여기서 켜도 검증은 「AI 검토 실패」·「EOS 확인 불가」로 끝납니다.」를 표시한다.
+  - 저장된 값 중 지금 규칙에 맞지 않는 항목은 기본값으로 읽는다(AI·EOS는 항목별, 견적 기본값·문구는 묶음 전체). 설정 오류로 견적서·검증이 멈추지 않게 한다.
+  - [연결 테스트]는 「끄기」 상태에서도 실행한다. 보내는 데이터는 고정 예시 품목 1건(Cisco `C9300-48UXM-A`)뿐이고, 호출 기록은 `llm_calls`에 남긴다(POL-012).
+  - 진행 중인 검증은 시작할 때 읽은 설정으로 끝난다. 이미 받은 견적서 파일과 이미 만든 견적의 단가 단위·최소 GP율은 바뀌지 않는다.
+  - EOS 캐시 기간(7일)·EOS 동시 조회 수·출처 도메인·AI 프롬프트·권고 분류·검증 규칙은 이 설정 대상이 아니다(코드·정책서로만 바꾼다).
+- **검증 의사코드**:
+
+  ```js
+  function readSetting(key, defaults, check) {          // 견적서·검증·EOS 검색이 쓰는 값
+    const saved = db.appSettings[key]?.value;
+    if (!saved) return defaults;                        // 저장값 없음 = 이전과 같다
+    const {value, errors} = check({...defaults, ...saved}, defaults);
+    return errors.length ? defaults : value;            // 규칙에 맞지 않으면 기본값 (AI·EOS 는 항목별)
+  }
+  function saveSetting(user, key, input, defaults, check) {
+    if (user.role !== "관리자") return reject(403, "FORBIDDEN");
+    const {value, errors} = check(input, defaults);
+    if (errors.length) return reject(400, errors);      // 칸별 문구
+    const changed = diffKeys(readSetting(key, defaults, check), value);
+    if (changed.length) { db.appSettings[key] = {value, updatedAt: now(), updatedBy: user.id};
+                          audit("환경설정 변경", {target: key, fields: changed}); }   // 값은 기록하지 않는다
+    return value;
+  }
+  function llmFor(run) {                                 // 검증·단건 검색 시작 때 한 번
+    const cfg = readSetting("llm", envDefaults(), checkLlm);
+    return (!cfg.enabled || !env.LLM_ENABLED || !env.API_KEY) ? disabledLlm() : claude(cfg);
+  }
+  ```
+
+- **관련 요구사항**: REQ-030, REQ-018, REQ-008, REQ-009, REQ-019
+- **관련 화면**: SCR-014, SCR-010
+- **관련 테스트**: TC-164, TC-165, TC-166, TC-167, TC-168, TC-169, TC-170
+
+### POL-041 AI 사용량 집계·월 예산
+
+- **규칙** (한 문장): AI(Claude) 호출은 1건마다 사용량 기록(용도·모델·결과·입력/출력 토큰·웹 검색 횟수·사용자·BoM 건, 원문 없음)을 남기고, 관리자는 SCR-014 [AI 사용량]에서 기간별 집계와 정가 기준 추정 비용을 본다. 월 예산을 정하면 이번 달 추정 비용이 경고 비율·예산에 닿을 때 관리자에게 알리지만 **AI 호출은 막지 않는다**.
+- **용도** (4종)
+
+| 용도 | 무엇 | 사용자 | BoM 건 |
+|---|---|---|---|
+| 검증 — EOS 조회 | 검증 ② 단계의 EOS AI 검색(POL-029) | 검증을 시작한 사람 | 기록 |
+| 검증 — AI 검토 | 검증 ③ 단계·AI [다시 시도](POL-031) | 검증을 시작한 사람 | 기록 |
+| EOS 단건 검색 | SCR-011 단건·여러 SKU 검색의 AI 검색(POL-050) | 검색한 사람 | 없음 |
+| 연결 테스트 | SCR-014 [연결 테스트](POL-040) | 테스트한 관리자 | 없음 |
+
+- **추정 비용** (Anthropic 정가, 2026-09 기준, USD): Claude Sonnet 5.5 입력 $2·출력 $10, Claude Opus 5.5 입력 $4·출력 $20(1M 토큰당), 웹 검색 $10 / 1,000회. `비용 = 입력 토큰 × 입력 단가 ÷ 1M + 출력 토큰 × 출력 단가 ÷ 1M + 웹 검색 × 0.01`. 토큰·웹 검색이 모두 0인 호출(호출 전 차단 등)은 0이다. 단가표에 없는 모델은 비용에서 빼고 건수로 따로 센다.
+- **집계**: 합계(호출·실패·입력 토큰·출력 토큰·웹 검색·추정 비용), 용도별, 모델별, 사용자별, 일별, 월별, BoM 건별(검증 호출만, 비용·호출이 많은 순 20건). 실패 = 결과가 성공이 아닌 호출(오류·시간 초과·거부·전송 필드 차단).
+- **조회 기간**: 이번 달(기본) / 지난 달 / 직접 지정. KST 날짜, 양 끝 포함, 최대 366일.
+- **월 예산**: 월 예산(USD) — 비우면 예산을 쓰지 않는다(경고 없음). 0 초과 1,000,000 이하, 소수 둘째 자리까지. 경고 비율 — 1 ~ 100 정수(%), 기본 80.
+- **예산 판정**: 이번 달(1일 ~ 오늘, KST) 추정 비용이 예산 이상이면 「초과」, 예산 × 경고 비율 이상이면 「경고」다. 관리자에게만 모든 화면 맨 위에 배너로 보이고 [사용량 보기]로 [AI 사용량] 탭을 연다.
+- **적용 시점**: 모든 LLM 호출 직후(기록), `GET /api/settings/llm/usage?from=&to=`, `PUT /api/settings/llm/budget`, `GET /api/notice`(예산 경고 — 관리자 응답에만)
+- **위반/실패 시 처리**
+  - 시작일이 종료일보다 늦으면: 「시작일이 종료일보다 늦습니다.」 / 366일을 넘으면: 「조회 기간은 1년(366일) 이내로 골라 주세요.」 (HTTP 400)
+  - 기간에 호출이 없으면: 「{from} ~ {to} 기간에 AI 호출이 없습니다.」
+  - 단가를 모르는 모델이 섞이면: 「단가를 모르는 모델 {n}건은 비용에서 뺐습니다」
+  - 월 예산 형식 위반: 「월 예산은 0보다 크고 1,000,000 이하인 금액(소수 둘째 자리까지)으로 입력해 주세요.」 / 경고 비율: 「{field}은(는) {min} ~ {max} 사이 정수로 입력해 주세요.」
+  - 경고 배너: 「이번 달 AI 추정 비용이 월 예산의 {pct}%입니다. (${cost} / ${budget})」 / 초과 배너: 「이번 달 AI 추정 비용이 월 예산을 넘었습니다. ({pct}%, ${cost} / ${budget}) 호출은 막지 않습니다.」
+  - 예산 변경은 감사 로그에 남긴다(환경설정 변경, 바뀐 항목 이름만 — POL-011). 사용량 조회는 기록하지 않는다.
+- **예외**: 추정 비용은 정가 기준이라 계약 단가·할인과 다를 수 있다(화면에 단가와 함께 안내). 사용량 기록은 BoM 건을 지워도 남는다 — LLM 요청·응답 원문(`llm_calls`)은 POL-012대로 BoM 건과 함께 지운다. 이 기능 이전의 호출은 기존 원문 기록에서 옮겨 담았고, 그중 검증 밖 EOS 호출은 「EOS 단건 검색」으로 센다(연결 테스트의 EOS 1건과 구분하지 못함).
+- **검증 의사코드**:
+
+  ```js
+  const PRICES = {"claude-sonnet-5-5": [2, 10], "claude-opus-5-5": [4, 20]}, WEB_PER_1K = 10;   // USD, 2026-09 정가
+  function estimateCost(r) {
+    if (!r.inputTokens && !r.outputTokens && !r.webSearches) return D(0);
+    const p = PRICES[r.model]; if (!p) return null;                      // 단가 없음 → 비용에서 뺀다
+    return D(r.inputTokens).mul(p[0]).div(1e6).add(D(r.outputTokens).mul(p[1]).div(1e6)).add(D(r.webSearches).mul(WEB_PER_1K).div(1000));
+  }
+  function checkRange(from, to) {
+    if (from > to) return block("SEARCH_DATE_ORDER");
+    if (daysBetween(from, to) >= 366) return block("USAGE_RANGE_TOO_LONG");
+    return ok();
+  }
+  function budgetStatus(budget, monthCost) {               // monthCost = 이번 달 1일 ~ 오늘 추정 비용
+    if (budget.monthlyUsd == null) return null;
+    const level = monthCost.gte(budget.monthlyUsd) ? "over"
+      : monthCost.mul(100).gte(D(budget.monthlyUsd).mul(budget.warnPct)) ? "warn" : "ok";
+    return {level, pct: monthCost.div(budget.monthlyUsd).mul(100).toDecimalPlaces(0, ROUND_HALF_UP)};
+  }
+  // 배너: user.role === "관리자" && level !== "ok" 일 때만
+  ```
+
+- **관련 요구사항**: REQ-031, REQ-008, REQ-009
+- **관련 화면**: SCR-014 (예산 경고 배너는 관리자의 전 화면 상단)
+- **관련 테스트**: TC-171, TC-172
+
+### POL-042 내 견적서 기본값
+
+- **규칙** (한 문장): 작성자는 견적서 다운로드 창에서 7칸(담당자 HP · 담당자(부) · 담당자(부) HP · 담당자(부) E-mail · 하자 보증기간 · 납기 / 장소 · 대금 결제조건)을 「내 기본값」으로 저장할 수 있고, 저장한 칸은 그 뒤 머리를 아직 저장하지 않은 견적의 처음 값이 된다. 빈 칸은 관리자 설정(POL-040)을 쓴다.
+
+| 칸 | 최대 | 처음 값 우선순위 (머리를 저장하지 않은 견적) |
+|---|---|---|
+| 담당자 HP · 담당자(부) · 담당자(부) HP | 30자 | 내 기본값 > 빈 값 |
+| 담당자(부) E-mail | 100자 | 내 기본값 > 빈 값 |
+| 하자 보증기간 | 50자 | 내 기본값 > 「{n} Months」(SERVICE 행 기간) > 관리자 설정 |
+| 납기 / 장소 · 대금 결제조건 | 100자 | 내 기본값 > 관리자 설정 |
+
+- **저장 방법**: 다운로드 창 담당자 칸 아래 체크박스 「담당자 연락처·하자 보증기간·납기·결제조건을 내 기본값으로 저장 — 다음에 만드는 견적에 자동으로 채워집니다」. 내 기본값이 하나도 없으면 체크된 채로, 있으면 해제된 채로 연다. 체크하고 [다운로드]하면 견적서 머리 저장과 함께 7칸을 지금 입력값으로 덮어쓴다(빈 칸은 빈 값으로 저장 → 다음 견적에서 관리자 설정을 쓴다).
+- **적용 시점**: 견적서 다운로드 창 [다운로드] `PUT /api/quotes/{id}/doc-header {…, saveMyDefaults: true}`, 견적 조회(처음 값 계산)
+- **위반/실패 시 처리**: 길이 검사는 견적서 머리(POL-037)와 같다. 위반이면 머리와 내 기본값 **둘 다** 저장하지 않고 입력칸 아래에 「{field}은(는) {max}자 이내로 입력해 주세요.」를 표시한다.
+- **예외**: 이미 머리를 저장한 견적은 내 기본값이 바뀌어도 그대로다. 저장된 값 중 규칙(문자열·최대 글자 수)에 맞지 않는 칸은 빈 칸으로 읽는다. 장비 설치지원·특기사항·수신·참조는 내 기본값 대상이 아니다. 내 기본값은 본인 견적에서만 쓰고, 사용자 목록·감사 로그에는 내보내지 않으며 감사 사건도 아니다.
+- **검증 의사코드**:
+
+  ```js
+  const MY_DOC_FIELDS = ["ownerPhone", "subName", "subPhone", "subEmail", "warrantyTerm", "delivery", "paymentTerms"];
+  function myDocDefaults(saved) {                       // 규칙에 맞는 칸만
+    return Object.fromEntries(MY_DOC_FIELDS.map(k => {
+      const v = typeof saved?.[k] === "string" ? saved[k].trim() : "";
+      return [k, [...v].length <= DOC_LIMITS[k] ? v : ""];
+    }));
+  }
+  function docHeaderDefaults(quote, bom, rows, cfg, author) {          // cfg: POL-040 견적 설정
+    const months = warrantyMonths(rows);                               // SERVICE 행 기간 최빈값
+    const base = {validDays: cfg.validDays, install: cfg.termDefaults.install, delivery: cfg.termDefaults.delivery,
+      paymentTerms: cfg.termDefaults.paymentTerms, warrantyTerm: months != null ? `${months} Months` : cfg.termDefaults.warrantyTerm,
+      ownerPhone: "", subName: "", subPhone: "", subEmail: ""};
+    const mine = Object.fromEntries(Object.entries(myDocDefaults(author.docDefaults)).filter(([, v]) => v));
+    return {...base, ...mine, ...(quote.docHeader ?? {})};             // 저장된 머리 > 내 기본값 > 기본
+  }
+  function saveDocHeader(quote, header, saveMine, user) {
+    const errors = checkDocHeader(header);
+    if (errors.length) return reject(400, errors);                     // 둘 다 저장 안 함
+    tx(() => { quote.docHeader = header; if (saveMine) user.docDefaults = pick(header, MY_DOC_FIELDS); });
+  }
+  ```
+
+- **관련 요구사항**: REQ-032, REQ-018
+- **관련 화면**: SCR-010
+- **관련 테스트**: TC-173
+
+### POL-043 EOS 관리자 등록·캐시 관리
+
+- **규칙** (한 문장): 관리자는 SCR-014 [EOS 관리]에서 (벤더, SKU 또는 Dell 제품 품명)마다 EOS를 출처와 함께 등록·수정·삭제할 수 있고, 등록값은 캐시·AI 검색보다 먼저 쓰이며 지울 때까지 만료되지 않는다. EOS 결과 캐시는 전체·벤더·고른 항목 단위로 비울 수 있고, 비워도 등록값은 남는다(DEC-64).
+- **등록 입력**
+
+| 칸 | 규칙 |
+|---|---|
+| 벤더 | Cisco / Dell — 필수 |
+| 조회 단위 | SKU / 제품 품명(Dell만 — 검증의 Dell 조회 단위, POL-029) |
+| SKU·제품 품명 | 필수, 247자 이내. 키는 (벤더, 대문자 SKU) 또는 (벤더, `PRODUCT:` + 대문자 품명). 같은 키가 있으면 고친다 |
+| 판매 상태 | 판매중 / EoS 예정 / 판매 종료 — 필수 |
+| EoS 공지일 · End-of-Sale 일자 · LDoS 일자 | `YYYY-MM-DD`. EoS 예정·판매 종료는 End-of-Sale 일자 필수. 판매중이면 날짜를 지운다 |
+| 대체 제품 | 64자 이내 |
+| 출처 | 필수. `https://`로 시작하는 주소 1개, 500자 이내. 도메인 제한 없음(관리자가 확인한 근거) |
+| 메모 | 200자 이내 |
+
+- **판정**: 등록값도 같은 판정 함수(POL-029)를 쓴다 — 상태는 End-of-Sale 일자로 다시 정해진다(예: 「EoS 예정」으로 등록했어도 End-of-Sale ≤ 오늘이면 「판매 종료」). 출처 도메인은 검사하지 않는다. 표시 문구는 POL-029의 관리자 등록 문구(「(관리자 등록, 출처: …)」가 붙는 3종)이고, 「AI 검색 결과」 대신 「관리자 등록」으로 표시한다(검증 R8·단건·여러 SKU 검색 공통).
+- **캐시 목록**: 최근 조회 순 50건씩, 벤더·SKU/품명(부분 일치)으로 찾는다. 항목마다 오늘 기준으로 다시 판정한 상태, End-of-Sale, 대체 제품, 출처, 조회 일시, 만료 일시(조회 + 7일), 관리자 등록 여부를 보여준다.
+- **캐시 비우기**: 고른 항목 / 벤더(Cisco·Dell) / 전체. 비우기 전에 확인 대화상자를 띄운다: 「고른 {n}건의 캐시를 지웁니다. 다음 검증·검색은 AI로 새로 조회합니다(비용이 듭니다).」 / 「{vendor} 캐시를 모두 지웁니다. 다음 검증·검색은 AI로 새로 조회합니다(비용이 듭니다).」 / 「EOS 캐시를 모두 지웁니다. 다음 검증·검색은 AI로 새로 조회합니다(비용이 듭니다).」 관리자 등록을 지울 때는 「{vendor} {sku} 관리자 등록을 지웁니다. 그 뒤로는 캐시·AI 검색 결과를 씁니다.」 완료 토스트 「EOS 캐시 {n}건을 지웠습니다.」. 관리자 등록값은 지우지 않는다.
+- **적용 시점**: `GET /api/settings/eos/cache?vendor=&q=&page=`, `GET /api/settings/eos/overrides`, `PUT /api/settings/eos/overrides`, `DELETE /api/settings/eos/overrides?vendor=&key=`, `POST /api/settings/eos-cache/clear {vendor?, keys?}`. 등록·삭제는 그 뒤 시작하는 검증·EOS 검색부터 쓴다(진행 중인 검증은 그대로).
+- **위반/실패 시 처리**: 저장하지 않고 칸 아래에 문구를 표시한다(HTTP 400, 첫 오류 + 목록).
+  - 벤더 없음: 「벤더를 선택해 주세요.」 / 필수 칸: 「{field}을(를) 입력해 주세요.」 / 길이: 「{field}은(는) {max}자 이내로 입력해 주세요.」 / 목록 밖(조회 단위·판매 상태): 「{field} 값을 목록에서 골라 주세요.」 / 날짜 형식: 「{field}은(는) YYYY-MM-DD 형식으로 입력해 주세요.」
+  - End-of-Sale 누락: 「EoS 예정·판매 종료는 End-of-Sale 일자를 입력해 주세요.」 / 출처: 「출처는 https:// 로 시작하는 주소(500자 이내)로 입력해 주세요.」
+  - 없는 등록값 삭제: HTTP 404
+  - 성공: 「EOS 를 등록했습니다.」 / 삭제 「관리자 등록을 지웠습니다. 이제 캐시·AI 검색 결과를 씁니다.」. 등록값이 없으면 「관리자가 등록한 EOS 가 없습니다.」, 캐시가 없으면 「저장된 EOS 캐시가 없습니다.」
+  - 등록·수정·삭제(벤더·키)와 캐시 비우기(범위·건수)는 감사 로그에 남긴다(환경설정 변경 — POL-011).
+- **예외**: 단건 검색 [다시 조회]도 등록값이 있으면 AI를 부르지 않는다. 등록값은 캐시 기간(7일)과 무관하다. 등록을 지우면 다음 조회부터 캐시·AI 검색 결과를 쓴다.
+- **검증 의사코드**:
+
+  ```js
+  function checkOverride(v) {
+    const errs = [];
+    if (!["Cisco", "Dell"].includes(v.vendor)) errs.push(["vendor", "EOS_VENDOR_REQUIRED"]);
+    if (!["sku", "product"].includes(v.kind) || (v.kind === "product" && v.vendor !== "Dell")) errs.push(["kind", "SET_CHOICE"]);
+    if (!v.value?.trim()) errs.push(["value", "SET_REQUIRED"]); else if ([...v.value.trim()].length > 247) errs.push(["value", "SET_TOO_LONG"]);
+    if (!["ON_SALE", "EOS_ANNOUNCED", "END_OF_SALE"].includes(v.status)) errs.push(["status", "SET_CHOICE"]);
+    if (v.status !== "ON_SALE" && !v.endOfSaleDate) errs.push(["endOfSaleDate", "EOS_EOS_DATE_REQUIRED"]);
+    if (!/^https:\/\/[^/]+/.test(v.sourceUrl ?? "") || v.sourceUrl.length > 500) errs.push(["sourceUrl", "EOS_SOURCE_URL"]);
+    return errs;
+  }
+  const overrideKey = v => [v.vendor, v.kind === "product" ? "PRODUCT:" + normalize(v.value).toUpperCase() : v.value.trim().toUpperCase()];
+  function clearCache({vendor, keys}) {                   // 관리자 등록값(overrides)은 건드리지 않는다
+    const n = cache.delete(e => (!vendor || e.vendor === vendor) && (!keys || keys.some(k => k.vendor === e.vendor && k.key === e.key)));
+    audit("환경설정 변경", {target: "eos_cache", scope: keys ? "keys" : vendor ? "vendor" : "all", count: n});
+    return n;
+  }
+  ```
+
+- **관련 요구사항**: REQ-033, REQ-008, REQ-019
+- **관련 화면**: SCR-014, SCR-007, SCR-011
+- **관련 테스트**: TC-174, TC-175
+
+### POL-044 감사 로그 조회·내보내기
+
+- **규칙** (한 문장): 관리자는 SCR-015에서 감사 로그(POL-011)를 사건·사용자·결과·기간으로 걸러 최신순 **50건씩** 보고, 거른 조건 그대로 CSV(최대 **100,000건**)로 내려받는다. 내려받은 사실도 감사 로그에 남는다. 감사 로그는 조회만 하고 고칠 수 없다.
+
+| 조건 | 규칙 |
+|---|---|
+| 사건 | POL-011 사건 중 하나(화면은 사건 이름 목록) |
+| 사용자 | 사용자 하나(이름 목록) |
+| 결과 | 성공 / 실패 |
+| 기간 | 시작일 00:00:00 ~ 종료일 23:59:59 (KST), 양 끝 포함, 한쪽만 넣어도 된다 |
+
+- **목록 열**: 일시(KST, 초까지) · 사건 · 사용자 · 대상 ID · 결과 · 상세. 정렬은 일시 내림차순, 같으면 기록 ID 내림차순
+- **CSV**: UTF-8 BOM(Excel에서 바로 열림), 열 `일시(KST)` · `사건` · `사건 코드` · `사용자` · `사용자 ID` · `대상 ID` · `결과` · `상세`(JSON). 파일명 `감사로그_{YYYY-MM-DD}.csv`(KST 오늘, POL-007 예외)
+- **적용 시점**: `GET /api/audit?event=&userId=&result=&from=&to=&page=`, `GET /api/audit.csv?event=&userId=&result=&from=&to=`
+- **위반/실패 시 처리**
+  - 시작일이 종료일보다 늦으면: 「시작일이 종료일보다 늦습니다.」 / 목록에 없는 사건 코드: HTTP 400 「입력값을 확인해 주세요.」
+  - 결과가 0건이면: 「조건에 맞는 기록이 없습니다.」
+  - CSV 대상이 100,000건을 넘으면 내보내지 않는다: 「내보낼 기록이 {n}건을 넘습니다. 기간이나 조건을 좁혀 주세요.」({n} = 100,000)
+  - CSV 내보내기는 감사 로그 「감사 로그 내보내기」(거른 조건·건수)를 먼저 쓰고, 쓰지 못하면 내려주지 않는다(HTTP 500, POL-011 다운로드 규칙).
+- **예외**: 조회는 기록하지 않는다. 감사 로그에는 금액이 없으므로(POL-009·011) 내보내기에도 금액이 없다. 화면 안내: 「로그인·역할 변경·확정·다운로드·환경설정 변경 등의 기록입니다. 금액은 남기지 않습니다. CSV 는 지금 거른 조건 그대로(최대 10만 건) 내려받고, 내려받은 사실도 기록됩니다.」
+- **검증 의사코드**:
+
+  ```js
+  const PAGE = 50, CSV_MAX = 100000;
+  function filtered(q) {
+    if (q.event && !AUDIT_EVENTS.includes(q.event)) return block("VALIDATION_FAILED", {status: 400});
+    if (q.from && q.to && q.from > q.to) return block("SEARCH_DATE_ORDER");
+    return auditLog.where(e => (!q.event || e.event === q.event) && (q.userId == null || e.userId === q.userId)
+      && (!q.result || e.result === q.result) && (!q.from || e.at >= startOfDayKST(q.from)) && (!q.to || e.at <= endOfDayKST(q.to)))
+      .orderBy(["at desc", "id desc"]);
+  }
+  function exportCsv(admin, q) {
+    const rows = filtered(q);
+    if (rows.length > CSV_MAX) return block("AUDIT_TOO_MANY", {n: CSV_MAX});
+    return sendFile(utf8Bom(csv(rows)), {audit: {event: "AUDIT_EXPORT", extra: {...q, count: rows.length}, mandatory: true}});
+  }
+  ```
+
+- **관련 요구사항**: REQ-034, NFR-008
+- **관련 화면**: SCR-015
+- **관련 테스트**: TC-176, TC-186
+
+### POL-045 운영 통계·AI 권고 품질 지표
+
+- **규칙** (한 문장): 관리자는 SCR-016에서 기간(기본 최근 6개월 — 5개월 전 1일 ~ 오늘, 최대 366일)의 활동 건수·벤더별 새 BoM·판정·AI 권고 품질 지표를 본다. 활동 건수는 감사 로그(성공)로 세어 BoM 건을 지워도 남는다(DEC-65).
+- **활동 지표** (합계·월별·사용자별 — 사용자는 건수 많은 순)
+
+| 지표 | 세는 것 |
+|---|---|
+| 새 BoM | 「BoM 건 생성」 성공(복제 포함) |
+| 검증 | 기간 안에 시작한 검증 실행(검증 기록 기준 — BoM 건을 지우면 함께 빠진다) |
+| 확정 | 「확정」 성공(「AI 검토 없이 확정」 포함, 확정 1건 = 1) |
+| 견적 | 「견적 만들기」 성공 |
+| 견적서 | 「견적서 다운로드」 성공 |
+| BoM 다운로드 | 「표준 BoM 다운로드」 성공 |
+
+- **벤더별 새 BoM**: 기간 안에 만든, 지금 남아 있는 BoM 건 중 어느 버전에든 그 벤더 행이 있는 건수(Cisco·Dell·행 없음). 두 벤더가 섞인 건은 양쪽에 센다.
+- **판정**: 기간 안에 시작해 끝난 검증의 판정을 등급별·규칙별(많은 순)로 센다.
+- **AI 권고 품질** (PRD 리스크 5 지표, 기간 안에 시작해 끝난 검증의 권고 기준)
+
+| 지표 | 정의 |
+|---|---|
+| 권고 수 · 검증당 권고 | 권고 건수, 권고 ÷ 검증 |
+| 확인함 비율 | 「확인함」이 체크된 권고 ÷ 권고 |
+| 일괄 확인 비율 | 기간 안 「확인함」 체크(감사 로그, 판정·권고 모두) 중 일괄 체크(`bulk`, CR-001)인 것 ÷ 체크 전체 |
+| 재검증에서 사라진 권고 | 같은 BoM 건의 **바로 다음 완료 검증**(기간 밖 포함)에 같은 분류이면서 대상 행 계보 ID가 하나라도 겹치는 권고(「BoM 전체」 권고끼리는 같다고 본다)가 없는 권고 ÷ 다음 완료 검증이 있는 권고. 대상 행 계보를 저장하기 시작한 뒤의 권고만 잰다 |
+| AI 검토 실패율 | AI 단계가 실패한 검증 ÷ AI 단계가 끝난(성공·실패) 검증 |
+| 분류별 권고 | 분류별 건수(많은 순) |
+
+  - 비율은 백분율 소수 첫째 자리까지다. 분모가 0이면 값을 표시하지 않는다.
+- **적용 시점**: `GET /api/stats?from=&to=`
+- **위반/실패 시 처리**
+  - 기간 오류: 「시작일이 종료일보다 늦습니다.」 / 「조회 기간은 1년(366일) 이내로 골라 주세요.」 (HTTP 400)
+  - 기간에 활동이 없으면: 「{from} ~ {to} 기간에 활동이 없습니다.」
+  - 화면 안내: 「활동 건수는 감사 로그로 셉니다 — BoM 건을 지워도 남습니다. 벤더별 새 BoM 은 남아 있는 BoM 기준입니다.」, 「「재검증에서 사라진 권고」는 같은 BoM 의 다음 검증에서 같은 분류·같은 대상 행의 권고가 나오지 않은 비율로, 권고를 반영해 고쳤는지 추정한 값입니다. 다음 검증이 있는 권고만 셉니다.」
+- **예외**: 통계 조회는 기록하지 않는다. 금액·가격은 다루지 않는다. 「재검증에서 사라진 권고」는 수정 반영을 추정한 값이다(권고를 무시하고 다시 검증해도 AI가 같은 권고를 내지 않으면 해소로 센다).
+- **검증 의사코드**:
+
+  ```js
+  const AUDIT_METRIC = {BOM_CREATE: "새 BoM", CONFIRM: "확정", QUOTE_CREATE: "견적", DOWNLOAD_QUOTE: "견적서", DOWNLOAD_BOM: "BoM 다운로드"};
+  const same = (a, b) => a.category === b.category && a.lineages && b.lineages
+    && ((!a.lineages.length && !b.lineages.length) || a.lineages.some(x => b.lineages.includes(x)));
+  function aiQuality(periodVals, allValsOfSameBoms, recsOf, acks) {
+    const recs = periodVals.flatMap(v => recsOf(v.id));
+    let measurable = 0, resolved = 0;
+    for (const v of periodVals) {
+      const next = nextDoneValidation(allValsOfSameBoms, v);           // 같은 BoM, 시작 순 바로 다음
+      if (!next) continue;
+      for (const r of recsOf(v.id).filter(r => r.lineages != null)) { measurable++; if (!recsOf(next.id).some(x => same(r, x))) resolved++; }
+    }
+    const checks = acks.filter(a => a.acked), aiDone = periodVals.filter(v => ["OK", "FAILED"].includes(v.aiStatus));
+    const rate = (n, d) => d ? round1(n / d * 100) : null;
+    return {ackedRate: rate(recs.filter(r => r.ackBy).length, recs.length), bulkAckRate: rate(checks.filter(a => a.bulk).length, checks.length),
+            resolvedRate: rate(resolved, measurable), aiFailureRate: rate(aiDone.filter(v => v.aiStatus === "FAILED").length, aiDone.length)};
+  }
+  ```
+
+- **관련 요구사항**: REQ-035
+- **관련 화면**: SCR-016
+- **관련 테스트**: TC-177, TC-178, TC-187
+
+### POL-046 공지·점검 배너
+
+- **규칙** (한 문장): 관리자가 공지를 켜 두면 표시 기간 동안 로그인한 모든 사용자(역할 미지정 포함)의 화면 맨 위에 종류(안내·점검)와 문구를 띄운다. 사용자가 [닫기]하면 같은 문구는 그 브라우저 탭에서 다시 띄우지 않는다.
+
+| 칸 | 규칙 | 기본값 |
+|---|---|---|
+| 공지 표시 | 켬 / 끔 | 끔 |
+| 공지 종류 | 안내 / 점검 | 안내 |
+| 공지 문구 | 켜면 필수, 200자 이내, 줄바꿈·제어 문자 금지 | 빈 값 |
+| 표시 시작 · 표시 종료 | 날짜와 시각(분, KST). 비우면 제한 없음. 시작 ≤ 종료 | 빈 값 |
+
+- **표시 조건**: 켜져 있고 문구가 있으며, 지금(KST, 분 단위)이 표시 시작 이후이고 표시 종료 이전(양 끝 포함)일 때. 화면은 5분마다 다시 확인한다.
+- **닫기**: 닫은 문구를 그 브라우저 탭에만 기억한다. 문구가 바뀌거나 새 탭을 열면 다시 보인다.
+- **적용 시점**: SCR-014 [공지·점검] 저장 `GET·PUT /api/settings/notice`(관리자), 모든 화면 상단 `GET /api/notice`(로그인한 모든 사용자)
+- **위반/실패 시 처리**: 저장하지 않고 칸 아래에 문구를 표시한다(HTTP 400).
+  - 켰는데 문구가 비면: 「{field}을(를) 입력해 주세요.」 / 200자 초과: 「{field}은(는) {max}자 이내로 입력해 주세요.」 / 줄바꿈·제어 문자: 「줄바꿈과 제어 문자는 입력할 수 없습니다.」
+  - 날짜·시각 중 하나만 넣으면: 「{field}은(는) 날짜와 시각을 모두 입력해 주세요.」 / 종료가 시작보다 빠르면: 「표시 종료가 표시 시작보다 빠릅니다.」 / 종류가 목록 밖: 「{field} 값을 목록에서 골라 주세요.」
+  - 저장하면 「저장했습니다.」, 바뀐 항목 이름을 감사 로그에 남긴다(환경설정 변경 — POL-011).
+  - 화면 안내: 「켜 두면 로그인한 모든 사용자 화면 맨 위에 보입니다. 표시 기간을 비우면 끌 때까지 계속 보입니다.」
+- **예외**: 공지는 서비스 사용을 막지 않는다(「점검」도 표시만 한다). 저장된 값이 규칙에 맞지 않으면 공지를 끈 것으로 본다. 관리자에게는 AI 월 예산 경고(POL-041)가 같은 자리에 함께 보인다.
+- **검증 의사코드**:
+
+  ```js
+  function checkNotice(v) {
+    const errs = [], text = (v.text ?? "").trim();
+    if (!["info", "maintenance"].includes(v.level)) errs.push(["level", "SET_CHOICE"]);
+    if (v.enabled && !text) errs.push(["text", "SET_REQUIRED"]);
+    else if ([...text].length > 200) errs.push(["text", "SET_TOO_LONG"]);
+    else if (/[\u0000-\u001F\u007F]/.test(text)) errs.push(["text", "BOM_CONTROL_CHAR"]);
+    const s = parseDateTime(v.startAt), e = parseDateTime(v.endAt);          // "" → null, 형식 오류 → SET_DATETIME
+    if (s && e && s > e) errs.push(["endAt", "NOTICE_RANGE_ORDER"]);
+    return errs;
+  }
+  function noticeActive(n, nowKst) {
+    if (!(n.enabled && n.text)) return false;
+    const now = truncateToMinute(nowKst);
+    return (!n.start || now >= n.start) && (!n.end || now <= n.end);
+  }
+  // 화면: closedText(sessionStorage) === n.text 이면 띄우지 않는다
+  ```
+
+- **관련 요구사항**: REQ-036
+- **관련 화면**: SCR-014, SCR-002, 전 화면 상단(GNB 위)
+- **관련 테스트**: TC-179
+
+### POL-047 사용자 비활성화
+
+- **규칙** (한 문장): 관리자는 SCR-012에서 사용자를 1명 이상 골라 비활성화·다시 활성화할 수 있다. 비활성화하면 그 사용자의 로그인 세션을 **즉시** 지우고, 다시 활성화할 때까지 로그인할 수 없다. 역할과 작성한 BoM 건은 그대로이며, 본인은 비활성화할 수 없다(DEC-63).
+- **상태**: 활성 / 비활성(비활성화 일시를 사용자에 기록). 사용자 목록에 상태 열과 상태 필터(전체·활성·비활성)가 있다.
+- **적용 시점**: [비활성화]·[다시 활성화] `PATCH /api/users/status {userIds, disabled}`, SSO 콜백(POL-002), 모든 API 요청(세션 확인)
+- **위반/실패 시 처리**
+  - 선택한 사용자가 0명이면 버튼이 비활성이다. API는 HTTP 400 「입력값을 확인해 주세요.」
+  - 비활성화 선택에 자기 자신이 들어 있으면 요청 전체를 차단한다(일부만 반영하지 않음): 「자신의 계정은 비활성화할 수 없습니다. 선택 목록에서 본인을 빼 주세요.」 다시 활성화는 본인이 섞여도 된다.
+  - 비활성화 확인 대화상자: 「{n}명을 비활성화합니다. 로그인한 상태라면 바로 끊기고, 다시 활성화할 때까지 로그인할 수 없습니다. 비활성화하시겠습니까?」
+  - 다시 활성화 확인 대화상자: 「{n}명을 다시 활성화합니다. 이전 역할 그대로 다시 로그인할 수 있습니다. 다시 활성화하시겠습니까?」
+  - 성공: 「{n}명을 비활성화했습니다. 로그인이 바로 끊깁니다.」 / 「{n}명을 다시 활성화했습니다.」 ({n} = 실제로 상태가 바뀐 사용자 수)
+  - 비활성 사용자가 로그인하면 세션을 만들지 않는다: 로그인 화면 「사용이 중지된 계정입니다. 관리자(CSD)에게 문의해 주세요.」(로그인 실패로 기록 — POL-011)
+  - 비활성화 전에 만든 세션으로 요청하면 그 세션을 지우고 HTTP 401 `ACCOUNT_DISABLED` 「사용이 중지된 계정입니다. 관리자(CSD)에게 문의해 주세요.」
+  - 상태가 바뀐 사용자마다 「사용자 비활성화」·「사용자 다시 활성화」를 감사 로그에 남긴다(POL-011).
+- **예외**: 이미 같은 상태인 사용자는 기록하지 않고 {n}에서도 뺀다. 비활성화해도 역할·작성한 BoM 건·작성자 표시는 그대로이고(POL-010, POL-013), 다시 활성화하면 이전 역할로 쓴다. 역할 미지정 사용자도 비활성화할 수 있다.
+- **검증 의사코드**:
+
+  ```js
+  function changeStatus(admin, userIds, disabled) {
+    if (userIds.length === 0) return block("VALIDATION_FAILED", {status: 400});
+    if (disabled && userIds.includes(admin.id)) return block("SELF_DISABLE", {status: 400});
+    const changed = userIds.map(users.get).filter(u => !!u.disabledAt !== disabled);
+    tx(() => {
+      changed.forEach(u => u.disabledAt = disabled ? now() : null);
+      if (disabled) sessions.deleteWhere(s => changed.some(u => u.id === s.userId));   // 즉시 끊는다
+    });
+    changed.forEach(u => audit(disabled ? "USER_DISABLE" : "USER_ENABLE", {by: admin.id, target: u.id}));
+    return ok({message: msg(disabled ? "USERS_DISABLED" : "USERS_ENABLED", {n: changed.length})});
+  }
+  function onRequest(session) {                           // POL-001 세션 확인 뒤
+    if (users.get(session.userId).disabledAt) { destroy(session); return block("ACCOUNT_DISABLED", {status: 401}); }
+    return ok();
+  }
+  ```
+
+- **관련 요구사항**: REQ-037, REQ-020
+- **관련 화면**: SCR-012, SCR-001
+- **관련 테스트**: TC-180
+
+### POL-048 BoM 건 복제
+
+- **규칙** (한 문장): 작성자 역할(영업·관리자)은 BoM 건의 **확정 버전** 하나를 골라 새 BoM 건(v1 작성중·미검증)으로 복제할 수 있다. 행 구성은 그대로 옮기고 계보 ID는 새로 만든다. 원본 BoM 건의 작성자(POL-009)면 가격 정보·원본 파일까지, 그 밖의 사람은 **구성만** 복사한다(DEC-66).
+
+| 복사하는 것 | 원본 작성자 | 그 밖의 사람 |
+|---|---|---|
+| 행 — 행 번호·벤더·원본 라인 번호·상위 행·행 유형·구분·모듈명·SKU·옵션 ID·품명·수량·서비스·구독 기간·구독 정보·원본 파일명·원본 행 번호·비고 | ○ | ○ |
+| 가격 정보 — 통화·List 단가·List 금액·할인율·벤더 Net 금액 | ○ | × |
+| 원본 벤더 파일(그 버전 행이 쓰는 파일만, 파일 자체를 복사) · 벤더 파일 합계(R9 기준값) | ○ | × |
+| 계보 ID | 새로 만든다 | 새로 만든다 |
+| 검증 결과·「확인함」·견적·다른 버전 | × | × |
+
+- **입력**: 새 고객사명·건명(POL-003과 같은 규칙·문구 — 처음 값은 원본 고객사명, 원본 건명 뒤에 (복제)), 복제할 버전 번호. 새 건의 작성자는 복제한 사람이다.
+- **적용 시점**: SCR-005 [BoM 건 복제] → 복제 모달, `POST /api/boms/{id}/clone {customer, title, versionNo}`
+- **위반/실패 시 처리**
+  - 확정되지 않은 버전: HTTP 409 「확정된 버전에서만 복제할 수 있습니다.」 (화면은 확정 버전에서만 버튼을 보인다)
+  - 엔지니어·역할 미지정: HTTP 403(POL-008). 없는 버전: HTTP 404
+  - 고객사명·건명 위반: POL-003 문구
+  - 모달 안내: 원본 작성자 「가격 정보와 원본 파일까지 복사합니다. 새 건은 v1 작성중·미검증으로 시작합니다.」 / 그 밖 「다른 사람의 BoM 건이라 가격 정보와 원본 파일은 복사하지 않고 구성만 가져옵니다.」
+  - 성공하면 새 BoM 건의 v1 화면으로 이동한다.
+  - 감사 로그: 「BoM 건 생성」에 원본 BoM 건 ID·버전 번호·가격 복사 여부(POL-011)
+- **예외**: 원본 BoM 건은 바뀌지 않는다. 계보 ID가 새것이므로 원본 건과 버전 비교·견적 가져오기(POL-049)는 이어지지 않는다. 가격을 복사하지 않은 건은 CCW 구성형처럼 가격이 빈 상태로 시작한다.
+- **검증 의사코드**:
+
+  ```js
+  function cloneBom(user, src, versionNo, input) {
+    if (!AUTHOR_ROLES.includes(user.role)) return block("FORBIDDEN", {status: 403});
+    const v = src.versions.find(x => x.no === versionNo); if (!v) return block("NOT_FOUND", {status: 404});
+    if (v.status !== "확정") return block("CLONE_NEEDS_CONFIRMED", {status: 409});
+    const err = checkPol003(input); if (err) return err;
+    const withPrice = AUTHOR_ROLES.includes(user.role) && src.authorId === user.id;      // POL-009
+    const bom = boms.create({...input, authorId: user.id, solutionMeta: withPrice ? src.solutionMeta : null});
+    const v1 = bom.addVersion({no: 1, status: "작성중", validationState: "미검증"});
+    const files = withPrice ? copyFiles(src, v) : {};
+    for (const r of v.rows) v1.addRow({...structureOf(r), lineageId: uuid(), fileId: files[r.fileId] ?? null,
+                                       price: withPrice ? r.price : undefined});
+    audit("BOM_CREATE", {target: bom.id, cloneOf: src.id, versionNo, withPrices: withPrice});
+    return bom;
+  }
+  ```
+
+- **관련 요구사항**: REQ-038
+- **관련 화면**: SCR-005
+- **관련 테스트**: TC-182
+
+### POL-049 이전 버전 견적 가져오기
+
+- **규칙** (한 문장): 작성자는 새 견적을 만들 때 **같은 BoM 건의 다른 버전** 견적 하나를 골라, 그 견적의 전체 설정·환율·견적서 머리(견적일·상세 내역 뺌)와 행별 입력을 계보 ID가 같은 행으로 옮길 수 있다(DEC-66).
+
+| 옮기는 값 | 규칙 |
+|---|---|
+| 전체 설정 — 전체 DC율·기본 매입 DC율·전체 목표 GP율·단가 단위·최소 GP율 | 원본 견적 값 그대로(관리자 견적 기본값보다 먼저) |
+| 환율 | 그대로 |
+| 견적서 머리 — 양식·형식·견적명·수신·참조·유효기간·거래 조건·특기사항·담당자 연락처 | 그대로. 견적일자는 오늘, Summary 상세 내역은 처음 값(상위 품목 품명) |
+| 행별 입력 — 할인율·목표 GP율·판매단가·매입 DC율·매입단가·소비자가 입력·통화·견적서 제외 | 계보 ID가 같은 행으로 옮긴다 |
+| 이번 버전에만 있는 행 | 새 견적 처음 값(POL-033) |
+| 원본 견적에만 있는 행 | 옮기지 못한다 — 건수를 알린다 |
+
+- **고를 수 있는 견적**: 같은 BoM 건의 다른 버전(앞·뒤 버전 모두)의 견적. 최근 버전·최근 수정 순으로 보여준다.
+- **적용 시점**: SCR-009 [이전 버전 견적에서 만들기], `GET /api/versions/{id}/quote-sources`, `POST /api/versions/{id}/quotes {fromQuoteId}`
+- **위반/실패 시 처리**
+  - 다른 BoM 건의 견적·같은 버전의 견적·없는 견적: HTTP 400 「가져올 견적을 찾을 수 없습니다. 같은 BoM 건의 다른 버전 견적만 고를 수 있습니다.」
+  - 기준 버전이 확정되지 않음: 「확정된 버전으로만 견적을 만들 수 있습니다.」(POL-033)
+  - 성공 토스트: 「이전 버전 견적에서 {copied}행의 설정을 가져왔습니다.」 + 못 옮긴 행이 있으면 「이번 버전에 없는 {missing}행은 가져오지 않았습니다.」
+  - 감사 로그: 「견적 만들기」에 원본 견적 ID·옮긴 행 수·못 옮긴 행 수(POL-011)
+- **예외**: 원본 견적은 바뀌지 않는다. 가져온 값이 이번 버전에서 저장 조건(POL-033)을 만족하는지는 저장·다운로드할 때 검사한다(만들 때는 막지 않는다). 다른 BoM 건(복제한 건 포함)의 견적은 가져올 수 없다.
+- **검증 의사코드**:
+
+  ```js
+  function createQuoteFrom(user, version, sourceId) {
+    const sources = quotes.where(q => q.version.bomId === version.bomId && q.versionId !== version.id);
+    const src = sources.find(q => q.id === sourceId);
+    if (!src) return block("QUOTE_SOURCE_INVALID", {status: 400});
+    const q = createQuote(version, user);                               // POL-033 처음 값
+    const target = new Map(version.rows.map(r => [r.lineageId, r.id]));
+    let copied = 0, missing = 0;
+    for (const sr of src.rows) {
+      const rid = target.get(lineageOf(sr.rowId));
+      if (rid == null) { missing++; continue; }
+      Object.assign(q.rows[rid], pick(sr, ROW_INPUTS)); copied++;
+    }
+    Object.assign(q, {fx: {...src.fx}, settings: {...src.settings}});
+    if (src.docHeader) q.docHeader = omit(src.docHeader, ["date", "details"]);
+    audit("QUOTE_CREATE", {target: q.id, fromQuoteId: src.id, copiedRows: copied, missingRows: missing});
+    return {id: q.id, copied, missing};
+  }
+  ```
+
+- **관련 요구사항**: REQ-039
+- **관련 화면**: SCR-009
+- **관련 테스트**: TC-183
+
+### POL-050 EOS 여러 SKU 검색
+
+- **규칙** (한 문장): 사용자는 SCR-011 [여러 SKU]에서 한 벤더의 SKU를 **최대 100개** 붙여 넣어 한 번에 조회하고 결과를 표와 xlsx로 받는다. 조회는 SKU마다 단건 검색(POL-029)과 같은 규칙으로 **4개씩 동시에** 하고, xlsx는 AI를 다시 부르지 않고 캐시·관리자 등록값만 읽는다.
+- **입력**: 벤더 1개 + SKU 목록. 줄바꿈·쉼표·세미콜론·공백·탭으로 나눈다. 대소문자를 무시한 중복은 처음 것만 남긴다. 화면 안내: 「SKU를 한 줄에 하나씩(또는 쉼표로 나눠) 붙여 넣으세요. 최대 100개, 중복은 한 번만 조회합니다.」
+- **조회**: 형식(R3, POL-024)에 맞는 SKU만 `GET /api/eos?vendor=&sku=`로 조회한다(관리자 등록값 → 캐시 → AI 검색). 행마다 단건 검색과 같은 결과 문구·출처·조회 일시·「AI 검색 결과」/「관리자 등록」 표시를 보여준다.
+- **xlsx**: 열 `벤더` · `SKU` · `상태` · `End-of-Sale` · `LDoS` · `EoS 공지일` · `대체 제품` · `결과 구분` · `출처` · `조회 일시`. 형식 오류 SKU는 빼고 보낸다. 서버는 관리자 등록값·캐시(7일)만 읽고, 없는 SKU는 상태 「조회 안 됨」이다. 가격 정보는 없다. 파일명 `EOS검색_{벤더}_{YYYY-MM-DD}.xlsx`(POL-007 예외).
+- **적용 시점**: SCR-011 [여러 SKU] 탭 [조회]·[멈추기]·[xlsx 다운로드], `GET /api/eos`(SKU마다), `POST /api/eos/bulk.xlsx {vendor, skus}`
+- **위반/실패 시 처리**
+  - 벤더 없음: 「벤더를 선택해 주세요.」 / SKU 0개 또는 100개 초과: 「SKU를 1 ~ {max}개 입력해 주세요.」 — 조회하지 않는다(API는 HTTP 400)
+  - 형식이 맞지 않는 SKU는 조회하지 않고 그 행에 「{vendor} SKU 형식이 아닙니다.」
+  - 행별 조회 실패: 「EOS 정보를 가져오지 못했습니다」 / AI가 찾지 못함: 「{vendor} 자료에서 찾을 수 없는 SKU입니다 (AI 검색 결과 — 틀릴 수 있습니다)」
+  - 끝나면: 「{n}개 조회를 마쳤습니다. (실패 {failed}개)」
+  - xlsx 다운로드는 감사 로그 「EOS 검색 결과 다운로드」(벤더·건수)를 먼저 쓰고, 쓰지 못하면 내려주지 않는다(POL-011).
+- **예외**: 개별 조회는 단건 검색이므로 AI 호출은 사용량의 「EOS 단건 검색」으로 센다(POL-041). 조회 중 [멈추기]를 누르면 남은 SKU는 조회하지 않는다. 모든 역할(영업·엔지니어·관리자)이 쓸 수 있다(POL-008).
+- **검증 의사코드**:
+
+  ```js
+  const BULK_MAX = 100, CONCURRENCY = 4;
+  function parseSkuList(text) {
+    const seen = new Set(), out = [];
+    for (const t of text.split(/[\s,;]+/).map(s => s.trim()).filter(Boolean))
+      if (!seen.has(t.toUpperCase())) { seen.add(t.toUpperCase()); out.push(t); }
+    return out;
+  }
+  async function bulkSearch(vendor, text) {
+    if (!["Cisco", "Dell"].includes(vendor)) return block("EOS_VENDOR_REQUIRED");
+    const skus = parseSkuList(text);
+    if (skus.length === 0 || skus.length > BULK_MAX) return block("EOS_BULK_COUNT", {max: BULK_MAX});
+    const jobs = skus.map(s => singleQueryError(vendor, s) ? {sku: s, invalid: true} : {sku: s});
+    await pool(jobs.filter(j => !j.invalid), CONCURRENCY, j => j.result = eosSearch(vendor, j.sku));   // POL-029 단건 검색
+    return jobs;
+  }
+  function bulkXlsx(vendor, skus) {                       // AI 를 부르지 않는다
+    return skus.map(s => { const hit = overrides.get(key(vendor, s)) ?? cache.get(key(vendor, s));
+                           return hit ? judge(vendor, hit) : {sku: s, status: "조회 안 됨"}; });
+  }
+  ```
+
+- **관련 요구사항**: REQ-040, REQ-019
+- **관련 화면**: SCR-011
+- **관련 테스트**: TC-184
 
 ## 부록 A. 샘플 기대 결과표
 
@@ -1807,3 +2529,5 @@ EOS(R8)와 AI 검토 권고는 외부 응답에 따라 결과가 달라지므로
 | v0.4 | 2026-10-01 | `/qa-tc` 반영: 정책 목록·각 POL의 관련 테스트에 TC ID 역참조(05-qa-tc.md v0.1, TC-001 ~ TC-162). 규칙 변경 없음 | - |
 | v0.5 | 2026-10-01 | 기획 확정 검토 결정 반영: 제안값 10건 확정, 검토중 → 확정(D-35). POL-029 MVP는 Cisco도 AI 웹 검색·판매 종료 경고·출처 도메인 벤더별(D-38), EoX API는 P1(REQ-029). POL-004 발생 조건 없는 문구 삭제(D-39). POL-011·013 보관 기간 미확정 유지·삭제 없이 보관(D-36). POL-012 OI-13 해결 반영·EOS 전송 필드 공통화(D-37) | - |
 | v1.0 | 2026-10-01 | 최초 승인(POL-001 ~ POL-039 — 확정 37, 미확정 2: POL-011·013 보관 기간). 이후 변경은 CR 절차(/change)로 반영 | - |
+| v1.1 | 2026-10-01 | POL-032 「확인함」 일괄 체크·해제(예외·적용 시점·문구·의사코드), POL-011 일괄 체크 기록 단위. 관련 테스트에 TC-163 추가 | CR-001 |
+| v1.2 | 2026-10-02 | CR-002·003·004 반영. 신설 POL-040 ~ POL-050(환경설정, AI 사용량·월 예산, 내 견적서 기본값, EOS 관리자 등록·캐시 관리, 감사 로그 조회·CSV, 통계·AI 권고 품질 지표, 공지·점검 배너, 사용자 비활성화, BoM 건 복제, 이전 버전 견적 가져오기, EOS 여러 SKU 검색). 변경: POL-033 ~ 036 견적 계산을 표준양식 VER1 방식으로(DEC-58), POL-037 견적서 배치·EOS × 유효기간·Summary 상세·관리자 설정값(DEC-59·60·61), POL-038 원가분석표 폐지, POL-029 Dell 품명 조회·router-switch 출처·관리자 등록 우선·캐시 범위 비우기·설정값·「SKU를 찾지 못함」 7일 캐시(DEC-37·56·57·64), POL-013 저장 항목에 비활성화 일시·내 견적서 기본값, POL-031·021 시간 한도 설정값, POL-008·009·032 관리자 = 작성자 역할(DEC-62)·환경설정·감사 로그·통계 권한, POL-002·010 비활성 상태(DEC-63), POL-011 조회 화면·새 사건, POL-012 사용량 집계 보관·연결 테스트, POL-006·007 연쇄 정리. 관련 테스트에 TC-164 ~ TC-187 추가, TC-127·TC-140 삭제 표시 | CR-002, CR-003, CR-004 |

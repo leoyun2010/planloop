@@ -9,8 +9,8 @@
 </head>
 <body>
 <div class="wf-meta">
-  <strong>SCR-001 로그인·인증 오류</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-001-로그인.md">SCR-001-로그인.md</a>
-  <div class="tags">REQ-001 · POL-001, POL-002, POL-013 · /login</div>
+  <strong>SCR-001 로그인·인증 오류</strong> · v1.1 · 상태: 승인 · 정의서: <a href="SCR-001-로그인.md">SCR-001-로그인.md</a>
+  <div class="tags">REQ-001, REQ-037 · POL-001, POL-002, POL-013, POL-047 · /login</div>
 </div>
 <div class="pinbar">
   상태:
@@ -20,6 +20,7 @@
   <button data-s="err-sso" onclick="setState('err-sso')">에러: 인증 실패</button>
   <button data-s="err-expired" onclick="setState('err-expired')">에러: 세션 만료</button>
   <button data-s="err-profile" onclick="setState('err-profile')">에러: 계정 정보 없음</button>
+  <button data-s="err-disabled" onclick="setState('err-disabled')">에러: 비활성 계정</button>
 </div>
 
 <div class="pc" style="background:#f4f4f4">
@@ -37,13 +38,14 @@
       <div class="wf-text err" data-state="err-sso">Naver Works 인증에 실패했습니다. 다시 시도하거나 관리자에게 문의해 주세요.</div>
       <div class="wf-text err" data-state="err-expired">로그인 시간이 만료되었습니다. 다시 로그인해 주세요.</div>
       <div class="wf-text err" data-state="err-profile">Naver Works 계정 정보를 받지 못했습니다. 관리자에게 문의해 주세요.</div>
+      <div class="wf-text err" data-state="err-disabled">사용이 중지된 계정입니다. 관리자(CSD)에게 문의해 주세요.</div>
     </div>
 
     <div class="wf-box none" style="margin:16px 0">
       <span class="n">3</span>
       <span class="wf-btn primary" style="width:340px" data-state="default empty" data-go="SCR-003-BoM목록.html">Naver Works로 로그인</span>
       <span class="wf-btn dis" style="width:340px" data-state="loading">⟳ Naver Works로 로그인</span>
-      <span class="wf-btn primary" style="width:340px" data-state="err-sso err-expired err-profile" data-go="#loading">다시 로그인</span>
+      <span class="wf-btn primary" style="width:340px" data-state="err-sso err-expired err-profile err-disabled" data-go="#loading">다시 로그인</span>
       <div class="wf-text sm" style="margin:6px 0 0 25px">성공 → returnTo 또는 SCR-003 · 역할 미지정 → <a href="SCR-002-역할대기.html">SCR-002</a></div>
     </div>
 

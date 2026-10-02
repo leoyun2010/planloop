@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-015 감사 로그 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-015 감사 로그</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-015-감사로그.md">SCR-015-감사로그.md</a>
+  <div class="tags">REQ-034 · POL-008, POL-011, POL-044 · CR-004 · /admin/audit · 관리자만</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본</button>
+  <button data-s="filtered" onclick="setState('filtered')">조건 적용</button>
+  <button data-s="csv" onclick="setState('csv')">CSV 내려받는 중</button>
+  <button data-s="toomany" onclick="setState('toomany')">CSV 한도 초과</button>
+  <button data-s="loading" onclick="setState('loading')">로딩</button>
+  <button data-s="empty" onclick="setState('empty')">빈 상태</button>
+  <button data-s="error" onclick="setState('error')">에러</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a data-go="SCR-003-BoM목록.html">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><a data-go="SCR-012-사용자역할관리.html">사용자 관리</a><a data-go="SCR-016-통계.html">통계</a><a class="on">감사 로그</a><a data-go="SCR-014-환경설정.html">환경설정</a><span class="spacer"></span><span class="me">정관리 (관리자)</span><span class="wf-btn sm" data-go="SCR-001-로그인.html">로그아웃</span></div>
+  <div class="main">
+    <div class="pagehead"><span class="n">2</span><h1>감사 로그</h1><span class="spacer"></span>
+      <span class="wf-btn" data-state="default filtered toomany" data-go="#csv">CSV 내려받기</span><span class="wf-btn dis" data-state="csv">⟳ CSV 내려받기</span><span class="wf-btn dis" data-state="loading empty error">CSV 내려받기</span></div>
+    <div class="wf-text sm" style="margin-bottom:8px;position:relative"><span class="n">3</span>로그인·역할 변경·확정·다운로드·환경설정 변경 등의 기록입니다. 금액은 남기지 않습니다. CSV 는 지금 거른 조건 그대로(최대 10만 건) 내려받고, 내려받은 사실도 기록됩니다.</div>
+
+    <div class="filterbar"><span class="n abs">4</span>
+      사건 <span class="wf-input wf-sel val" style="min-width:130px" data-state="default csv toomany loading error">전체</span><span class="wf-input wf-sel val" style="min-width:130px" data-state="filtered empty">환경설정 변경</span>
+      사용자 <span class="wf-input wf-sel val" style="min-width:90px">전체</span>
+      결과 <span class="wf-input wf-sel val" style="min-width:70px">전체</span>
+      기간 <span class="wf-input" style="min-width:110px" data-state="default csv toomany loading error">연도-월-일</span><span class="wf-input val" style="min-width:110px" data-state="filtered">2026-10-01</span><span class="wf-input val" style="min-width:110px" data-state="empty">2026-09-01</span>
+      ~ <span class="wf-input" style="min-width:110px" data-state="default csv toomany loading error">연도-월-일</span><span class="wf-input val" style="min-width:110px" data-state="filtered">2026-10-02</span><span class="wf-input val" style="min-width:110px" data-state="empty">2026-09-30</span>
+      <span class="wf-btn" data-go="#filtered">검색</span><span class="wf-btn" data-go="#default">초기화</span><span class="grow"></span>
+      <span data-state="default csv toomany">총 1,284건 · 최신순</span><span data-state="filtered">총 6건 · 최신순</span><span data-state="empty">총 0건 · 최신순</span></div>
+
+    <div class="wf-box none" style="position:relative"><span class="n abs">5</span>
+      <div data-state="loading"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk w80"></div></div>
+      <div data-state="empty" class="center"><div class="ic"></div>조건에 맞는 기록이 없습니다.</div>
+      <div data-state="error" class="center"><div class="ic"></div>데이터를 불러오지 못했습니다. 다시 시도해 주세요.<br><br><span class="wf-btn" data-go="#default">다시 시도</span></div>
+      <table class="wf" data-state="default csv toomany filtered">
+        <tr><th>일시</th><th>사건</th><th>사용자</th><th>대상 ID</th><th>결과</th><th>상세</th></tr>
+        <tr data-state="csv"><td>2026-10-02 10:20:05</td><td>감사 로그 내보내기</td><td>정관리</td><td>-</td><td>성공</td><td>count=1284</td></tr>
+        <tr><td>2026-10-02 10:12:31</td><td>환경설정 변경</td><td>정관리</td><td>company</td><td>성공</td><td>fields=["ceo"]</td></tr>
+        <tr><td>2026-10-02 09:41:10</td><td>환경설정 변경</td><td>정관리</td><td>eos_override</td><td>성공</td><td>action=create · vendor=Cisco · key=C9200L-48P-4X-E</td></tr>
+        <tr data-state="default csv toomany"><td>2026-10-02 09:35:47</td><td>견적서 다운로드</td><td>김영업</td><td>12</td><td>성공</td><td>form=single · type=pdf</td></tr>
+        <tr data-state="default csv toomany"><td>2026-10-02 09:30:02</td><td>확정</td><td>김영업</td><td>31</td><td>성공</td><td></td></tr>
+        <tr data-state="default csv toomany"><td>2026-10-02 09:12:44</td><td>사용자 비활성화</td><td>정관리</td><td>58</td><td>성공</td><td></td></tr>
+        <tr data-state="default csv toomany"><td>2026-10-02 09:02:19</td><td>표준 BoM 다운로드</td><td>박엔지</td><td>31</td><td><b>실패</b></td><td></td></tr>
+        <tr data-state="default csv toomany"><td>2026-10-02 08:58:00</td><td>로그인</td><td>박엔지</td><td>-</td><td>성공</td><td></td></tr>
+        <tr data-state="filtered"><td>2026-10-01 18:00:12</td><td>환경설정 변경</td><td>정관리</td><td>budget</td><td>성공</td><td>fields=["monthlyUsd"]</td></tr>
+      </table>
+      <div class="wf-text sm" data-state="default csv toomany filtered" style="margin-top:4px">상세 열은 예시다 — 실제 키는 사건마다 다르며 금액은 남기지 않는다(POL-011).</div>
+    </div>
+    <div class="pager" data-state="default csv toomany"><span class="n">6</span>&lt; <b>1</b> / 26 &gt; · 페이지당 50건</div>
+  </div>
+  <div class="toast" data-state="toomany">내보낼 기록이 100000건을 넘습니다. 기간이나 조건을 좁혀 주세요.</div>
+</div>
+</body>
+</html>

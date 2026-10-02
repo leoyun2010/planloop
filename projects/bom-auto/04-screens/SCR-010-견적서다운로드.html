@@ -6,80 +6,103 @@
 <title>SCR-010 견적서 다운로드 — 와이어프레임</title>
 <link rel="stylesheet" href="_wf.css">
 <script src="_wf.js" defer></script>
+<style>
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 12px; }
+  .grid3 .wide { grid-column: span 2; }
+  .ph { color: #aaa; }
+  .mbody { max-height: 640px; overflow-y: auto; padding-right: 4px; }
+  .modal .foot.stick { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #ddd; padding-top: 8px; }
+</style>
 </head>
 <body>
 <div class="wf-meta">
-  <strong>SCR-010 견적서 다운로드 (모달)</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-010-견적서다운로드.md">SCR-010-견적서다운로드.md</a>
-  <div class="tags">REQ-018 · POL-007, POL-011, POL-033, POL-036, POL-037 · …/quotes/{quoteId}?doc=1 · 작성자(영업)만</div>
+  <strong>SCR-010 견적서 다운로드 (모달)</strong> · v1.1 · 상태: 승인 · 정의서: <a href="SCR-010-견적서다운로드.md">SCR-010-견적서다운로드.md</a>
+  <div class="tags">REQ-018, 030, 032 · POL-007, POL-011, POL-033, POL-036, POL-037, POL-040, POL-042 · …/quotes/{quoteId}?doc=1 · 작성자(자기 BoM의 영업·관리자)만</div>
 </div>
 <div class="pinbar">
   상태:
   <button data-s="default" onclick="setState('default')">기본(단일 표형)</button>
-  <button data-s="summary" onclick="setState('summary')">Summary형</button>
+  <button data-s="summary" onclick="setState('summary')">Summary 양식</button>
+  <button data-s="mine" onclick="setState('mine')">내 기본값 있음</button>
+  <button data-s="eos" onclick="setState('eos')">EOS 경고</button>
   <button data-s="loading" onclick="setState('loading')">로딩</button>
   <button data-s="empty" onclick="setState('empty')">빈: 품목 0행</button>
   <button data-s="invalid" onclick="setState('invalid')">에러: 입력 오류</button>
   <button data-s="failed" onclick="setState('failed')">에러: 생성 실패</button>
 </div>
 
-<div class="pc" style="min-height:900px">
+<div class="pc" style="min-height:940px">
   <div class="gnb"><span class="logo">BoM 자동화</span><a class="on">BoM 목록</a><a>EOS 검색</a><span class="spacer"></span><span class="me">김영업 (영업)</span><span class="wf-btn sm">로그아웃</span></div>
-  <div class="main"><div class="bomhead"><span class="ttl">EY한영 · 스위치 교체</span><span class="chip dark">v1 확정</span></div>
+  <div class="main"><div class="bomhead"><span class="ttl">EY한영 · 스위치 교체</span><span class="chip dark">v2 확정</span></div>
     <div class="btabs"><div>표준 BoM</div><div>검증 결과</div><div>버전 이력</div><div class="on">견적</div></div>
     <div class="sk"></div><div class="sk"></div><div class="sk w80"></div><div class="sk"></div></div>
   <div class="dim-bg"></div>
-  <div class="modal wide">
+  <div class="modal wide" style="top:30px">
     <div class="row"><span class="n">1</span><h2 style="margin:0">견적서 다운로드</h2><span class="grow"></span>
-      <span data-state="default summary empty invalid failed" data-go="SCR-009-견적편집.html">✕</span><span data-state="loading" style="color:#ccc">✕</span></div>
+      <span data-state="default summary mine eos empty invalid failed" data-go="SCR-009-견적편집.html">✕</span><span data-state="loading" style="color:#ccc">✕</span></div>
     <div class="line"></div>
-    <div class="banner" data-state="failed">견적서를 만들지 못했습니다. 관리자에게 문의해 주세요.</div>
-
-    <div class="row" style="margin-bottom:6px;position:relative"><span class="n">2</span><b style="min-width:50px">양식</b>
-      <span data-state="default loading empty invalid failed"><span class="radio on"></span>단일 표형 &nbsp; <span class="radio" data-go="#summary"></span>Summary + 세부 시트형</span>
-      <span data-state="summary"><span class="radio" data-go="#default"></span>단일 표형 &nbsp; <span class="radio on"></span>Summary + 세부 시트형</span></div>
-    <div class="row" style="margin-bottom:10px;position:relative"><span class="n">3</span><b style="min-width:50px">형식</b><span class="radio on"></span>xlsx &nbsp; <span class="radio"></span>PDF</div>
+    <div class="mbody">
+    <div class="row" style="margin-bottom:10px;position:relative;font-size:13px"><span class="n">2</span><b>양식</b>
+      <span data-state="default mine eos loading empty invalid failed"><span class="radio on"></span>견적서 (단일 표형) &nbsp; <span class="radio" data-go="#summary"></span>Summary (견적 요약 + 견적서 상세)</span>
+      <span data-state="summary"><span class="radio" data-go="#default"></span>견적서 (단일 표형) &nbsp; <span class="radio on"></span>Summary (견적 요약 + 견적서 상세)</span>
+      <span class="n" style="margin-left:14px">3</span><b>형식</b><span class="radio on"></span>xlsx &nbsp; <span class="radio"></span>PDF</div>
 
     <div class="wf-box" style="font-size:12px"><span class="n abs">4</span>
-      <div class="two">
-        <div class="fld"><label>견적일자 *</label><span class="wf-input full val">2026-10-06</span></div>
-        <div class="fld"><label>견적명(프로젝트명) * <span class="cnt">5/100</span></label>
-          <span class="wf-input full val" data-state="default summary loading empty failed">스위치 교체</span>
+      <div class="grid3">
+        <div class="fld"><label>견적일자</label><span class="wf-input full val">2026-10-08</span></div>
+        <div class="fld wide"><label>견적명</label>
+          <span class="wf-input full val" data-state="default summary mine eos loading empty failed">스위치 교체</span>
           <span class="wf-input full err" data-state="invalid"> </span><div class="wf-text err" data-state="invalid">견적명을 입력해 주세요.</div></div>
-      </div>
-      <div class="two">
-        <div class="fld"><label>수신 <span class="cnt">9/50</span></label><span class="wf-input full val">EY한영 IT인프라팀</span></div>
-        <div class="fld"><label>참조 <span class="cnt">0/50</span></label><span class="wf-input full"> </span></div>
-      </div>
-      <div class="two">
-        <div class="fld"><label>유효기간(일) *</label>
-          <span class="wf-input val" data-state="default summary loading empty failed">14</span>
+        <div class="fld"><label>수신</label><span class="wf-input full ph">예) ABC 주식회사 귀중</span></div>
+        <div class="fld"><label>참조</label><span class="wf-input full ph">예) 홍길동 상무님</span></div>
+        <div class="fld"><label>유효기간(일)</label>
+          <span class="wf-input val" data-state="default summary mine eos loading empty failed">14</span>
           <span class="wf-input err val" data-state="invalid">120</span><div class="wf-text err" data-state="invalid">유효기간은 1~90일 사이 정수여야 합니다.</div></div>
-        <div class="fld"><label>결제조건 <span class="cnt">14/100</span></label><span class="wf-input full val">계산서 발행 후 60일 이내</span></div>
+        <div class="fld"><label>하자 보증기간</label><span class="wf-input full val wf-sel">36 Months</span><div class="wf-text sm">서비스 행 기간 36개월 → 「36 Months」</div></div>
+        <div class="fld"><label>장비 설치지원</label><span class="wf-input full val wf-sel">별도 협의</span></div>
+        <div class="fld"><label>납기 / 장소</label>
+          <span class="wf-input full val wf-sel" data-state="default summary eos loading empty invalid failed">발주 후 4주 이내 / 귀사 지정 장소</span><span class="wf-input full val wf-sel" data-state="mine">120 Days (Business Days) / 귀사 지정 장소</span></div>
+        <div class="fld"><label>대금 결제조건</label>
+          <span class="wf-input full val wf-sel" data-state="default summary eos loading empty failed">계산서 발행 후 60일 이내</span><span class="wf-input full val wf-sel" data-state="mine">검수 후 익월 말 현금 지급</span>
+          <span class="wf-input full val err" data-state="invalid">계산서 발행 후 60일 이내 — 대금은 … (101자)</span><div class="wf-text err" data-state="invalid">결제조건은(는) 100자 이내로 입력해 주세요.</div></div>
+        <div class="fld wide"><label>특기사항</label><span class="wf-input full"> </span></div>
+        <div class="fld"><label>담당자</label><span class="wf-text">김영업 · young@insunginfo.co.kr</span></div>
+        <div class="fld"><label>담당자 HP</label><span class="wf-input full" data-state="default summary eos loading empty invalid failed"> </span><span class="wf-input full val" data-state="mine">010-2345-6789</span></div>
+        <div class="fld"><label>담당자(부)</label><span class="wf-input full" data-state="default summary eos loading empty invalid failed"> </span><span class="wf-input full val" data-state="mine">박영업</span></div>
+        <div class="fld"><label>담당자(부) HP</label><span class="wf-input full" data-state="default summary eos loading empty invalid failed"> </span><span class="wf-input full val" data-state="mine">010-3456-7890</span></div>
+        <div class="fld"><label>담당자(부) E-mail</label><span class="wf-input full" data-state="default summary eos loading empty invalid failed"> </span><span class="wf-input full val" data-state="mine">sales.park@insunginfo.co.kr</span></div>
       </div>
-      <div class="two">
-        <div class="fld" data-state="summary"><label>무상유지보수 <span class="cnt">2/50</span></label><span class="wf-input full val">3년</span><div class="wf-text sm">기본값: SERVICE 행 기간 최빈값 36개월 → 「3년」</div></div>
-        <div class="fld"><label>담당자 (자동)</label><span class="wf-text">김영업 · young@insunginfo.co.kr</span></div>
-      </div>
+      <div class="wf-text sm">▾ = 선택지 제안(직접 입력도 됨). 선택지·처음 값은 관리자 설정(SCR-014 [견적 기본값·견적서 문구]), 그 위에 내 기본값이 먼저 쓰인다</div>
+      <div class="row" style="margin-top:6px;position:relative"><span class="n">9</span>
+        <span data-state="default summary eos loading empty invalid failed"><span class="check on"></span></span><span data-state="mine"><span class="check"></span></span>
+        담당자 연락처·하자 보증기간·납기·결제조건을 내 기본값으로 저장 — 다음에 만드는 견적에 자동으로 채워집니다</div>
+      <div class="wf-text sm" style="margin-left:26px">내 기본값을 저장한 적이 없으면 처음엔 체크, 저장한 적이 있으면 해제 상태로 연다</div>
     </div>
 
     <div class="wf-box" style="font-size:12px" data-state="summary"><span class="n abs">5</span>
-      <b>상세 내역</b> (상위 품목마다, 0~500자)
-      <div class="fld" style="margin-top:6px"><label>1. C9300-48T-M</label><span class="wf-input area val">Catalyst 9300 48-port data only, Network Advantage&#10;*상세스펙 …</span></div>
-      <div class="fld"><label>2. C9300-24T-M</label><span class="wf-input full val">Catalyst 9300 24-port data only…</span></div>
-      <div class="wf-text sm">… 3. MA-SFP-10GB-SR · 4. CAB-C15-CBN-KOR= · 5. CAB-C15-CBN-KOR=</div>
+      <b>상세 내역 (견적 블록 설명)</b>
+      <div class="fld" style="margin-top:6px"><label style="font-weight:normal;color:#888">견적 1. Catalyst 9300 48-port data only</label><span class="wf-input full val">Catalyst 9300 48-port data only</span></div>
+      <div class="fld"><label style="font-weight:normal;color:#888">견적 2. Network Module</label><span class="wf-input full val">Network Module</span></div>
+      <div class="wf-text sm">… 상위 품목마다 1칸(기본값 = 품명, 0~500자). 받은 파일: Summary 시트(페이지) 뒤에 상세 견적서 시트(새 페이지)</div>
     </div>
+
+    <div class="banner" data-state="eos"><span class="n abs">10</span>
+      <div>! 견적일 이전에 판매가 끝난 품목이 1개 있습니다: C9300-NM-8X-M-O</div>
+      <div>! 견적 유효기간(2026-10-22까지) 안에 판매가 끝나는 품목이 1개 있습니다: C9300-48T-M</div>
+      <div class="wf-text sm">입력 중인 견적일·유효기간 기준 — 바꾸면 바로 다시 비교. 다운로드는 막지 않는다</div></div>
 
     <div class="wf-box solid" style="font-size:13px"><span class="n abs">6</span>
-      <span data-state="default loading invalid failed">품목 11행 (제외 2행) · 합계 <b>26,966,510</b>원 (VAT 별도)</span>
-      <span data-state="summary">품목 11행 (제외 2행) · 합계 <b>26,966,510</b>원 (VAT 별도) · VAT 포함 <b>29,663,161</b>원</span>
+      <span data-state="default summary mine eos loading invalid failed">품목 4행 (제외 1행) · 공급가액 19,158,000원 · 합계금액(VAT 포함) 21,073,800원</span>
       <span data-state="empty" class="wf-text err">견적서에 넣을 품목이 없습니다. 견적서 제외를 해제해 주세요.</span>
     </div>
-    <div class="wf-box none" style="position:relative"><span class="n">7</span><span class="wf-text sm">제외 행 중 견적가 > 0인 행이 있으면: 「견적서에서 제외한 행 중 금액이 있는 행이 {n}개 있습니다. 이 금액은 견적서 합계에서 빠집니다.」 (차단 아님)</span></div>
+    <div class="wf-box none" style="position:relative"><span class="n">7</span><span class="wf-text sm">제외 행 중 금액이 있으면: 「견적서에서 제외한 행 중 금액이 있는 행이 {n}개 있습니다. 이 금액은 견적서 합계에서 빠집니다.」 (차단 아님)</span></div>
+    <div class="wf-text err" data-state="failed" style="margin-top:6px">견적서를 만들지 못했습니다. 관리자에게 문의해 주세요.</div>
+    </div>
 
-    <div class="foot"><span class="n">8</span><span class="wf-btn" data-go="SCR-009-견적편집.html">취소</span>
-      <span class="wf-btn primary" data-state="default summary invalid failed" data-go="#loading">다운로드</span>
+    <div class="foot stick"><span class="n">8</span><span class="wf-btn" data-go="SCR-009-견적편집.html">취소</span>
+      <span class="wf-btn primary" data-state="default summary mine eos invalid failed" data-go="#loading">다운로드</span>
       <span class="wf-btn dis" data-state="loading">⟳ 다운로드</span><span class="wf-btn dis" data-state="empty">다운로드</span></div>
-    <div class="wf-text sm" style="text-align:right;margin-top:4px">파일명: EY한영_스위치 교체_견적서_v1.xlsx</div>
+    <div class="wf-text sm" style="text-align:right;margin-top:4px">파일명: EY한영_스위치 교체_견적서_v2.xlsx · 문서번호 예: ISI26-1008-Q0012 (접두어 = 관리자 설정) · 모달 높이 = 화면 − 160px, 넘치면 안에서 스크롤, 버튼 줄 고정</div>
   </div>
 </div>
 </body>

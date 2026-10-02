@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCR-016 통계 — 와이어프레임</title>
+<link rel="stylesheet" href="_wf.css">
+<script src="_wf.js" defer></script>
+<style>
+  .cards { display:grid; gap:8px; margin-bottom:8px; position:relative; }
+  .cards.c6 { grid-template-columns:repeat(6, 1fr); } .cards.c5 { grid-template-columns:repeat(5, 1fr); }
+  .cards .fcard { margin:0; } .cards .fcard b { display:block; font-size:16px; }
+  .sec { font-size:14px; font-weight:bold; margin:14px 0 6px; position:relative; }
+  .sec .wf-text.sm { font-weight:normal; }
+</style>
+</head>
+<body>
+<div class="wf-meta">
+  <strong>SCR-016 통계</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-016-통계.md">SCR-016-통계.md</a>
+  <div class="tags">REQ-035 · POL-008, POL-011, POL-045 · CR-004 · /admin/stats · 관리자만</div>
+</div>
+<div class="pinbar">
+  상태:
+  <button data-s="default" onclick="setState('default')">기본(최근 6개월)</button>
+  <button data-s="custom" onclick="setState('custom')">직접 지정</button>
+  <button data-s="loading" onclick="setState('loading')">로딩</button>
+  <button data-s="empty" onclick="setState('empty')">빈 상태</button>
+  <button data-s="error" onclick="setState('error')">에러</button>
+</div>
+
+<div class="pc">
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a data-go="SCR-003-BoM목록.html">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><a data-go="SCR-012-사용자역할관리.html">사용자 관리</a><a class="on">통계</a><a data-go="SCR-015-감사로그.html">감사 로그</a><a data-go="SCR-014-환경설정.html">환경설정</a><span class="spacer"></span><span class="me">정관리 (관리자)</span><span class="wf-btn sm" data-go="SCR-001-로그인.html">로그아웃</span></div>
+  <div class="main">
+    <div class="pagehead"><span class="n">2</span><h1>통계</h1></div>
+    <div class="wf-text sm" style="margin-bottom:8px;position:relative"><span class="n">3</span>활동 건수는 감사 로그로 셉니다 — BoM 건을 지워도 남습니다. 벤더별 새 BoM 은 남아 있는 BoM 기준입니다.</div>
+    <div class="filterbar"><span class="n abs">4</span>기간
+      <span data-state="default loading empty error"><span class="radio on"></span>최근 6개월 <span class="radio"></span>이번 달 <span class="radio"></span>지난 달 <span class="radio"></span>직접 지정</span>
+      <span data-state="custom"><span class="radio"></span>최근 6개월 <span class="radio"></span>이번 달 <span class="radio"></span>지난 달 <span class="radio on"></span>직접 지정 <span class="wf-input val" style="min-width:100px">2026-09-01</span> ~ <span class="wf-input val" style="min-width:100px">2026-09-30</span> <span class="wf-btn sm">조회</span></span>
+      <span class="grow"></span><span class="wf-btn sm" data-state="default custom empty error">새로고침</span><span class="wf-btn sm dis" data-state="loading">⟳ 새로고침</span></div>
+
+    <div data-state="loading"><div class="sk w40"></div><div class="sk"></div><div class="sk"></div><div class="sk w80"></div><div class="sk"></div><div class="sk w60"></div></div>
+    <div data-state="error" class="center"><div class="ic"></div>데이터를 불러오지 못했습니다. 다시 시도해 주세요.<br><br><span class="wf-btn" data-go="#default">다시 시도</span></div>
+
+    <div data-state="default custom empty">
+      <div class="sec"><span data-state="default empty">2026-05-01 ~ 2026-10-02</span><span data-state="custom">2026-09-01 ~ 2026-09-30</span></div>
+      <div data-state="empty" class="center"><div class="ic"></div>2026-05-01 ~ 2026-10-02 기간에 활동이 없습니다.</div>
+      <div data-state="default custom">
+        <div class="cards c6"><span class="n abs">5</span>
+          <div class="fcard">새 BoM<b>42건</b></div><div class="fcard">검증 실행<b>118건</b></div><div class="fcard">확정<b>37건</b></div>
+          <div class="fcard">견적 만들기<b>29건</b></div><div class="fcard">견적서 다운로드<b>51건</b></div><div class="fcard">표준 BoM 다운로드<b>64건</b></div>
+        </div>
+        <div style="position:relative"><span class="n abs">6</span><div class="sec">월별</div>
+          <table class="wf">
+            <tr><th>월</th><th class="num">새 BoM</th><th class="num">검증 실행</th><th class="num">확정</th><th class="num">견적 만들기</th><th class="num">견적서 다운로드</th><th class="num">표준 BoM 다운로드</th></tr>
+            <tr data-state="default"><td>2026-09</td><td class="num">30</td><td class="num">81</td><td class="num">25</td><td class="num">20</td><td class="num">34</td><td class="num">45</td></tr>
+            <tr><td>2026-10</td><td class="num">12</td><td class="num">37</td><td class="num">12</td><td class="num">9</td><td class="num">17</td><td class="num">19</td></tr>
+          </table></div>
+        <div style="position:relative"><span class="n abs">7</span><div class="sec">사용자별</div>
+          <table class="wf">
+            <tr><th>사용자</th><th class="num">새 BoM</th><th class="num">검증 실행</th><th class="num">확정</th><th class="num">견적 만들기</th><th class="num">견적서 다운로드</th><th class="num">표준 BoM 다운로드</th></tr>
+            <tr><td>김영업</td><td class="num">18</td><td class="num">52</td><td class="num">16</td><td class="num">14</td><td class="num">25</td><td class="num">20</td></tr>
+            <tr><td>이영업</td><td class="num">15</td><td class="num">41</td><td class="num">13</td><td class="num">10</td><td class="num">19</td><td class="num">15</td></tr>
+            <tr><td>박엔지</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">22</td></tr>
+            <tr><td>(알 수 없음)</td><td class="num">9</td><td class="num">25</td><td class="num">8</td><td class="num">5</td><td class="num">7</td><td class="num">7</td></tr>
+          </table></div>
+        <div class="two" style="margin-top:4px">
+          <div style="position:relative"><span class="n abs">8</span><div class="sec">벤더별 새 BoM</div>
+            <table class="wf"><tr><td>Cisco</td><td class="num">27건</td></tr><tr><td>Dell</td><td class="num">13건</td></tr><tr><td>행 없음(파일 안 올림)</td><td class="num">3건</td></tr></table></div>
+          <div style="position:relative"><span class="n abs">9</span><div class="sec">검증 판정 <span class="wf-text sm">오류 46 · 경고 212</span></div>
+            <table class="wf"><tr><td>R1</td><td class="num">31건</td></tr><tr><td>R6</td><td class="num">58건</td></tr><tr><td>R7</td><td class="num">12건</td></tr><tr><td>R8</td><td class="num">142건</td></tr><tr><td>R9</td><td class="num">15건</td></tr></table></div>
+        </div>
+      </div>
+      <div style="position:relative"><span class="n abs">10</span>
+        <div class="sec">AI 권고 품질</div>
+        <div class="wf-text sm" style="margin-bottom:6px">「재검증에서 사라진 권고」는 같은 BoM 의 다음 검증에서 같은 분류·같은 대상 행의 권고가 나오지 않은 비율로, 권고를 반영해 고쳤는지 추정한 값입니다. 다음 검증이 있는 권고만 셉니다.</div>
+        <div data-state="default custom"><div class="cards c5">
+          <div class="fcard">AI 검토 권고<b>304건</b><span class="wf-text sm">검증 112건 · 검증당 2.7건</span></div>
+          <div class="fcard">확인함 비율<b>81.6%</b><span class="wf-text sm">확인함을 체크한 권고 / 권고</span></div>
+          <div class="fcard">일괄 확인 비율<b>34.2%</b><span class="wf-text sm">일괄 체크 / 확인함 체크 412건</span></div>
+          <div class="fcard">재검증에서 사라진 권고<b>27.5%</b><span class="wf-text sm">다음 검증이 있는 권고 120건 기준</span></div>
+          <div class="fcard">AI 검토 실패율<b>3.6%</b><span class="wf-text sm">AI 검토를 끝내지 못한 검증</span></div>
+        </div></div>
+        <div data-state="empty"><div class="cards c5">
+          <div class="fcard">AI 검토 권고<b>0건</b><span class="wf-text sm">검증 0건 · 검증당 -건</span></div>
+          <div class="fcard">확인함 비율<b>-</b><span class="wf-text sm">확인함을 체크한 권고 / 권고</span></div>
+          <div class="fcard">일괄 확인 비율<b>-</b><span class="wf-text sm">일괄 체크 / 확인함 체크 0건</span></div>
+          <div class="fcard">재검증에서 사라진 권고<b>-</b><span class="wf-text sm">다음 검증이 있는 권고 0건 기준</span></div>
+          <div class="fcard">AI 검토 실패율<b>-</b><span class="wf-text sm">AI 검토를 끝내지 못한 검증</span></div>
+        </div></div>
+        <table class="wf" style="width:480px" data-state="default custom">
+          <tr><th>권고 분류</th><th class="num">건수</th></tr>
+          <tr><td>호환성</td><td class="num">121</td></tr><tr><td>필수 액세서리 누락</td><td class="num">108</td></tr><tr><td>고객에게 불필요한 항목</td><td class="num">75</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

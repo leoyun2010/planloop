@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="wf-meta">
-  <strong>SCR-003 BoM 목록</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-003-BoM목록.md">SCR-003-BoM목록.md</a>
+  <strong>SCR-003 BoM 목록</strong> · v1.1 · 상태: 승인 · 정의서: <a href="SCR-003-BoM목록.md">SCR-003-BoM목록.md</a>
   <div class="tags">REQ-014, REQ-003, REQ-015 · POL-006, POL-008, POL-009 · /boms</div>
 </div>
 <div class="pinbar">
@@ -20,36 +20,37 @@
   <button data-s="nores" onclick="setState('nores')">빈: 검색 0건</button>
   <button data-s="error" onclick="setState('error')">에러</button>
   <button data-s="invalid" onclick="setState('invalid')">입력 오류</button>
+  <button data-s="admin" onclick="setState('admin')">역할: 관리자</button>
   <button data-s="engineer" onclick="setState('engineer')">역할: 엔지니어</button>
 </div>
 
 <div class="pc">
-  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a class="on">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><span class="spacer"></span>
-    <span class="me" data-state="default loading empty nores error invalid">김영업 (영업)</span><span class="me" data-state="engineer">박엔지 (엔지니어)</span>
+  <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><a class="on">BoM 목록</a><a data-go="SCR-011-EOS검색.html">EOS 검색</a><span data-state="admin"><a data-go="SCR-012-사용자역할관리.html">사용자 관리</a> &nbsp; <a data-go="SCR-016-통계.html">통계</a> &nbsp; <a data-go="SCR-015-감사로그.html">감사 로그</a> &nbsp; <a data-go="SCR-014-환경설정.html">환경설정</a></span><span class="spacer"></span>
+    <span class="me" data-state="default loading empty nores error invalid">김영업 (영업)</span><span class="me" data-state="engineer">박엔지 (엔지니어)</span><span class="me" data-state="admin">정관리 (관리자)</span>
     <span class="wf-btn sm" data-go="SCR-001-로그인.html">로그아웃</span></div>
   <div class="main">
     <div class="pagehead"><span class="n">2</span><h1>BoM 목록</h1><span class="spacer"></span>
-      <span class="wf-btn primary" data-state="default loading empty nores error invalid" data-go="SCR-004-새BoM.html">새 BoM</span></div>
+      <span class="wf-btn primary" data-state="default loading empty nores error invalid admin" data-go="SCR-004-새BoM.html">새 BoM</span></div>
 
     <div class="filterbar"><span class="n abs">3</span>
       고객사명·건명 <span class="wf-input" style="min-width:170px">대웅</span>
-      SKU <span class="wf-input" data-state="default loading empty nores error engineer" style="min-width:120px">C9300X</span><span class="wf-input err val" data-state="invalid" style="min-width:120px">C9</span>
+      SKU <span class="wf-input" data-state="default loading empty nores error engineer admin" style="min-width:120px">C9300X</span><span class="wf-input err val" data-state="invalid" style="min-width:120px">C9</span>
       벤더 <span class="wf-input wf-sel" style="min-width:70px">전체</span>
       작성자 <span class="wf-input wf-sel" style="min-width:80px">전체</span>
       상태 <span class="wf-input wf-sel" style="min-width:70px">전체</span>
-      최종 수정일 <span class="wf-input" style="min-width:95px" data-state="default loading empty nores error engineer">2026-10-01</span><span class="wf-input err val" style="min-width:95px" data-state="invalid">2026-10-09</span> ~ <span class="wf-input" style="min-width:95px">2026-10-08</span>
+      최종 수정일 <span class="wf-input" style="min-width:95px" data-state="default loading empty nores error engineer admin">2026-10-01</span><span class="wf-input err val" style="min-width:95px" data-state="invalid">2026-10-09</span> ~ <span class="wf-input" style="min-width:95px">2026-10-08</span>
       <span class="wf-btn primary">검색</span><span class="wf-btn">초기화</span>
       <div data-state="invalid" style="width:100%"><span class="wf-text err">SKU는 3자 이상 입력해 주세요.</span> · <span class="wf-text err">시작일이 종료일보다 늦습니다.</span> <span class="wf-text sm">(검색을 실행하지 않는다)</span></div>
     </div>
 
     <div class="row" style="margin-bottom:8px">
-      <span data-state="default loading empty nores error invalid"><span class="n">4</span>내 BoM만 보기 <span class="toggle"></span></span>
+      <span data-state="default loading empty nores error invalid admin"><span class="n">4</span>내 BoM만 보기 <span class="toggle"></span></span>
       <span class="spacer grow"></span>
-      <span class="n">5</span><span class="wf-text sm" data-state="default invalid engineer">총 42건 · 최종 수정일 최신순</span><span class="wf-text sm" data-state="loading">조회 중</span><span class="wf-text sm" data-state="empty nores">총 0건</span>
+      <span class="n">5</span><span class="wf-text sm" data-state="default invalid engineer admin">총 42건 · 최종 수정일 최신순</span><span class="wf-text sm" data-state="loading">조회 중</span><span class="wf-text sm" data-state="empty nores">총 0건</span>
     </div>
 
     <div class="wf-box none" style="position:relative"><span class="n abs">6</span>
-      <table class="wf" data-state="default invalid engineer">
+      <table class="wf" data-state="default invalid engineer admin">
         <tr><th>고객사명</th><th>건명</th><th>벤더</th><th>작성자</th><th>최신 버전·상태</th><th>최종 수정일시 ▼</th></tr>
         <tr data-go="SCR-005-BoM상세.html"><td>대웅제약</td><td>마곡 C&amp;D 센터 구축</td><td>Cisco</td><td>김영업</td><td>v2 작성중</td><td>2026-10-06 14:20</td></tr>
         <tr data-go="SCR-005-BoM상세.html#confirmed"><td>국방부</td><td>해군 지능데이터센터</td><td>Dell</td><td>이영업</td><td>v1 확정</td><td>2026-10-05 17:02</td></tr>
@@ -59,10 +60,11 @@
       </table>
       <div data-state="loading"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
       <div data-state="empty" class="center"><div class="ic"></div>등록된 BoM이 없습니다.<br><br><span class="wf-btn primary" data-go="SCR-004-새BoM.html">새 BoM</span></div>
+      <div data-state="admin" class="wf-text sm" style="margin-top:4px">관리자도 영업처럼 [새 BoM]·내 BoM만 보기가 있다. 자기가 만든 건은 작성자 권한, 남의 건 가격은 숨김 (DEC-62).</div>
       <div data-state="nores" class="center"><div class="ic"></div>조건에 맞는 BoM이 없습니다.<br><br><span class="wf-btn">초기화</span></div>
       <div data-state="error" class="center"><div class="ic"></div>데이터를 불러오지 못했습니다. 다시 시도해 주세요.<br><br><span class="wf-btn">다시 시도</span></div>
     </div>
-    <div class="pager" data-state="default invalid engineer"><span class="n">7</span>&lt; <b>1</b> 2 3 &gt; · 페이지당 20건</div>
+    <div class="pager" data-state="default invalid engineer admin"><span class="n">7</span>&lt; <b>1</b> 2 3 &gt; · 페이지당 20건</div>
   </div>
 </div>
 </body>

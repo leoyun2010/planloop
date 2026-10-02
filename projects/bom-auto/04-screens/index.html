@@ -48,13 +48,13 @@
 
 <header>
   <h1>BoM 자동 작성·검증 서비스 (bom-auto) — 화면 목록</h1>
-  <div class="sub">P0 13화면 · PC Chrome·Edge 1280px 기준 · 화면정의서(.md) + 로파이 목업(.html) 쌍 작성 완료 · P1·P2 화면은 2차 기획</div>
-  <div class="meta">기준 산출물: PRD v1.0 · 정책서 v1.0 · IA v1.0 (<a href="../03-ia.md" style="color:#c9c9c9">03-ia.md</a>) · 갱신: 2026-10-01</div>
+  <div class="sub">P0 16화면 · PC Chrome·Edge 1280px 기준 · 화면정의서(.md) + 로파이 목업(.html) 쌍 작성 완료 · P1·P2 화면은 2차 기획</div>
+  <div class="meta">기준 산출물: PRD v1.2 · 정책서 v1.2 · IA v1.1 (<a href="../03-ia.md" style="color:#c9c9c9">03-ia.md</a>) · 갱신: 2026-10-02 (CR-002 · CR-003 · CR-004 반영)</div>
 </header>
 
 <div class="bar">
   <input id="q" placeholder="화면명 · ID · REQ · POL 검색" oninput="applyFilter()">
-  <button class="on" data-f="all" onclick="setF('all')">전체 13</button>
+  <button class="on" data-f="all" onclick="setF('all')">전체 16</button>
   <button data-f="entry" onclick="setF('entry')">진입·공통</button>
   <button data-f="bom" onclick="setF('bom')">BoM 작성·검증</button>
   <button data-f="quote" onclick="setF('quote')">견적</button>
@@ -70,7 +70,7 @@
   <div class="grid" id="grid-bom"></div>
   <div class="grp" id="g-quote">견적 <span>작성자(영업)만 · 확정 버전 기준</span></div>
   <div class="grid" id="grid-quote"></div>
-  <div class="grp" id="g-tool">조회·관리 <span>EOS 단건 검색 · 사용자 역할 관리(관리자)</span></div>
+  <div class="grp" id="g-tool">조회·관리 <span>EOS 검색(SKU 하나·여러 SKU) · 사용자 관리·환경설정·감사 로그·통계(관리자)</span></div>
   <div class="grid" id="grid-tool"></div>
 </div>
 
@@ -80,30 +80,33 @@
   · <b>[정의서]</b>는 화면정의서(.md)다. 구성요소 번호 <code>[n]</code>은 목업의 빨간 배지와 일치한다.<br>
   · <b>목업끼리 연결되어 있다.</b> 버튼·표 행·탭을 클릭하면 다음 화면(또는 같은 화면의 다음 상태)으로 이동한다. <b>이동 가능 요소 표시</b>를 켜면 클릭할 수 있는 요소가 파란 점선으로 보인다.<br>
   · 추천 시작점: <a href="SCR-003-BoM목록.html">SCR-003 BoM 목록</a> → 새 BoM → 업로드 → 검증 → 확정 → 견적 순서.<br>
-  · 표·금액의 예시 값은 샘플 파일(대웅제약 Cisco 구성형, EY한영 Cisco 가격형, Dell CASE1_Storage)에서 가져왔고, 금액은 정책서 POL-034·036 공식으로 계산했다.<br>
+  · 표·금액의 예시 값은 샘플 파일(대웅제약 Cisco 구성형, EY한영 Cisco 가격형, Dell CASE1_Storage)에서 가져왔고, 금액은 정책서 견적 계산 규칙(POL-034 ~ 036, 표준양식 VER1 — DEC-58)으로 계산했다.<br>
   · 문구는 정책서 원문이다. 정책서에 없는 공통 문구는 <code>03-ia.md</code> 4.1장에 있다. 문구를 바꾸려면 정책서(또는 IA)를 먼저 고친다.
 </footer>
 
 <script>
 const S = [
-  {id:"SCR-001",nm:"로그인·인증 오류",g:"entry",url:"/login",req:"REQ-001",pol:"POL-001, 002, 013",f:"SCR-001-로그인",d:"로그아웃 후 · SSO 실패 · 세션 만료 · 계정 정보 없음",r:"미인증"},
-  {id:"SCR-002",nm:"역할 대기",g:"entry",url:"/pending",req:"REQ-001, 002, 020",pol:"POL-002, 010, 013",f:"SCR-002-역할대기",d:"역할 미지정 안내 · 내 계정 정보 · 다시 확인",r:"역할 미지정"},
-  {id:"SCR-013",nm:"권한 없음 안내",g:"entry",url:"/403, /404",req:"REQ-002, 015",pol:"POL-008, 009",f:"SCR-013-권한없음",d:"403 / 404 · 견적 존재 여부는 403으로 숨김",r:"로그인 사용자"},
-  {id:"SCR-003",nm:"BoM 목록",g:"bom",url:"/boms",req:"REQ-014",pol:"POL-006, 008, 009",f:"SCR-003-BoM목록",d:"조건 AND 검색 · SKU 3자 이상 · 20건/페이지 · 최종 수정일 최신순",r:"3역할"},
-  {id:"SCR-004",nm:"새 BoM 만들기 (모달)",g:"bom",url:"/boms?new=1",req:"REQ-003",pol:"POL-003, 004, 008",f:"SCR-004-새BoM",d:"고객사명 1~50자 · 건명 1~100자 · 중복 허용",r:"영업"},
-  {id:"SCR-005",nm:"BoM 상세 — 표준 BoM",g:"bom",url:"/boms/{bomId}/v/{n}",req:"REQ-005, 006, 008, 012, 013, 015",pol:"POL-004, 005, 007~009, 016~020, 029, 039",f:"SCR-005-BoM상세",d:"계층 표 · 셀 편집 · 수정됨 표시 · 가격 열(작성자) · Dell 하위 제품 · 충돌·이탈 대화상자",r:"3역할 / 편집 작성자"},
-  {id:"SCR-006",nm:"파일 업로드·형식 판별 (패널)",g:"bom",url:"…/v/{n}?upload=1",req:"REQ-004, 005",pol:"POL-005, 014, 015, 016, 019",f:"SCR-006-파일업로드",d:"거부 사유 7종 · 판별 안내 · 형식 직접 선택 · 변환 요약",r:"작성자"},
-  {id:"SCR-007",nm:"검증 결과·확정",g:"bom",url:"…/v/{n}/validation",req:"REQ-007 ~ 011",pol:"POL-021 ~ 032, 039",f:"SCR-007-검증결과",d:"진행 3단계 · R1~R9 판정 · AI 권고 · 확인함 · 확정 비활성 사유 6종",r:"3역할 / 확정 작성자"},
-  {id:"SCR-008",nm:"버전 이력·비교",g:"bom",url:"/boms/{bomId}/versions",req:"REQ-012, 013",pol:"POL-004, 007, 008, 009, 039",f:"SCR-008-버전이력",d:"버전 목록 · 새 버전 · 두 버전 비교(계보 ID)",r:"3역할 / 새 버전 작성자"},
-  {id:"SCR-009",nm:"견적 편집",g:"quote",url:"…/v/{n}/quotes/{quoteId}",req:"REQ-009, 015, 016, 017, 028",pol:"POL-005, 007, 009, 033 ~ 038",f:"SCR-009-견적편집",d:"환율 · 구분별 DC율 · 마진율 · 행별 원가·견적가 · 번들 포함 · 견적서 제외 · 원가분석표",r:"작성자"},
-  {id:"SCR-010",nm:"견적서 다운로드 (모달)",g:"quote",url:"…/quotes/{quoteId}?doc=1",req:"REQ-018",pol:"POL-007, 011, 033, 036, 037",f:"SCR-010-견적서다운로드",d:"단일 표형 / Summary형 · xlsx / PDF · 부대 문구 기본값 · VAT",r:"작성자"},
-  {id:"SCR-011",nm:"EOS 검색",g:"tool",url:"/eos",req:"REQ-019",pol:"POL-008, 012, 024, 029",f:"SCR-011-EOS검색",d:"Cisco·Dell AI 검색(출처 필수) · 캐시 7일 · 다시 조회",r:"3역할"},
-  {id:"SCR-012",nm:"사용자 역할 관리",g:"tool",url:"/admin/users",req:"REQ-020",pol:"POL-002, 008, 010, 011, 013",f:"SCR-012-사용자역할관리",d:"역할 필터 · 일괄 지정 · 자기 관리자 해제 불가",r:"관리자"},
+  {id:"SCR-001",v:"v1.1",nm:"로그인·인증 오류",g:"entry",url:"/login",req:"REQ-001, 037",pol:"POL-001, 002, 013, 047",f:"SCR-001-로그인",d:"로그아웃 후 · SSO 실패 · 세션 만료 · 계정 정보 없음 · 비활성 계정",r:"미인증"},
+  {id:"SCR-002",v:"v1.1",nm:"역할 대기",g:"entry",url:"/pending",req:"REQ-001, 002, 020, 036",pol:"POL-002, 010, 013, 046",f:"SCR-002-역할대기",d:"역할 미지정 안내 · 내 계정 정보 · 다시 확인 · 공지 배너",r:"역할 미지정"},
+  {id:"SCR-013",v:"v1.0",nm:"권한 없음 안내",g:"entry",url:"/403, /404",req:"REQ-002, 015",pol:"POL-008, 009",f:"SCR-013-권한없음",d:"403 / 404 · 견적 존재 여부는 403으로 숨김",r:"로그인 사용자"},
+  {id:"SCR-003",v:"v1.1",nm:"BoM 목록",g:"bom",url:"/boms",req:"REQ-014",pol:"POL-006, 008, 009",f:"SCR-003-BoM목록",d:"조건 AND 검색 · SKU 3자 이상 · 20건/페이지 · 최종 수정일 최신순 · 새 BoM·내 BoM만 보기(영업·관리자)",r:"3역할"},
+  {id:"SCR-004",v:"v1.0",nm:"새 BoM 만들기 (모달)",g:"bom",url:"/boms?new=1",req:"REQ-003",pol:"POL-003, 004, 008",f:"SCR-004-새BoM",d:"고객사명 1~50자 · 건명 1~100자 · 중복 허용",r:"영업·관리자"},
+  {id:"SCR-005",v:"v1.1",nm:"BoM 상세 — 표준 BoM",g:"bom",url:"/boms/{bomId}/v/{n}",req:"REQ-005, 006, 008, 012, 013, 015, 038",pol:"POL-004, 005, 007~009, 016~020, 029, 039, 048",f:"SCR-005-BoM상세",d:"계층 표 · 셀 편집 · 수정됨 표시 · 가격 열(작성자) · Dell 하위 제품 · 충돌·이탈 대화상자 · BoM 건 복제",r:"3역할 / 편집 작성자"},
+  {id:"SCR-006",v:"v1.0",nm:"파일 업로드·형식 판별 (패널)",g:"bom",url:"…/v/{n}?upload=1",req:"REQ-004, 005",pol:"POL-005, 014, 015, 016, 019",f:"SCR-006-파일업로드",d:"거부 사유 7종 · 판별 안내 · 형식 직접 선택 · 변환 요약",r:"작성자"},
+  {id:"SCR-007",v:"v1.2",nm:"검증 결과·확정",g:"bom",url:"…/v/{n}/validation",req:"REQ-007 ~ 011, 033",pol:"POL-021 ~ 032, 039, 043",f:"SCR-007-검증결과",d:"진행 3단계 · R1~R9 판정 · AI 권고 · 확인함(일괄) · 확정 비활성 사유 6종 · R8 관리자 등록 표시",r:"3역할 / 확정 작성자"},
+  {id:"SCR-008",v:"v1.0",nm:"버전 이력·비교",g:"bom",url:"/boms/{bomId}/versions",req:"REQ-012, 013",pol:"POL-004, 007, 008, 009, 039",f:"SCR-008-버전이력",d:"버전 목록 · 새 버전 · 두 버전 비교(계보 ID)",r:"3역할 / 새 버전 작성자"},
+  {id:"SCR-009",v:"v1.1",nm:"견적 편집",g:"quote",url:"…/v/{n}/quotes/{quoteId}",req:"REQ-009, 015, 016, 017, 039 (028 폐지)",pol:"POL-005, 007, 009, 033 ~ 037, 040, 049",f:"SCR-009-견적편집",d:"표준양식 VER1 계산 · 환율 · 전체 설정 · 행별 할인율·목표 GP·매입 DC · EOS × 유효기간 · 이전 버전 견적에서 만들기 · 견적서 제외",r:"작성자"},
+  {id:"SCR-010",v:"v1.1",nm:"견적서 다운로드 (모달)",g:"quote",url:"…/quotes/{quoteId}?doc=1",req:"REQ-018, 030, 032",pol:"POL-007, 011, 033, 036, 037, 040, 042",f:"SCR-010-견적서다운로드",d:"단일 표형 / Summary형(+상세) · xlsx / PDF · 거래 조건 선택지 · 내 기본값 · EOS 경고 · VAT",r:"작성자"},
+  {id:"SCR-011",v:"v1.1",nm:"EOS 검색",g:"tool",url:"/eos, /eos?mode=bulk",req:"REQ-019, 033, 040",pol:"POL-008, 012, 024, 029, 043, 050",f:"SCR-011-EOS검색",d:"SKU 하나 / 여러 SKU(최대 100개·xlsx) · AI 검색(출처 필수) · 관리자 등록 · 캐시 7일 · 다시 조회",r:"3역할"},
+  {id:"SCR-012",v:"v1.1",nm:"사용자 역할 관리",g:"tool",url:"/admin/users",req:"REQ-020, 037",pol:"POL-002, 008, 010, 011, 013, 047",f:"SCR-012-사용자역할관리",d:"역할·상태 필터 · 일괄 지정 · 비활성화·다시 활성화 · 자기 관리자 해제·비활성화 불가",r:"관리자"},
+  {id:"SCR-014",v:"v1.0",nm:"환경설정",g:"tool",url:"/admin/settings?tab=…",req:"REQ-030, 031, 033, 036",pol:"POL-005, 008, 011, 029, 040, 041, 043, 046",f:"SCR-014-환경설정",d:"탭 6개: 견적서 회사 정보·CI · 견적 기본값·견적서 문구 · AI·EOS(연결 테스트) · AI 사용량·월 예산 · EOS 관리 · 공지·점검",r:"관리자"},
+  {id:"SCR-015",v:"v1.0",nm:"감사 로그",g:"tool",url:"/admin/audit",req:"REQ-034",pol:"POL-008, 011, 044",f:"SCR-015-감사로그",d:"사건·사용자·결과·기간 필터 · 50건/페이지 · CSV(최대 10만 건)",r:"관리자"},
+  {id:"SCR-016",v:"v1.0",nm:"통계",g:"tool",url:"/admin/stats",req:"REQ-035",pol:"POL-008, 011, 045",f:"SCR-016-통계",d:"활동 월별·사용자별·벤더별 · 검증 판정 · AI 권고 품질 지표",r:"관리자"},
 ];
 let F = "all", PV = false;
 function card(s) {
   return `<div class="card" data-g="${s.g}" data-t="${(s.id+" "+s.nm+" "+s.req+" "+s.pol+" "+s.d).toLowerCase()}">
-    <div class="ch"><div class="id">${s.id} <span class="chip p0">P0</span> <span class="chip draft">v1.0 승인</span> <span class="chip r">${s.r}</span></div>
+    <div class="ch"><div class="id">${s.id} <span class="chip p0">P0</span> <span class="chip draft">${s.v} 승인</span> <span class="chip r">${s.r}</span></div>
     <div class="nm">${s.nm}</div><div class="url">${s.url}</div></div>
     <div class="pv hidden" data-src="${s.f}.html"></div>
     <div class="cb"><b>${s.d}</b><br><span class="tag">${s.req}</span><span class="tag">${s.pol}</span></div>

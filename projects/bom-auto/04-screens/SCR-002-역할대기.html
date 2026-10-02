@@ -9,8 +9,8 @@
 </head>
 <body>
 <div class="wf-meta">
-  <strong>SCR-002 역할 대기</strong> · v1.0 · 상태: 승인 · 정의서: <a href="SCR-002-역할대기.md">SCR-002-역할대기.md</a>
-  <div class="tags">REQ-001, REQ-002, REQ-020 · POL-002, POL-010, POL-013 · /pending</div>
+  <strong>SCR-002 역할 대기</strong> · v1.1 · 상태: 승인 · 정의서: <a href="SCR-002-역할대기.md">SCR-002-역할대기.md</a>
+  <div class="tags">REQ-001, REQ-002, REQ-020, REQ-036 · POL-002, POL-010, POL-013, POL-046 · /pending</div>
 </div>
 <div class="pinbar">
   상태:
@@ -19,10 +19,12 @@
   <button data-s="empty" onclick="setState('empty')">빈 상태(해당 없음)</button>
   <button data-s="error" onclick="setState('error')">에러</button>
   <button data-s="notyet" onclick="setState('notyet')">다시 확인 — 아직 미지정</button>
+  <button data-s="notice" onclick="setState('notice')">공지 배너</button>
 </div>
 
 <div class="pc">
   <div class="gnb"><span class="n">1</span><span class="logo">BoM 자동화</span><span class="spacer"></span><span class="me">홍길동 (역할 미지정)</span><span class="wf-btn sm" data-go="SCR-001-로그인.html">로그아웃</span></div>
+  <div class="banner info" style="margin:0" data-state="notice"><span class="n">6</span><b>점검</b> 오늘 18:00 ~ 19:00 서비스 점검이 있습니다. 작업 중인 내용은 미리 저장해 주세요. <span style="float:right;text-decoration:underline" data-go="#default">닫기</span></div>
   <div class="main" style="width:640px;margin:40px auto">
     <div class="wf-box solid" style="padding:18px"><span class="n abs">2</span>
       <div class="row"><div class="center" style="padding:0"><div class="ic" style="margin:0">i</div></div>
@@ -31,7 +33,7 @@
 
     <div class="wf-box"><span class="n abs">3</span>
       <div style="font-weight:bold;font-size:13px;margin-bottom:6px">내 계정 정보</div>
-      <div data-state="default notyet empty">
+      <div data-state="default notyet empty notice">
         <div class="kv"><b>이름</b>홍길동</div>
         <div class="kv"><b>계정</b>gildong@insunginfo.co.kr</div>
         <div class="kv"><b>부서</b>기업사업부 <span class="wf-text sm" data-state="empty">(부서가 없으면 「-」)</span></div>
@@ -42,7 +44,7 @@
     </div>
 
     <div class="row" style="position:relative">
-      <span class="n">4</span><span class="wf-btn primary" data-state="default empty error notyet" data-go="#notyet">다시 확인</span><span class="wf-btn dis" data-state="loading">⟳ 다시 확인</span>
+      <span class="n">4</span><span class="wf-btn primary" data-state="default empty error notyet notice" data-go="#notyet">다시 확인</span><span class="wf-btn dis" data-state="loading">⟳ 다시 확인</span>
       <span class="n">5</span><span class="wf-btn" data-go="SCR-001-로그인.html">로그아웃</span>
       <span class="wf-text sm">역할이 지정됐으면 → <a href="SCR-003-BoM목록.html">SCR-003</a></span>
     </div>
