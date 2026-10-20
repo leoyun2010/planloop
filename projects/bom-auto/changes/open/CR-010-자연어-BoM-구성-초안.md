@@ -8,11 +8,93 @@
 | 출처 | 사용자 제안 (2026-10-20) — 구현 저장소 `docs/decisions/open-decisions.md` DEC-93, 계획 `docs/plan/nl-bom-draft.md` |
 | 발생 단계 | 운영 (출시 뒤 기능 추가) |
 | 유형 | 기능 추가 |
-| 우선순위 | 미정 — **조건부 승인 제안**: 0단계 스파이크가 진행 기준(5장)을 넘으면 반영 |
+| 우선순위 | 미정 — **조건부 승인 제안**: 0단계 스파이크가 진행 기준(5장)을 넘으면 반영. 구현은 끝났고(2026-10-20) 기능은 꺼진 채 배포된다 — 0장 |
 
-> CR-003·008·009 와 달리 **구현 전에 올리는 CR** 이다. 승인되면 구현하고, 구현 중 바뀐 점은 반영 때 고친다.
+> 처음에는 **구현 전에 올린 CR** 이었다(2026-10-20 오전). 같은 날 사용자 요청으로 구현했다 — 구현이 2장 TO-BE 와 달라진 곳은 **0장 구현 메모**에 모았다. 반영(merge) 때는 0장을 기준으로 2장을 고친다.
 > 번호는 가번호(REQ-N1, POL-N1·N2, SCR-N1, TC-N1 ~ N12)다 — CR-005 ~ 009 반영 뒤 이어서 매긴다.
 > AS-IS 는 현재 승인 문서(CR-004 까지 반영)를 기준으로 한다.
+
+## 0. 구현 메모 (2026-10-20)
+
+구현 저장소 `9ee5e23`(기능)·`e9bfa7f`(정답셋 작성 안내 화면). 상세 위치는 구현 저장소 `docs/plan/nl-bom-draft.md` §5.1.
+검증: `check.ps1` ALL PASS(pytest 466·vitest 108), E2E 24 통과, 실제 Claude 호출 1건 확인(26초, 약 $0.25).
+
+### 0.1 진행 기준의 뜻이 바뀐 곳 — 승인 때 확인
+
+| 항목 | CR(2장·5장) | 구현 |
+|---|---|---|
+| 0단계 진행 기준(5장) | 넘으면 **구현** | 구현은 먼저 했다. 관리자 「AI 구성 초안 켜기」가 **처음 꺼진 채 배포**되고, 기준을 넘으면 **켠다** — 5장의 「구현」을 「켜기」로 읽는다 |
+
+### 0.2 2장 TO-BE 와 다른 곳
+
+| # | 항목 | CR(2장) | 구현 | 고칠 곳 |
+|---|---|---|---|---|
+| 1 | 시간 한도 | 서버 설정 `NL_DRAFT_TIMEOUT_SEC`(기본 180초) | 코드 상수 180초(①·② 합침) — 서버 `.env` 추가 없음. 3장 「새 환경변수」 없음 | POL-N1 시간 한도, 3장 개발 영향 |
+| 2 | 사내 이력 범위 | 같은 벤더의 확정 BoM 행 | **확정 버전의 벤더 파일에서 온 행**(직접 입력·AI 초안 행 제외) + 원가 단가 이력. AI 가 지어낸 SKU 가 BoM 으로 넘어간 뒤 「사내 이력」 등급을 받지 않게 | POL-N1 참고 자료, POL-N2 등급 표 「사내 이력」 조건 |
+| 3 | 참고 행 고르기 | 제품군과 맞는 것 | ①이 돌려준 제품군 검색어(최대 5개, 예 `Catalyst 9300`)가 SKU·품명에 들어간 행, 같은 SKU 는 한 번, 최근 것부터 200행 | POL-N1 참고 자료 |
+| 4 | 웹 검색 횟수·토큰 | 행당 EOS 와 같은 값 | 초안 1건당 상한 8회(코드 상수 — 시험 1건 3~4회), 최대 출력 토큰 = 「AI 검토」 값과 24,000 중 큰 값. 모델·생각 강도는 「AI 검토」 값 그대로 | POL-N1 설정 |
+| 5 | 고객사·프로젝트명 길이 | 200 · 400자 | BoM 건과 같은 50 · 100자(POL-003) — 넘치면 BoM 건 문구(「…자 이내로…」) | POL-N1 입력 표 |
+| 6 | 질문 판정 | 벤더·장비 종류·수량 중 정할 수 없는 것 | 같음 + 벤더가 「자동」인데 AI 도 벤더를 못 정하면 질문. 왕복 2번 뒤에도 벤더를 못 정하면 실패(`NL_DRAFT_VENDOR`). 다른 벤더로 판단하면 바로 실패 | POL-N1 핵심 정보 |
+| 7 | 통화 | (정하지 않음) | 한 초안 안에서는 사내 단가가 가장 많은 통화를 먼저 고른다(같으면 KRW·USD 순). 합계는 통화별. AI 추정가 통화가 없으면 USD | POL-N2 가격 출처 |
+| 8 | Dell 합계 | (정하지 않음) | 아래에 가격 있는 행이 있으면 그 아래 행들, 없으면 자기 행만 센다(표준 BoM 합산 대상과 같은 뜻 — 이중 계산 방지). 화면은 합계에서 뺀 행의 금액을 흐리게 | POL-N2 합계 |
+| 9 | BoM 만들기 — 행 | 행 출처 파일 이름 「AI 초안」 | 같음. 「AI 초안」 행은 직접 입력 행처럼 **벤더를 고칠 수 있다**. AI 가 구성품 아래에 구성품을 두면 최상위 행 바로 아래로 옮긴다(직접 만든 행은 상위 품목 → 구성품 두 단계, POL-020). 미확인 행 비고 「AI 초안 — SKU 확인 필요」 | POL-N2 BoM 만들기, POL-020 |
+| 10 | BoM 만들기 — 두 번째 | 만든 BoM 으로 이동 | 같음(응답 `created: false`). 만든 BoM 을 지웠으면 다시 만들 수 있다 | POL-N2 |
+| 11 | 기록 | 요구사항 글(가린 뒤) | 같음 — **가리기 전 글은 남기지 않는다**(다시 만들기 때 처음 값도 가린 글). 감사 로그 `NL_DRAFT_RUN`(요청·답하고 이어서마다, 벤더 선택·왕복 수), `NL_DRAFT_TO_BOM`(BoM ID·행 수) + 기존 `BOM_CREATE`. 사용량 종류 `NL_SPEC`·`NL_DRAFT` | POL-N1 기록, POL-011 |
+| 12 | 서버 재기동 | (정하지 않음) | 실행 중이던 초안은 실패(`NL_DRAFT_FAILED`)로 정리 — 다시 요청한다(검증과 같다) | POL-N1 |
+| 13 | 화면 경로 | (IA 안) | `/drafts`(새 요청 + 내 최근 초안 20건), `/drafts/{id}`(진행·질문·결과, 2초 폴링). 사이드바 [AI 구성 초안](작성자 역할, 꺼져 있어도 보이고 화면에서 안내) | IA, SCR-N1 |
+| 14 | 정답셋 작성 안내 | (없음) | 도움말 화면 `/help/goldset` 추가(영업·관리자) — 0단계 정답셋 작성 규칙, cases.csv 한 줄 만들기(엑셀용·CSV 복사, 모델명 경고), 양식 받기. 측정 도구라 SCR 번호 없이 `/help/quote` 와 같은 도움말로 둘지 정한다 | IA(도움말) |
+| 15 | 문구 | 2장 표 | 실제 카탈로그 문구(아래 0.3) | POL-N1 위반/실패 표 |
+
+### 0.3 실제 문구 (구현 카탈로그 `shared/messages.ko.json`)
+
+| 코드 | HTTP | 문구 |
+|---|---|---|
+| `NL_DRAFT_REQUEST_REQUIRED` | 400 | 요구사항을 입력해 주세요. |
+| `NL_DRAFT_REQUEST_LENGTH` | 400 | 요구사항은 10 ~ 2,000자로 입력해 주세요. |
+| `NL_DRAFT_ANSWER_TOO_LONG` | 400 | 답은 질문마다 500자 이내로 입력해 주세요. |
+| `NL_DRAFT_OFF` | 503 | AI 구성 초안을 지금 사용할 수 없습니다. 관리자에게 문의해 주세요. |
+| `NL_DRAFT_VENDOR` | (초안 실패) | Cisco·Dell 구성만 만들 수 있습니다. 벤더를 골라 다시 요청해 주세요. |
+| `NL_DRAFT_FAILED` | (초안 실패) | 초안을 만들지 못했습니다. 잠시 뒤 다시 시도해 주세요. |
+| `NL_DRAFT_BUSY` | 429 | 이미 만들고 있는 초안이 있거나 요청이 많습니다. 잠시 뒤 다시 시도해 주세요. |
+| `NL_DRAFT_STATE` | 409 | 지금 상태에서는 할 수 없습니다. 화면을 새로 고쳐 주세요. (질문이 없는데 답하기, 끝나지 않은 초안으로 BoM 만들기) |
+
+입력 안내 `NL_DRAFT_INPUT_NOTICE`, 고객사·프로젝트명 안내 `NL_DRAFT_NAMES_NOTE`, 합계 안내 `NL_DRAFT_ESTIMATE_NOTICE`, BoM 만들기 안내 `NL_DRAFT_TO_BOM_NOTE`, 진행 문구 `NL_DRAFT_RUNNING_SPEC`·`_DRAFT`, 환경설정 안내 `LLM_NL_DRAFT_NOTE` 는 카탈로그 그대로 옮긴다.
+
+### 0.4 API (POL-008 행 · SCR-N1)
+
+| 메서드 · 경로 | 내용 |
+|---|---|
+| `GET /api/nl-drafts` | 켜져 있는지(`enabled`) + 내 최근 초안 20건(요구사항 앞 120자) |
+| `POST /api/nl-drafts` | 요청 시작(202) — 요구사항·벤더 선택·고객사·프로젝트명(선택) |
+| `GET /api/nl-drafts/{id}` | 진행·질문·결과 (본인 초안만, 남의 것은 404) |
+| `POST /api/nl-drafts/{id}/answers` | 질문에 답하고 이어서(202) — 답 수 = 질문 수, 빈 답은 「모름」 |
+| `POST /api/nl-drafts/{id}/bom` | BoM 건 만들기(201) — 고객사·건명 필수 |
+
+### 0.5 TC 가번호 ↔ 자동 테스트
+
+| TC | 위치 |
+|---|---|
+| TC-N1 | `test_nl_drafts.py::test_off_by_default_and_author_roles_only`, `test_draft_grades_prices_and_masks_names`(남의 초안 404), E2E `test_draft_forbidden_for_engineer` |
+| TC-N2 | `test_input_checks`, `test_nl_draft_domain.py::test_check_request_and_mask` |
+| TC-N3 | `test_off_by_default_and_author_roles_only`, `test_failures`(관리자가 끄면 503) |
+| TC-N4 | `test_questions_then_answers`, `test_decide` |
+| TC-N5 | `test_draft_grades_prices_and_masks_names`(스텁 기록에 고객사·건명 없음, 참고 행 필드) |
+| TC-N6 | `llm_steps` 전송 필드 검사 — `build_llm_input("NL_SPEC"·"NL_DRAFT")` (기존 TC-103 방식) |
+| TC-N7 | `test_draft_grades_prices_and_masks_names`, `test_grade_and_price_order`, `test_dell_summed_lines_and_result_totals` |
+| TC-N8 | 사내 단가는 원가 단가 이력만 읽는다(`nl_draft_store.lookup`) — 견적 테이블을 읽지 않는다 |
+| TC-N9 | `test_failures`(fail·bad_json) |
+| TC-N10 | `test_failures`(429) |
+| TC-N11 | `test_to_bom`, `test_edit_rows_flatten_and_prices`, E2E `test_draft_questions_result_and_bom` |
+| TC-N12 | 수동(운영) — 구현 저장소 `qa-progress.md` N-32 |
+
+### 0.6 6장 「승인 때 정할 것」 — 구현은 제안대로
+
+#1 AI 추정 단가는 BoM List 단가에 넣지 않고 비고에만 · #2 초안 기록은 삭제 없음(본인 삭제 기능 없음) · #3 P1 · #4 사용자당 동시 1·분당 3, 전체 동시 4, 180초.
+
+### 0.7 함께 바뀐 것 (이 기능 밖)
+
+- AI 사용량 화면의 용도에 「AI 구성 초안」이 생겼다(POL-041 출처 `NL_DRAFT`). 일별 그래프의 여섯째 용도는 회색으로 그린다(계열 색 5개).
+- Claude 호출 클라이언트에 시간 한도 600초를 직접 준다(SDK 기본값과 같음) — 최대 출력 토큰이 클 때 SDK 가 비스트리밍 호출을 막던 것을 없앴다. 검증·EOS·내자 견적서 호출에도 같이 적용되며 동작은 같다.
 
 ## 1. 배경 (왜 바꾸는가)
 
